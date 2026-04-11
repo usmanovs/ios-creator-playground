@@ -1,5 +1,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Check, Clock, Tag, Zap, Star, MessageCircle } from 'lucide-react';
+import mbankQr from '@/assets/mbank-qr.png';
 
 const PricingSection = () => {
   const { t } = useLanguage();
