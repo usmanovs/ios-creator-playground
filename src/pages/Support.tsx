@@ -75,7 +75,7 @@ const Support = () => {
           <h2 className="text-xl font-semibold mb-4">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {[
-              { q: 'How do I get started with the program?', a: 'After enrolling, you'll receive access to our community and course materials via WhatsApp and Telegram. Our team will guide you through the onboarding process.' },
+              { q: 'How do I get started with the program?', a: "After enrolling, you'll receive access to our community and course materials via WhatsApp and Telegram. Our team will guide you through the onboarding process." },
               { q: 'What if I have technical issues with the app?', a: 'Reach out via WhatsApp or Telegram and our support team will help you troubleshoot any issues.' },
               { q: 'Can I get a refund?', a: 'Please contact us within 7 days of enrollment to discuss refund options.' },
               { q: 'Do I need prior coding experience?', a: 'No! The program is designed for anyone who wants to build an iOS app using AI — no prior coding experience required.' },
