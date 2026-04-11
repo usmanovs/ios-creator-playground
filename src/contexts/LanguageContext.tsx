@@ -117,7 +117,7 @@ const translations: Record<string, Record<Language, string>> = {
   'price.tier.current.when': { en: '1–2 weeks before start', ru: '1–2 недели до начала' },
   'price.tier.current.dates': { en: 'Apr 15 – Apr 26, 2026', ru: '15 апреля – 26 апреля 2026' },
   'price.tier.last': { en: 'Last Chance', ru: 'Последний шанс' },
-  'price.tier.last.amount': { en: '$300', ru: '$300' },
+  'price.tier.last.amount': { en: '$350', ru: '$350' },
   'price.tier.last.when': { en: 'Last 2 days', ru: 'Последние 2 дня' },
   'price.tier.last.dates': { en: 'Apr 27 – Apr 30, 2026', ru: '27 апреля – 30 апреля 2026' },
 
