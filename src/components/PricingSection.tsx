@@ -97,9 +97,7 @@ const PricingSection = () => {
             {/* QR */}
             <div className="bg-secondary/50 rounded-lg p-4 mb-4 text-center">
               <p className="text-xs text-muted-foreground mb-3">{t('plan.scanMbank')}</p>
-              <div className="w-32 h-32 bg-background border border-border rounded-lg mx-auto flex items-center justify-center text-xs text-muted-foreground">
-                QR Code
-              </div>
+              <img src={mbankQr} alt="Mbank QR Code" className="w-36 h-36 mx-auto rounded-lg" />
               <p className="text-xs text-muted-foreground mt-3">{t('plan.afterPayment')}</p>
             </div>
 
@@ -179,9 +177,7 @@ const PricingSection = () => {
             {/* QR */}
             <div className="bg-secondary/50 rounded-lg p-4 mb-4 text-center">
               <p className="text-xs text-muted-foreground mb-3">{t('plan.scanMbank')}</p>
-              <div className="w-32 h-32 bg-background border border-border rounded-lg mx-auto flex items-center justify-center text-xs text-muted-foreground">
-                QR Code
-              </div>
+              <img src={mbankQr} alt="Mbank QR Code" className="w-36 h-36 mx-auto rounded-lg" />
               <p className="text-xs text-muted-foreground mt-3">{t('plan.afterPayment')}</p>
             </div>
 
