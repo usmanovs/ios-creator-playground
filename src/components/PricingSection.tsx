@@ -91,7 +91,7 @@ const PricingSection = () => {
             <h3 className="text-xl font-bold text-foreground mb-2">{t('plan.rec.title')}</h3>
             <p className="text-sm text-muted-foreground mb-6">{t('plan.rec.desc')}</p>
 
-            <div className="text-4xl font-extrabold text-foreground mb-1">$150</div>
+            <div className="text-4xl font-extrabold text-foreground mb-1">$200</div>
             <p className="text-xs text-muted-foreground mb-6">{t('plan.oneTime')}</p>
 
             {/* QR */}
@@ -140,7 +140,7 @@ const PricingSection = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('plan.youPay')}</span>
-                <span className="text-primary font-bold">$150</span>
+                <span className="text-primary font-bold">$200</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('plan.savings')}</span>
@@ -169,8 +169,8 @@ const PricingSection = () => {
             <p className="text-sm text-muted-foreground mb-6">{t('plan.live.desc')}</p>
 
             <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-lg text-muted-foreground line-through">$280</span>
-              <span className="text-4xl font-extrabold text-foreground">$250</span>
+              <span className="text-lg text-muted-foreground line-through">$400</span>
+              <span className="text-4xl font-extrabold text-foreground">$350</span>
             </div>
             <p className="text-xs text-muted-foreground mb-6">{t('plan.oneTime')}</p>
 
@@ -220,7 +220,7 @@ const PricingSection = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('plan.youPay')}</span>
-                <span className="text-primary font-bold">$250</span>
+                <span className="text-primary font-bold">$350</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('plan.savings')}</span>
