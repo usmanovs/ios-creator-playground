@@ -1,6 +1,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCountdown } from '@/hooks/useCountdown';
-import { Users } from 'lucide-react';
+
 
 const HeroSection = () => {
   const { t } = useLanguage();
@@ -74,10 +74,33 @@ const HeroSection = () => {
         </a>
 
         {/* Social proof */}
-        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-foreground/40 animate-fade-in" style={{ animationDelay: '0.6s', animationFillMode: 'backwards' }}>
-          <Users className="w-4 h-4" />
-          <span>47+ {t('hero.students')}</span>
+        <div className="flex justify-center mt-8 animate-fade-in" style={{ animationDelay: '0.6s', animationFillMode: 'backwards' }}>
+          <div className="inline-flex items-center gap-4 pl-3 pr-6 py-2.5 rounded-full bg-card/40 border backdrop-blur-xl">
+            <div className="flex -space-x-3">
+              {[
+                'https://i.pravatar.cc/80?img=47',
+                'https://i.pravatar.cc/80?img=32',
+                'https://i.pravatar.cc/80?img=45',
+                'https://i.pravatar.cc/80?img=68',
+              ].map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt=""
+                  loading="lazy"
+                  className="w-9 h-9 rounded-full border-2 border-background object-cover"
+                />
+              ))}
+              <div className="w-9 h-9 rounded-full border-2 border-background bg-accent text-accent-foreground flex items-center justify-center text-[11px] font-bold">
+                +300
+              </div>
+            </div>
+            <p className="text-sm md:text-base font-semibold text-foreground">
+              300+ <span className="text-foreground/50 font-normal">{t('hero.students')}</span>
+            </p>
+          </div>
         </div>
+
       </div>
     </section>
   );
