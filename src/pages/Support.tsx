@@ -47,7 +47,7 @@ const Support = () => {
               </div>
             </a>
             <a
-              href="https://instagram.com/"
+              href="https://www.instagram.com/getforce_bootcamp/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-4 rounded-lg border border-border hover:bg-secondary/50 transition-colors"
