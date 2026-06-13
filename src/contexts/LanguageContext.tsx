@@ -21,7 +21,7 @@ const translations: Record<string, Record<Language, string>> = {
   'hero.title2': { en: 'That Earns', ru: 'Которое приносит' },
   'hero.title3': { en: '$10,000/month', ru: '$10,000/месяц' },
   'hero.subtitle': { en: 'Learn to build real iOS apps using AI — no prior coding experience needed. Go from zero to the App Store in 15 days.', ru: 'Научись создавать реальные iOS приложения с помощью ИИ — без опыта программирования. От нуля до App Store за 15 дней.' },
-  'hero.cta': { en: 'Enroll Now — $350', ru: 'Записаться — $350' },
+  'hero.cta': { en: 'Enroll Now — $399', ru: 'Записаться — $399' },
   'hero.students': { en: 'students enrolled', ru: 'студентов записались' },
   'hero.startDate': { en: 'Start Date', ru: 'Дата начала' },
   'hero.startDateVal': { en: 'May 1, 2026', ru: '1 мая 2026' },
@@ -117,7 +117,7 @@ const translations: Record<string, Record<Language, string>> = {
   'price.tier.current.when': { en: '1–2 weeks before start', ru: '1–2 недели до начала' },
   'price.tier.current.dates': { en: 'Apr 15 – Apr 26, 2026', ru: '15 апреля – 26 апреля 2026' },
   'price.tier.last': { en: 'Last Chance', ru: 'Последний шанс' },
-  'price.tier.last.amount': { en: '$350', ru: '$350' },
+  'price.tier.last.amount': { en: '$399', ru: '$399' },
   'price.tier.last.when': { en: 'Last 2 days', ru: 'Последние 2 дня' },
   'price.tier.last.dates': { en: 'Apr 27 – Apr 30, 2026', ru: '27 апреля – 30 апреля 2026' },
 
@@ -165,7 +165,7 @@ const translations: Record<string, Record<Language, string>> = {
 
   // Sticky CTA
   'sticky.text': { en: 'Limited spots available', ru: 'Количество мест ограничено' },
-  'sticky.cta': { en: 'Enroll — $350', ru: 'Записаться — $350' },
+  'sticky.cta': { en: 'Enroll — $399', ru: 'Записаться — $399' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
