@@ -6,7 +6,7 @@ const FooterSection = () => {
 
   const links = [
     { href: 'https://wa.me/12024554575', icon: MessageCircle, label: t('footer.whatsapp'), color: 'text-accent' },
-    { href: 'https://t.me/', icon: Send, label: t('footer.telegram'), color: 'text-primary' },
+    { href: 'https://t.me/ai_bootcamp', icon: Send, label: t('footer.telegram'), color: 'text-primary' },
     { href: 'https://www.instagram.com/getforce_bootcamp/', icon: Instagram, label: t('footer.instagram'), color: 'text-foreground' },
   ];
 
