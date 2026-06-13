@@ -22,7 +22,7 @@ const translations: Record<string, Record<Language, string>> = {
   'hero.title3': { en: '$10,000/month', ru: '$10,000/месяц' },
   'hero.subtitle': { en: 'Learn to build real iOS apps using AI — no prior coding experience needed. Go from zero to the App Store in 15 days.', ru: 'Научись создавать реальные iOS приложения с помощью ИИ — без опыта программирования. От нуля до App Store за 15 дней.' },
   'hero.cta': { en: 'Enroll Now — $399', ru: 'Записаться — $399' },
-  'hero.students': { en: 'students enrolled', ru: 'студентов записалось' },
+  'hero.students': { en: 'students already enrolled', ru: 'студентов уже записались' },
   'hero.startDate': { en: 'Start Date', ru: 'Дата начала' },
   'hero.startDateVal': { en: 'May 1, 2026', ru: '1 мая 2026' },
   'hero.goal': { en: 'Goal', ru: 'Цель' },
