@@ -65,13 +65,14 @@ const HeroSection = () => {
           href="https://wa.me/12024554575"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex px-8 py-4 text-lg font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105"
+          className="inline-flex px-8 py-4 text-lg font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 animate-slide-up"
+          style={{ animationDelay: '0.45s', animationFillMode: 'backwards' }}
         >
           {t('hero.cta')}
         </a>
 
         {/* Student count */}
-        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '0.6s', animationFillMode: 'backwards' }}>
           <Users className="w-4 h-4" />
           <span>47+ {t('hero.students')}</span>
         </div>
@@ -84,8 +85,9 @@ const HeroSection = () => {
             { icon: GraduationCap, label: t('hero.instructor'), value: t('hero.instructorVal') },
             { icon: Presentation, label: t('hero.demo'), value: t('hero.demoVal') },
           ].map((stat, i) => (
-            <div key={i} className="glass-card p-4 text-center">
+            <div key={i} className="glass-card p-4 text-center animate-slide-up hover:scale-105 hover:border-primary/40 transition-all" style={{ animationDelay: `${0.7 + i * 0.1}s`, animationFillMode: 'backwards' }}>
               <stat.icon className="w-5 h-5 text-primary mx-auto mb-2" />
+
               <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
               <div className="text-sm font-semibold text-foreground">{stat.value}</div>
             </div>
