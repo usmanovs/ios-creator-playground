@@ -3,7 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const CurriculumSection = () => {
   const { t } = useLanguage();
 
-  const weeks = ['week1', 'week2', 'week3', 'week4', 'week5'];
+  const weeks = ['week1', 'week2', 'week3', 'week4', 'week5', 'week6'];
 
   return (
     <section id="curriculum" className="py-20 px-4 relative">
