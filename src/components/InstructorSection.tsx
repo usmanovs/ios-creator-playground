@@ -1,5 +1,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AppWindow, Users, Clock } from 'lucide-react';
+import instructorPhoto from '@/assets/instructor.jpg.asset.json';
 
 const InstructorSection = () => {
   const { t } = useLanguage();
@@ -9,9 +10,12 @@ const InstructorSection = () => {
       <div className="max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12 text-foreground">{t('instructor.title')}</h2>
         <div className="glass-card p-8 flex flex-col md:flex-row items-center gap-8">
-          <div className="w-32 h-32 rounded-full bg-primary/20 border-2 border-primary/40 flex items-center justify-center shrink-0">
-            <span className="text-4xl">👨‍💻</span>
-          </div>
+          <img
+            src={instructorPhoto.url}
+            alt={t('instructor.name')}
+            className="w-32 h-32 rounded-full object-cover border-2 border-primary/40 shrink-0"
+          />
+
           <div className="text-center md:text-left">
             <h3 className="text-2xl font-bold text-foreground mb-2">{t('instructor.name')}</h3>
             <p className="text-muted-foreground leading-relaxed mb-6">{t('instructor.bio')}</p>
