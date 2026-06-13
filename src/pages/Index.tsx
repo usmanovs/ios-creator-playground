@@ -13,17 +13,22 @@ import StickyCtaBar from '@/components/StickyCtaBar';
 const Index = () => {
   return (
     <LanguageProvider>
-      <div className="min-h-screen bg-background pb-16">
-        <Navbar />
-        <HeroSection />
-        <InstructorSection />
-        <VibCoderSection />
-        <WhatYouGetSection />
-        <CurriculumSection />
-        <ScheduleSection />
-        <PricingSection />
-        <FooterSection />
-        <StickyCtaBar />
+      <div className="relative min-h-screen bg-background pb-20 overflow-x-hidden">
+        {/* Global aurora background */}
+        <div className="aurora-bg" aria-hidden="true" />
+
+        <div className="relative z-10">
+          <Navbar />
+          <HeroSection />
+          <InstructorSection />
+          <VibCoderSection />
+          <WhatYouGetSection />
+          <CurriculumSection />
+          <ScheduleSection />
+          <PricingSection />
+          <FooterSection />
+          <StickyCtaBar />
+        </div>
       </div>
     </LanguageProvider>
   );
