@@ -8,29 +8,42 @@ const HeroSection = () => {
 
   return (
     <section className="pt-24 pb-16 px-4 relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
+      {/* Animated background glows */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/20 blur-3xl animate-pulse-glow pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-accent/20 blur-3xl animate-pulse-glow pointer-events-none" style={{ animationDelay: '1.5s' }} />
+      {/* Grid pattern */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-30"
+        style={{
+          backgroundImage: 'linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+          maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 75%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 75%)',
+        }}
+      />
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary mb-8">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary mb-8 animate-fade-in">
           {t('hero.badge')}
         </div>
 
+
         {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 animate-slide-up">
           <span className="text-foreground">{t('hero.title1')}</span>
           <br />
           <span className="text-foreground">{t('hero.title2')} </span>
           <span className="gradient-text">{t('hero.title3')}</span>
         </h1>
 
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8 animate-slide-up" style={{ animationDelay: '0.15s', animationFillMode: 'backwards' }}>
           {t('hero.subtitle')}
         </p>
 
         {/* Countdown */}
-        <div className="mb-8">
+        <div className="mb-8 animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'backwards' }}>
+
           <p className="text-sm text-muted-foreground mb-3">{t('countdown.starts')}</p>
           <div className="flex justify-center gap-3">
             {[
@@ -52,13 +65,14 @@ const HeroSection = () => {
           href="https://wa.me/12024554575"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex px-8 py-4 text-lg font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105"
+          className="inline-flex px-8 py-4 text-lg font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 animate-slide-up"
+          style={{ animationDelay: '0.45s', animationFillMode: 'backwards' }}
         >
           {t('hero.cta')}
         </a>
 
         {/* Student count */}
-        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '0.6s', animationFillMode: 'backwards' }}>
           <Users className="w-4 h-4" />
           <span>47+ {t('hero.students')}</span>
         </div>
@@ -71,8 +85,9 @@ const HeroSection = () => {
             { icon: GraduationCap, label: t('hero.instructor'), value: t('hero.instructorVal') },
             { icon: Presentation, label: t('hero.demo'), value: t('hero.demoVal') },
           ].map((stat, i) => (
-            <div key={i} className="glass-card p-4 text-center">
+            <div key={i} className="glass-card p-4 text-center animate-slide-up hover:scale-105 hover:border-primary/40 transition-all" style={{ animationDelay: `${0.7 + i * 0.1}s`, animationFillMode: 'backwards' }}>
               <stat.icon className="w-5 h-5 text-primary mx-auto mb-2" />
+
               <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
               <div className="text-sm font-semibold text-foreground">{stat.value}</div>
             </div>
