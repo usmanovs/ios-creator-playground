@@ -91,7 +91,7 @@ const PricingSection = () => {
             <h3 className="text-xl font-bold text-foreground mb-2">{t('plan.rec.title')}</h3>
             <p className="text-sm text-muted-foreground mb-6">{t('plan.rec.desc')}</p>
 
-            <div className="text-4xl font-extrabold text-foreground mb-1">$200</div>
+            <div className="text-4xl font-extrabold text-foreground mb-1">$299</div>
             <p className="text-xs text-muted-foreground mb-6">{t('plan.oneTime')}</p>
 
             {/* QR */}
@@ -140,11 +140,11 @@ const PricingSection = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('plan.youPay')}</span>
-                <span className="text-primary font-bold">$200</span>
+                <span className="text-primary font-bold">$299</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('plan.savings')}</span>
-                <span className="text-green-400 font-bold">64%</span>
+                <span className="text-green-400 font-bold">46%</span>
               </div>
             </div>
 
