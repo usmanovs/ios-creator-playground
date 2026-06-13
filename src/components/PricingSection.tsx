@@ -91,7 +91,7 @@ const PricingSection = () => {
             <h3 className="text-xl font-bold text-foreground mb-2">{t('plan.rec.title')}</h3>
             <p className="text-sm text-muted-foreground mb-6">{t('plan.rec.desc')}</p>
 
-            <div className="text-4xl font-extrabold text-foreground mb-1">$200</div>
+            <div className="text-4xl font-extrabold text-foreground mb-1">$299</div>
             <p className="text-xs text-muted-foreground mb-6">{t('plan.oneTime')}</p>
 
             {/* QR */}
