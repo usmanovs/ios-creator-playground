@@ -5,46 +5,80 @@ const VibCoderSection = () => {
   const { t } = useLanguage();
 
   return (
-    <section className="py-20 px-4 relative">
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-accent/5 blur-[100px] pointer-events-none" />
-      <div className="max-w-5xl mx-auto relative z-10">
-        <h2 className="text-3xl font-bold text-center mb-3 text-foreground">{t('vibe.title')}</h2>
-        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">{t('vibe.subtitle')}</p>
+    <section className="py-24 md:py-32 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16 md:mb-20">
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            {t('vibe.title')}
+          </h2>
+          <p className="text-foreground/50 max-w-2xl mx-auto text-base md:text-lg">
+            {t('vibe.subtitle')}
+          </p>
+        </div>
 
         {/* Comparison */}
-        <div className="grid md:grid-cols-2 gap-6 mb-16">
-          <div className="glass-card p-6">
-            <h3 className="text-lg font-semibold text-muted-foreground mb-4">{t('vibe.traditional')}</h3>
-            {['trad1', 'trad2', 'trad3', 'trad4'].map((k) => (
-              <div key={k} className="flex items-center gap-3 mb-3 text-muted-foreground">
-                <X className="w-4 h-4 text-destructive shrink-0" />
-                <span className="text-sm">{t(`vibe.${k}`)}</span>
-              </div>
-            ))}
+        <div className="grid md:grid-cols-2 gap-4 mb-16">
+          <div className="glass-card p-10 md:p-12">
+            <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center mb-8">
+              <X className="w-5 h-5 text-destructive" />
+            </div>
+            <h3 className="font-display text-xl font-bold text-foreground/70 mb-8">
+              {t('vibe.traditional')}
+            </h3>
+            <ul className="space-y-5">
+              {['trad1', 'trad2', 'trad3', 'trad4'].map((k) => (
+                <li key={k} className="flex items-start gap-4 text-foreground/40">
+                  <div className="w-1.5 h-1.5 rounded-full bg-destructive/40 mt-2.5 shrink-0" />
+                  <span className="text-sm md:text-base">{t(`vibe.${k}`)}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="glass-card p-6 border-primary/30">
-            <h3 className="text-lg font-semibold text-primary mb-4">{t('vibe.vibeCoder')}</h3>
-            {['vib1', 'vib2', 'vib3', 'vib4'].map((k) => (
-              <div key={k} className="flex items-center gap-3 mb-3 text-foreground">
-                <Check className="w-4 h-4 text-green-400 shrink-0" />
-                <span className="text-sm">{t(`vibe.${k}`)}</span>
-              </div>
-            ))}
+
+          <div
+            className="glass-card p-10 md:p-12 relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, hsl(222 49% 17% / 0.6), hsl(240 28% 14% / 0.6))',
+              borderColor: 'hsl(141 71% 58% / 0.3)',
+              boxShadow: 'var(--shadow-glow-green)',
+            }}
+          >
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-accent/10 blur-[80px] rounded-full" />
+            <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-8 relative">
+              <Check className="w-5 h-5 text-accent" />
+            </div>
+            <h3 className="font-display text-xl font-bold text-accent mb-8 relative">
+              {t('vibe.vibeCoder')}
+            </h3>
+            <ul className="space-y-5 relative">
+              {['vib1', 'vib2', 'vib3', 'vib4'].map((k) => (
+                <li key={k} className="flex items-start gap-4 text-foreground/90">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent mt-2.5 shrink-0" />
+                  <span className="text-sm md:text-base">{t(`vibe.${k}`)}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
         {/* Feature cards */}
-        <div className="grid sm:grid-cols-2 gap-6">
+        <div className="grid sm:grid-cols-2 gap-4">
           {[
             { icon: Brain, key: 'card1' },
             { icon: Zap, key: 'card2' },
             { icon: Rocket, key: 'card3' },
             { icon: Sparkles, key: 'card4' },
           ].map(({ icon: Icon, key }) => (
-            <div key={key} className="glass-card p-6 hover:border-primary/30 transition-colors">
-              <Icon className="w-8 h-8 text-primary mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">{t(`vibe.${key}.title`)}</h3>
-              <p className="text-sm text-muted-foreground">{t(`vibe.${key}.desc`)}</p>
+            <div key={key} className="glass-card glass-card-hover p-8">
+              <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-5">
+                <Icon className="w-5 h-5 text-primary" />
+              </div>
+              <h3 className="font-display text-lg font-bold text-foreground mb-2">
+                {t(`vibe.${key}.title`)}
+              </h3>
+              <p className="text-sm text-foreground/50 leading-relaxed">
+                {t(`vibe.${key}.desc`)}
+              </p>
             </div>
           ))}
         </div>

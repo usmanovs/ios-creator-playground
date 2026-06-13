@@ -4,43 +4,38 @@ import { MessageCircle, Send, Instagram } from 'lucide-react';
 const FooterSection = () => {
   const { t } = useLanguage();
 
-  return (
-    <footer className="py-16 px-4 border-t border-border">
-      <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-2xl font-bold text-foreground mb-3">{t('footer.title')}</h2>
-        <p className="text-muted-foreground mb-8">{t('footer.question')}</p>
+  const links = [
+    { href: 'https://wa.me/12024554575', icon: MessageCircle, label: t('footer.whatsapp'), color: 'text-accent' },
+    { href: 'https://t.me/', icon: Send, label: t('footer.telegram'), color: 'text-primary' },
+    { href: 'https://instagram.com/', icon: Instagram, label: t('footer.instagram'), color: 'text-foreground' },
+  ];
 
-        <div className="flex justify-center gap-4 mb-12">
-          <a
-            href="https://wa.me/12024554575"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-3 rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors border border-green-600/30"
-          >
-            <MessageCircle className="w-5 h-5" />
-            {t('footer.whatsapp')}
-          </a>
-          <a
-            href="https://t.me/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-3 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors border border-blue-500/30"
-          >
-            <Send className="w-5 h-5" />
-            {t('footer.telegram')}
-          </a>
-          <a
-            href="https://instagram.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-3 rounded-lg bg-pink-500/20 text-pink-400 hover:bg-pink-500/30 transition-colors border border-pink-500/30"
-          >
-            <Instagram className="w-5 h-5" />
-            {t('footer.instagram')}
-          </a>
+  return (
+    <footer className="pt-24 pb-12 px-6 border-t border-foreground/5">
+      <div className="max-w-5xl mx-auto text-center">
+        <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3">
+          {t('footer.title')}
+        </h2>
+        <p className="text-foreground/50 mb-12">{t('footer.question')}</p>
+
+        <div className="flex flex-wrap justify-center gap-3 mb-16">
+          {links.map(({ href, icon: Icon, label, color }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-card/40 border border-foreground/10 backdrop-blur-xl text-sm font-bold tracking-wide hover:bg-card/60 transition-all ${color}`}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </a>
+          ))}
         </div>
 
-        <p className="text-xs text-muted-foreground">{t('footer.rights')}</p>
+        <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/30 font-bold">
+          {t('footer.rights')}
+        </p>
       </div>
     </footer>
   );

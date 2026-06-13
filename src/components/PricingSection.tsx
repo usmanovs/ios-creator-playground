@@ -11,19 +11,13 @@ const PricingSection = () => {
     { key: 'last', icon: Clock, status: 'upcoming' },
   ];
 
-  const recordingsFeatures = [
-    'plan.rec.f1', 'plan.rec.f2', 'plan.rec.f3', 'plan.rec.f4',
-  ];
-
-  const liveFeatures = [
-    'plan.live.f1', 'plan.live.f2', 'plan.live.f3', 'plan.live.f4', 'plan.live.f5', 'plan.live.f6',
-  ];
+  const recordingsFeatures = ['plan.rec.f1', 'plan.rec.f2', 'plan.rec.f3', 'plan.rec.f4'];
+  const liveFeatures = ['plan.live.f1', 'plan.live.f2', 'plan.live.f3', 'plan.live.f4', 'plan.live.f5', 'plan.live.f6'];
 
   const recordingsValue = [
     { label: 'plan.rec.v1', value: '$400' },
     { label: 'plan.rec.v2', value: '$150' },
   ];
-
   const liveValue = [
     { label: 'plan.live.v1', value: '$494' },
     { label: 'plan.live.v2', value: '$400' },
@@ -31,215 +25,231 @@ const PricingSection = () => {
   ];
 
   return (
-    <section id="pricing" className="py-20 px-4 relative">
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-accent/5 blur-[100px] pointer-events-none" />
-      <div className="max-w-5xl mx-auto relative z-10">
+    <section id="pricing" className="py-24 md:py-32 px-6">
+      <div className="max-w-6xl mx-auto">
         {/* Price Timeline */}
-        <h2 className="text-3xl font-bold text-center mb-3 text-foreground">
-          {t('price.timeline.title')}
-        </h2>
-        <p className="text-center text-muted-foreground mb-10">
-          {t('price.timeline.subtitle')}
-        </p>
+        <div className="text-center mb-12">
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
+            {t('price.timeline.title')}
+          </h2>
+          <p className="text-foreground/50">{t('price.timeline.subtitle')}</p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24">
           {tiers.map((tier) => {
             const isActive = tier.status === 'active';
             const isExpired = tier.status === 'expired';
             return (
               <div
                 key={tier.key}
-                className={`relative rounded-xl border p-6 text-center transition-all ${
+                className={`relative rounded-[2rem] border backdrop-blur-2xl p-7 text-center transition-all ${
                   isActive
-                    ? 'border-primary bg-primary/10 shadow-lg shadow-primary/10'
+                    ? 'border-primary/60 bg-card/60'
                     : isExpired
-                    ? 'border-border/50 opacity-50'
-                    : 'border-border'
+                    ? 'border-foreground/5 bg-card/20 opacity-50'
+                    : 'border-foreground/10 bg-card/30'
                 }`}
+                style={isActive ? { boxShadow: 'var(--shadow-glow-violet)' } : undefined}
               >
                 {isExpired && (
                   <div className="absolute inset-0 flex items-center justify-center z-10">
-                    <span className="text-sm font-bold text-destructive bg-background/80 px-3 py-1 rounded-full border border-destructive/30">
+                    <span className="text-xs font-bold uppercase tracking-widest text-destructive bg-background/80 px-4 py-1.5 rounded-full border border-destructive/30">
                       {t('price.expired')}
                     </span>
                   </div>
                 )}
                 {isActive && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold bg-primary text-primary-foreground px-3 py-1 rounded-full">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-[0.2em] bg-primary text-primary-foreground px-4 py-1.5 rounded-full">
                     {t('price.current')}
                   </div>
                 )}
-                <tier.icon className={`w-5 h-5 mx-auto mb-2 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                <div className="text-sm font-medium text-muted-foreground mb-1">{t(`price.tier.${tier.key}`)}</div>
-                <div className={`text-3xl font-extrabold mb-1 ${isActive ? 'text-primary' : 'text-foreground'}`}>
+                <tier.icon className={`w-5 h-5 mx-auto mb-3 ${isActive ? 'text-primary' : 'text-foreground/40'}`} />
+                <div className="text-xs uppercase tracking-widest text-foreground/50 mb-2">{t(`price.tier.${tier.key}`)}</div>
+                <div className={`font-display text-4xl font-bold mb-2 ${isActive ? 'text-primary' : 'text-foreground'}`}>
                   {t(`price.tier.${tier.key}.amount`)}
                 </div>
-                <div className="text-xs text-muted-foreground">{t(`price.tier.${tier.key}.when`)}</div>
-                <div className="text-xs text-muted-foreground mt-1">{t(`price.tier.${tier.key}.dates`)}</div>
+                <div className="text-xs text-foreground/40">{t(`price.tier.${tier.key}.when`)}</div>
+                <div className="text-xs text-foreground/40 mt-1">{t(`price.tier.${tier.key}.dates`)}</div>
               </div>
             );
           })}
         </div>
 
         {/* Plans */}
-        <h2 className="text-3xl font-bold text-center mb-3 text-foreground">{t('price.plans.title')}</h2>
-        <p className="text-center text-muted-foreground mb-10">{t('price.plans.subtitle')}</p>
+        <div className="text-center mb-16">
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            {t('price.plans.title')}
+          </h2>
+          <p className="text-foreground/50 text-base md:text-lg">{t('price.plans.subtitle')}</p>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Recordings Only */}
-          <div className="glass-card p-8 border-border">
-            <h3 className="text-xl font-bold text-foreground mb-2">{t('plan.rec.title')}</h3>
-            <p className="text-sm text-muted-foreground mb-6">{t('plan.rec.desc')}</p>
+          <div className="glass-card p-8 md:p-10 flex flex-col">
+            <h3 className="font-display text-2xl font-bold text-foreground mb-2">{t('plan.rec.title')}</h3>
+            <p className="text-sm text-foreground/50 leading-relaxed mb-8">{t('plan.rec.desc')}</p>
 
-            <div className="text-4xl font-extrabold text-foreground mb-1">$299</div>
-            <p className="text-xs text-muted-foreground mb-6">{t('plan.oneTime')}</p>
+            <div className="flex items-baseline gap-3 mb-1">
+              <span className="font-display text-5xl font-bold text-foreground">$299</span>
+              <span className="text-foreground/30 line-through text-lg">$550</span>
+            </div>
+            <p className="text-xs text-foreground/40 mb-8">{t('plan.oneTime')}</p>
 
             {/* QR */}
-            <div className="bg-secondary/50 rounded-lg p-4 mb-4 text-center">
-              <p className="text-xs text-muted-foreground mb-3">{t('plan.scanMbank')}</p>
-              <img src={mbankQr} alt="Mbank QR Code" className="w-36 h-36 mx-auto rounded-lg" />
-              <p className="text-xs text-muted-foreground mt-3">{t('plan.afterPayment')}</p>
+            <div className="rounded-2xl bg-background/60 border border-foreground/5 p-5 mb-4 text-center">
+              <p className="text-[10px] uppercase tracking-widest text-foreground/40 mb-3">{t('plan.scanMbank')}</p>
+              <img src={mbankQr} alt="Mbank QR Code" className="w-32 h-32 mx-auto rounded-lg" />
+              <p className="text-xs text-foreground/40 mt-3">{t('plan.afterPayment')}</p>
             </div>
 
             <a
               href="https://wa.me/12024554575"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors mb-3"
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-accent text-accent-foreground font-bold transition-all hover:brightness-110 mb-3"
+              style={{ boxShadow: 'var(--shadow-glow-green)' }}
             >
               <MessageCircle className="w-4 h-4" />
               {t('plan.confirmWhatsapp')}
             </a>
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-xs text-muted-foreground">{t('plan.or')}</span>
-              <div className="flex-1 h-px bg-border" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-1 h-px bg-foreground/10" />
+              <span className="text-[10px] uppercase tracking-widest text-foreground/40">{t('plan.or')}</span>
+              <div className="flex-1 h-px bg-foreground/10" />
             </div>
 
             <a
               href="https://wa.me/12024554575"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full py-3 rounded-lg border border-border text-center text-sm font-medium text-foreground hover:bg-secondary/50 transition-colors mb-8"
+              className="block w-full py-3.5 rounded-2xl border border-foreground/10 text-center text-sm font-bold text-foreground/80 hover:bg-card/60 transition-colors mb-8"
             >
               {t('plan.payCard')}
             </a>
 
             {/* Value breakdown */}
-            <div className="space-y-2 mb-4">
+            <div className="space-y-2 mb-6">
               {recordingsValue.map((item) => (
                 <div key={item.label} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t(item.label)}</span>
-                  <span className="text-foreground">{item.value}</span>
+                  <span className="text-foreground/50">{t(item.label)}</span>
+                  <span className="text-foreground/80">{item.value}</span>
                 </div>
               ))}
-              <div className="border-t border-border pt-2 flex justify-between text-sm">
-                <span className="text-muted-foreground">{t('plan.totalValue')}</span>
+              <div className="border-t border-foreground/10 pt-2 flex justify-between text-sm">
+                <span className="text-foreground/50">{t('plan.totalValue')}</span>
                 <span className="text-foreground font-semibold">$550</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t('plan.youPay')}</span>
+                <span className="text-foreground/50">{t('plan.youPay')}</span>
                 <span className="text-primary font-bold">$299</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t('plan.savings')}</span>
-                <span className="text-green-400 font-bold">46%</span>
+                <span className="text-foreground/50">{t('plan.savings')}</span>
+                <span className="text-accent font-bold">46%</span>
               </div>
             </div>
 
-            <div className="border-t border-border pt-6 space-y-3">
+            <div className="border-t border-foreground/10 pt-6 space-y-3 mt-auto">
               {recordingsFeatures.map((key) => (
                 <div key={key} className="flex items-center gap-3">
-                  <Check className="w-4 h-4 text-green-400 shrink-0" />
-                  <span className="text-sm text-foreground">{t(key)}</span>
+                  <Check className="w-4 h-4 text-accent shrink-0" />
+                  <span className="text-sm text-foreground/80">{t(key)}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Live Sessions */}
-          <div className="glass-card p-8 border-primary/30 relative">
-            <div className="absolute -top-3 right-6 flex items-center gap-1 text-xs font-bold bg-primary text-primary-foreground px-3 py-1 rounded-full">
+          {/* Live Sessions — featured */}
+          <div
+            className="relative rounded-[2rem] p-8 md:p-10 flex flex-col backdrop-blur-2xl"
+            style={{
+              background: 'linear-gradient(180deg, hsl(222 49% 17% / 0.7), hsl(240 28% 14% / 0.6))',
+              border: '2px solid hsl(252 92% 76% / 0.6)',
+              boxShadow: 'var(--shadow-glow-violet)',
+            }}
+          >
+            <div className="absolute -top-3 right-8 flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.2em] bg-primary text-primary-foreground px-4 py-1.5 rounded-full">
               <Star className="w-3 h-3" />
               {t('plan.popular')}
             </div>
 
-            <h3 className="text-xl font-bold text-foreground mb-2">{t('plan.live.title')}</h3>
-            <p className="text-sm text-muted-foreground mb-6">{t('plan.live.desc')}</p>
+            <h3 className="font-display text-2xl font-bold text-primary mb-2">{t('plan.live.title')}</h3>
+            <p className="text-sm text-foreground/50 leading-relaxed mb-8">{t('plan.live.desc')}</p>
 
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-lg text-muted-foreground line-through">$550</span>
-              <span className="text-4xl font-extrabold text-foreground">$399</span>
+            <div className="flex items-baseline gap-3 mb-1">
+              <span className="font-display text-5xl font-bold text-foreground">$399</span>
+              <span className="text-foreground/30 line-through text-lg">$550</span>
             </div>
-            <p className="text-xs text-muted-foreground mb-6">{t('plan.oneTime')}</p>
+            <p className="text-xs text-foreground/40 mb-8">{t('plan.oneTime')}</p>
 
             {/* QR */}
-            <div className="bg-secondary/50 rounded-lg p-4 mb-4 text-center">
-              <p className="text-xs text-muted-foreground mb-3">{t('plan.scanMbank')}</p>
-              <img src={mbankQr} alt="Mbank QR Code" className="w-36 h-36 mx-auto rounded-lg" />
-              <p className="text-xs text-muted-foreground mt-3">{t('plan.afterPayment')}</p>
+            <div className="rounded-2xl bg-background/60 border border-primary/20 p-5 mb-4 text-center">
+              <p className="text-[10px] uppercase tracking-widest text-primary font-bold mb-3">{t('plan.scanMbank')}</p>
+              <img src={mbankQr} alt="Mbank QR Code" className="w-32 h-32 mx-auto rounded-lg" />
+              <p className="text-xs text-foreground/40 mt-3">{t('plan.afterPayment')}</p>
             </div>
 
             <a
               href="https://wa.me/12024554575"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors mb-3"
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-accent text-accent-foreground font-bold transition-all hover:brightness-110 mb-3"
+              style={{ boxShadow: 'var(--shadow-glow-green)' }}
             >
               <MessageCircle className="w-4 h-4" />
               {t('plan.confirmWhatsapp')}
             </a>
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-xs text-muted-foreground">{t('plan.or')}</span>
-              <div className="flex-1 h-px bg-border" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-1 h-px bg-foreground/10" />
+              <span className="text-[10px] uppercase tracking-widest text-foreground/40">{t('plan.or')}</span>
+              <div className="flex-1 h-px bg-foreground/10" />
             </div>
 
             <a
               href="https://wa.me/12024554575"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full py-3 rounded-lg border border-border text-center text-sm font-medium text-foreground hover:bg-secondary/50 transition-colors mb-8"
+              className="block w-full py-3.5 rounded-2xl border border-foreground/10 text-center text-sm font-bold text-foreground/80 hover:bg-card/60 transition-colors mb-8"
             >
               {t('plan.payCard')}
             </a>
 
             {/* Value breakdown */}
-            <div className="space-y-2 mb-4">
+            <div className="space-y-2 mb-6">
               {liveValue.map((item) => (
                 <div key={item.label} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t(item.label)}</span>
-                  <span className="text-foreground">{item.value}</span>
+                  <span className="text-foreground/50">{t(item.label)}</span>
+                  <span className="text-foreground/80">{item.value}</span>
                 </div>
               ))}
-              <div className="border-t border-border pt-2 flex justify-between text-sm">
-                <span className="text-muted-foreground">{t('plan.totalValue')}</span>
+              <div className="border-t border-foreground/10 pt-2 flex justify-between text-sm">
+                <span className="text-foreground/50">{t('plan.totalValue')}</span>
                 <span className="text-foreground font-semibold">$1,194</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t('plan.youPay')}</span>
+                <span className="text-foreground/50">{t('plan.youPay')}</span>
                 <span className="text-primary font-bold">$399</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t('plan.savings')}</span>
-                <span className="text-green-400 font-bold">67%</span>
+                <span className="text-foreground/50">{t('plan.savings')}</span>
+                <span className="text-accent font-bold">67%</span>
               </div>
             </div>
 
-            <div className="border-t border-border pt-6 space-y-3">
+            <div className="border-t border-foreground/10 pt-6 space-y-3 mt-auto">
               {liveFeatures.map((key) => (
                 <div key={key} className="flex items-center gap-3">
-                  <Check className="w-4 h-4 text-green-400 shrink-0" />
-                  <span className="text-sm text-foreground">{t(key)}</span>
+                  <Check className="w-4 h-4 text-accent shrink-0" />
+                  <span className="text-sm text-foreground/80">{t(key)}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <p className="text-center text-sm text-muted-foreground mt-8">
+        <p className="text-center text-sm text-foreground/40 mt-10">
           👤 {t('price.ageRec')}
         </p>
       </div>
