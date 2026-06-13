@@ -78,10 +78,10 @@ const HeroSection = () => {
           <div className="inline-flex items-center gap-4 pl-3 pr-6 py-2.5 rounded-full bg-card/40 border backdrop-blur-xl">
             <div className="flex -space-x-3">
               {[
-                'https://i.pravatar.cc/80?img=47',
-                'https://i.pravatar.cc/80?img=32',
-                'https://i.pravatar.cc/80?img=45',
-                'https://i.pravatar.cc/80?img=68',
+                'https://i.pravatar.cc/80?img=12',
+                'https://i.pravatar.cc/80?img=33',
+                'https://i.pravatar.cc/80?img=44',
+                'https://i.pravatar.cc/80?img=60',
               ].map((src, i) => (
                 <img
                   key={i}
