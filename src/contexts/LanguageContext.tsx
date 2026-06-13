@@ -42,14 +42,14 @@ const translations: Record<string, Record<Language, string>> = {
   // Instructor
   'instructor.title': { en: 'Your Instructor', ru: 'Ваш инструктор' },
   'instructor.name': { en: 'Seyitbek Usmanov', ru: 'Сейитбек Усманов' },
-  'instructor.bio': { en: 'Experienced iOS developer and AI enthusiast. Has launched multiple apps on the App Store and helped hundreds of students turn their ideas into real products using AI-powered development.', ru: 'Опытный iOS-разработчик и энтузиаст ИИ. Запустил несколько приложений в App Store и помог сотням студентов превратить их идеи в реальные продукты с использованием ИИ.' },
+  'instructor.bio': { en: 'Experienced iOS developer and AI enthusiast. Has launched multiple apps on the App Store and helped hundreds of students turn their ideas into real products using AI-powered development. This course is built for absolute beginners — no prior Swift or programming experience required, just a Mac and curiosity.', ru: 'Опытный iOS-разработчик и энтузиаст ИИ. Запустил несколько приложений в App Store и помог сотням студентов превратить их идеи в реальные продукты с помощью ИИ. Курс рассчитан на абсолютных новичков — без опыта Swift и программирования, нужны только Mac и любопытство.' },
   'instructor.apps': { en: 'Apps Launched', ru: 'Запущено приложений' },
   'instructor.students': { en: 'Students Taught', ru: 'Обучено студентов' },
   'instructor.experience': { en: 'Years Experience', ru: 'Лет опыта' },
 
   // Vibe Coder
   'vibe.title': { en: 'What is a Vibe Coder?', ru: 'Что такое Vibe Coder?' },
-  'vibe.subtitle': { en: 'A new way to build apps — let AI write the code while you focus on the vision', ru: 'Новый способ создавать приложения — ИИ пишет код, а вы фокусируетесь на идее' },
+  'vibe.subtitle': { en: 'A new way to build apps — an AI-first workflow with Claude Code, Claude Desktop and Google Stitch, while you focus on the vision', ru: 'Новый способ создавать приложения — AI-first процесс с Claude Code, Claude Desktop и Google Stitch, а вы фокусируетесь на идее' },
   'vibe.traditional': { en: 'Traditional Developer', ru: 'Традиционный разработчик' },
   'vibe.vibeCoder': { en: 'Vibe Coder', ru: 'Vibe Coder' },
   'vibe.trad1': { en: 'Months learning syntax', ru: 'Месяцы на изучение синтаксиса' },
@@ -61,7 +61,7 @@ const translations: Record<string, Record<Language, string>> = {
   'vibe.vib3': { en: 'Describe what you want, AI builds it', ru: 'Опиши что хочешь, ИИ построит' },
   'vibe.vib4': { en: 'Ship in days, not months', ru: 'Запуск за дни, а не месяцы' },
   'vibe.card1.title': { en: 'AI-Powered Development', ru: 'Разработка с помощью ИИ' },
-  'vibe.card1.desc': { en: 'Use ChatGPT, Cursor, and other AI tools to write SwiftUI code faster than ever', ru: 'Используйте ChatGPT, Cursor и другие ИИ-инструменты для быстрого написания SwiftUI кода' },
+  'vibe.card1.desc': { en: 'Use Claude Code, Claude Desktop and Google Stitch to design, build and ship SwiftUI apps faster than ever', ru: 'Используйте Claude Code, Claude Desktop и Google Stitch, чтобы проектировать, разрабатывать и публиковать SwiftUI-приложения быстрее, чем когда-либо' },
   'vibe.card2.title': { en: 'No Experience Needed', ru: 'Опыт не нужен' },
   'vibe.card2.desc': { en: 'Our curriculum is designed for absolute beginners — start from zero', ru: 'Наша программа создана для абсолютных новичков — начните с нуля' },
   'vibe.card3.title': { en: 'Real App, Real Revenue', ru: 'Реальное приложение, реальный доход' },
