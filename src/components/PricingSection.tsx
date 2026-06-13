@@ -169,8 +169,8 @@ const PricingSection = () => {
             <p className="text-sm text-muted-foreground mb-6">{t('plan.live.desc')}</p>
 
             <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-lg text-muted-foreground line-through">$400</span>
-              <span className="text-4xl font-extrabold text-foreground">$350</span>
+              <span className="text-lg text-muted-foreground line-through">$550</span>
+              <span className="text-4xl font-extrabold text-foreground">$399</span>
             </div>
             <p className="text-xs text-muted-foreground mb-6">{t('plan.oneTime')}</p>
 
@@ -220,11 +220,11 @@ const PricingSection = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('plan.youPay')}</span>
-                <span className="text-primary font-bold">$350</span>
+                <span className="text-primary font-bold">$399</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('plan.savings')}</span>
-                <span className="text-green-400 font-bold">71%</span>
+                <span className="text-green-400 font-bold">67%</span>
               </div>
             </div>
 
