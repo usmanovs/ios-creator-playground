@@ -1,63 +1,60 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCountdown } from '@/hooks/useCountdown';
-import { Users, Calendar, Target, GraduationCap, Presentation } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 const HeroSection = () => {
   const { t } = useLanguage();
   const countdown = useCountdown('2026-05-01T00:00:00+06:00');
 
   return (
-    <section className="pt-24 pb-16 px-4 relative overflow-hidden">
-      {/* Animated background glows */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/20 blur-3xl animate-pulse-glow pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-accent/20 blur-3xl animate-pulse-glow pointer-events-none" style={{ animationDelay: '1.5s' }} />
-      {/* Grid pattern */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-30"
-        style={{
-          backgroundImage: 'linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-          maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 75%)',
-          WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 75%)',
-        }}
-      />
-
-      <div className="max-w-4xl mx-auto text-center relative z-10">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary mb-8 animate-fade-in">
-          {t('hero.badge')}
+    <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-20 text-center">
+      <div className="max-w-5xl mx-auto">
+        {/* Live badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card/40 border backdrop-blur-xl mb-10 animate-fade-in">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/70">
+            {t('hero.badge')}
+          </span>
         </div>
 
-
         {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 animate-slide-up">
+        <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-8 animate-slide-up">
           <span className="text-foreground">{t('hero.title1')}</span>
           <br />
           <span className="text-foreground">{t('hero.title2')} </span>
-          <span className="gradient-text">{t('hero.title3')}</span>
+          <span className="gradient-text drop-shadow-[0_0_30px_hsl(252_92%_76%/0.4)]">
+            {t('hero.title3')}
+          </span>
         </h1>
 
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8 animate-slide-up" style={{ animationDelay: '0.15s', animationFillMode: 'backwards' }}>
+        <p className="text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto mb-14 animate-slide-up" style={{ animationDelay: '0.15s', animationFillMode: 'backwards' }}>
           {t('hero.subtitle')}
         </p>
 
         {/* Countdown */}
-        <div className="mb-8 animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'backwards' }}>
-
-          <p className="text-sm text-muted-foreground mb-3">{t('countdown.starts')}</p>
-          <div className="flex justify-center gap-3">
-            {[
-              { val: countdown.days, label: t('countdown.days') },
-              { val: countdown.hours, label: t('countdown.hours') },
-              { val: countdown.minutes, label: t('countdown.minutes') },
-              { val: countdown.seconds, label: t('countdown.seconds') },
-            ].map((item, i) => (
-              <div key={i} className="glass-card px-4 py-3 min-w-[70px]">
-                <div className="text-2xl font-bold text-foreground">{String(item.val).padStart(2, '0')}</div>
-                <div className="text-xs text-muted-foreground">{item.label}</div>
+        <div className="flex justify-center items-end gap-6 md:gap-10 mb-10 animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'backwards' }}>
+          {[
+            { val: countdown.days, label: t('countdown.days') },
+            { val: countdown.hours, label: t('countdown.hours') },
+            { val: countdown.minutes, label: t('countdown.minutes') },
+          ].map((item, i, arr) => (
+            <div key={i} className="flex items-end gap-6 md:gap-10">
+              <div className="flex flex-col items-center">
+                <div className="font-display text-4xl md:text-5xl font-bold text-foreground tabular-nums">
+                  {String(item.val).padStart(2, '0')}
+                </div>
+                <div className="text-[10px] uppercase tracking-[0.2em] text-foreground/40 mt-1">
+                  {item.label}
+                </div>
               </div>
-            ))}
-          </div>
+              {i < arr.length - 1 && (
+                <div className="text-4xl md:text-5xl font-bold text-foreground/20 leading-none pb-5">:</div>
+              )}
+            </div>
+          ))}
         </div>
 
         {/* CTA */}
@@ -65,33 +62,21 @@ const HeroSection = () => {
           href="https://wa.me/12024554575"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex px-8 py-4 text-lg font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 animate-slide-up"
-          style={{ animationDelay: '0.45s', animationFillMode: 'backwards' }}
+          className="inline-flex items-center px-12 py-5 rounded-2xl font-bold text-lg md:text-xl text-primary-foreground transition-all hover:scale-105 active:scale-95 animate-slide-up"
+          style={{
+            background: 'var(--gradient-violet)',
+            boxShadow: 'var(--shadow-glow-violet)',
+            animationDelay: '0.45s',
+            animationFillMode: 'backwards',
+          }}
         >
           {t('hero.cta')}
         </a>
 
-        {/* Student count */}
-        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '0.6s', animationFillMode: 'backwards' }}>
+        {/* Social proof */}
+        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-foreground/40 animate-fade-in" style={{ animationDelay: '0.6s', animationFillMode: 'backwards' }}>
           <Users className="w-4 h-4" />
           <span>47+ {t('hero.students')}</span>
-        </div>
-
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
-          {[
-            { icon: Calendar, label: t('hero.startDate'), value: t('hero.startDateVal') },
-            { icon: Target, label: t('hero.goal'), value: t('hero.goalVal') },
-            { icon: GraduationCap, label: t('hero.instructor'), value: t('hero.instructorVal') },
-            { icon: Presentation, label: t('hero.demo'), value: t('hero.demoVal') },
-          ].map((stat, i) => (
-            <div key={i} className="glass-card p-4 text-center animate-slide-up hover:scale-105 hover:border-primary/40 transition-all" style={{ animationDelay: `${0.7 + i * 0.1}s`, animationFillMode: 'backwards' }}>
-              <stat.icon className="w-5 h-5 text-primary mx-auto mb-2" />
-
-              <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
-              <div className="text-sm font-semibold text-foreground">{stat.value}</div>
-            </div>
-          ))}
         </div>
       </div>
     </section>

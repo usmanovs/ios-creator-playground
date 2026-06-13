@@ -6,26 +6,46 @@ const CurriculumSection = () => {
   const weeks = ['week1', 'week2', 'week3', 'week4', 'week5', 'week6'];
 
   return (
-    <section id="curriculum" className="py-20 px-4 relative">
-      <div className="absolute top-1/2 left-0 w-[300px] h-[300px] rounded-full bg-primary/5 blur-[100px] pointer-events-none" />
-      <div className="max-w-3xl mx-auto relative z-10">
-        <h2 className="text-3xl font-bold text-center mb-3 text-foreground">{t('curr.title')}</h2>
-        <p className="text-center text-muted-foreground mb-12">{t('curr.subtitle')}</p>
+    <section id="curriculum" className="py-24 md:py-32 px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-16 md:mb-20">
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            {t('curr.title')}
+          </h2>
+          <p className="text-foreground/50 text-base md:text-lg">{t('curr.subtitle')}</p>
+        </div>
 
-        <div className="space-y-4">
-          {weeks.map((week, i) => (
-            <div key={week} className="glass-card p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                  <span className="text-sm font-bold text-primary">{i + 1}</span>
+        <div>
+          {weeks.map((week, i) => {
+            const isAccent = i % 2 === 0;
+            const isLast = i === weeks.length - 1;
+            return (
+              <div key={week} className="flex group">
+                <div className="flex flex-col items-center mr-6 md:mr-8">
+                  <div
+                    className={`w-11 h-11 rounded-full bg-card/60 border flex items-center justify-center font-display font-bold transition-all group-hover:scale-110 ${
+                      isAccent
+                        ? 'text-accent group-hover:bg-accent group-hover:text-accent-foreground'
+                        : 'text-primary group-hover:bg-primary group-hover:text-primary-foreground'
+                    }`}
+                  >
+                    {i + 1}
+                  </div>
+                  {!isLast && <div className="w-px flex-grow bg-foreground/10 mt-2" />}
                 </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2">{t(`curr.${week}`)}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{t(`curr.${week}.desc`)}</p>
+                <div className={`flex-grow ${isLast ? '' : 'pb-6'}`}>
+                  <div className="glass-card glass-card-hover p-7 md:p-8">
+                    <h3 className="font-display text-lg md:text-xl font-bold text-foreground mb-2">
+                      {t(`curr.${week}`)}
+                    </h3>
+                    <p className="text-sm md:text-base text-foreground/50 leading-relaxed">
+                      {t(`curr.${week}.desc`)}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

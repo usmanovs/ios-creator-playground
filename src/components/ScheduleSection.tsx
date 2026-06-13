@@ -5,13 +5,15 @@ const ScheduleSection = () => {
   const { t } = useLanguage();
 
   return (
-    <section className="py-20 px-4">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-3 text-foreground">{t('sched.title')}</h2>
-        <p className="text-center text-muted-foreground mb-12">{t('sched.subtitle')}</p>
+    <section className="py-24 md:py-32 px-6">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="font-display text-4xl md:text-5xl font-bold text-center text-foreground mb-4">
+          {t('sched.title')}
+        </h2>
+        <p className="text-center text-foreground/50 mb-16">{t('sched.subtitle')}</p>
 
-        <div className="glass-card p-8">
-          <div className="space-y-5">
+        <div className="glass-card p-8 md:p-12">
+          <div className="divide-y divide-foreground/5">
             {[
               { icon: Video, text: t('sched.format') },
               { icon: CalendarDays, text: t('sched.days') },
@@ -19,9 +21,11 @@ const ScheduleSection = () => {
               { icon: Clock, text: t('sched.duration') },
               { icon: PlayCircle, text: t('sched.recorded') },
             ].map(({ icon: Icon, text }, i) => (
-              <div key={i} className="flex items-center gap-4">
-                <Icon className="w-5 h-5 text-primary shrink-0" />
-                <span className="text-foreground">{text}</span>
+              <div key={i} className="flex items-center gap-5 py-4 first:pt-0 last:pb-0">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-foreground/90">{text}</span>
               </div>
             ))}
           </div>
