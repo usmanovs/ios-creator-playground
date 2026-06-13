@@ -144,7 +144,7 @@ const PricingSection = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('plan.savings')}</span>
-                <span className="text-green-400 font-bold">64%</span>
+                <span className="text-green-400 font-bold">46%</span>
               </div>
             </div>
 
