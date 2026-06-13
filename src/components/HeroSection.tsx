@@ -30,19 +30,20 @@ const HeroSection = () => {
 
 
         {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 animate-slide-up">
           <span className="text-foreground">{t('hero.title1')}</span>
           <br />
           <span className="text-foreground">{t('hero.title2')} </span>
           <span className="gradient-text">{t('hero.title3')}</span>
         </h1>
 
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8 animate-slide-up" style={{ animationDelay: '0.15s', animationFillMode: 'backwards' }}>
           {t('hero.subtitle')}
         </p>
 
         {/* Countdown */}
-        <div className="mb-8">
+        <div className="mb-8 animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'backwards' }}>
+
           <p className="text-sm text-muted-foreground mb-3">{t('countdown.starts')}</p>
           <div className="flex justify-center gap-3">
             {[
