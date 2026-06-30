@@ -111,6 +111,11 @@ export default function AdminPage() {
     if (isAdmin) load();
   }, [isAdmin, load]);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
   if (!ready) return <div className="p-10 text-foreground/60">Loading…</div>;
   if (!isAdmin)
     return (
@@ -292,12 +297,6 @@ export default function AdminPage() {
       await log("update", "lesson", updated.id, updated.title);
     }
   };
-
-  // Sensors for chapter drag
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
 
   const onChapterDragEnd = (e: DragEndEvent) => {
     const { active, over } = e;
