@@ -21,16 +21,17 @@ export default function CoursePage() {
 
       const { data: ch } = await supabase
         .from("chapters")
-        .select("id,title,position")
+        .select("id,title,order_index")
         .eq("course_id", COURSE_ID)
-        .order("position");
+        .order("order_index");
       setChapters(ch || []);
 
       const { data: ls } = await supabase
         .from("lessons")
-        .select("id,chapter_id,title,position,lesson_type")
+        .select("id,chapter_id,title,order_index,lesson_type")
         .eq("course_id", COURSE_ID)
-        .order("position");
+        .eq("status", "published")
+        .order("order_index");
       setLessons(ls || []);
     })();
   }, []);
