@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { ExternalLink, LogOut, Plus, BookOpen } from "lucide-react";
+import { ExternalLink, LogOut, Plus, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 import SortableChapter from "@/components/admin/SortableChapter";
 import LessonEditor, { EditableLesson } from "@/components/admin/LessonEditor";
 import AdminsPanel from "@/components/admin/AdminsPanel";
