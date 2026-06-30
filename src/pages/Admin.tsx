@@ -351,32 +351,52 @@ export default function AdminPage() {
 
         {/* Course info */}
         {course && (
-          <section className="glass-card rounded-2xl p-6 space-y-4">
-            <h2 className="font-display text-xl font-bold">Course</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Title</Label>
-                <Input value={course.title} onChange={(e) => setCourse({ ...course, title: e.target.value })} />
+          <section className="glass-card rounded-xl p-4">
+            <button
+              className="flex items-center justify-between w-full text-left"
+              onClick={() => setCourseExpanded((v) => !v)}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-medium uppercase tracking-wider text-foreground/50">Course</span>
+                <span className="font-display font-semibold">{course.title}</span>
+                {courseDirty && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">Unsaved</span>
+                )}
               </div>
-              <div className="space-y-2">
-                <Label>Cover image URL</Label>
-                <Input
-                  value={course.image_url ?? ""}
-                  onChange={(e) => setCourse({ ...course, image_url: e.target.value })}
-                />
+              {courseExpanded ? (
+                <ChevronUp className="w-4 h-4 text-foreground/50" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-foreground/50" />
+              )}
+            </button>
+            {courseExpanded && (
+              <div className="mt-4 pt-4 border-t border-border/50 space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Title</Label>
+                    <Input value={course.title} onChange={(e) => setCourse({ ...course, title: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Cover image URL</Label>
+                    <Input
+                      value={course.image_url ?? ""}
+                      onChange={(e) => setCourse({ ...course, image_url: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea
+                    value={course.description ?? ""}
+                    onChange={(e) => setCourse({ ...course, description: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+                <Button onClick={saveCourse} disabled={!courseDirty || savingCourse}>
+                  {savingCourse ? "Saving…" : courseDirty ? "Save course" : "Saved"}
+                </Button>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Description</Label>
-              <Textarea
-                value={course.description ?? ""}
-                onChange={(e) => setCourse({ ...course, description: e.target.value })}
-                rows={3}
-              />
-            </div>
-            <Button onClick={saveCourse} disabled={!courseDirty || savingCourse}>
-              {savingCourse ? "Saving…" : courseDirty ? "Save course" : "Saved"}
-            </Button>
+            )}
           </section>
         )}
 
