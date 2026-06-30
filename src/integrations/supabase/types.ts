@@ -14,7 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chapters: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          order_index: number
+          title: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          title?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chapters_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          cover_image: string | null
+          created_at: string
+          description: string | null
+          duration_hours: number | null
+          id: string
+          image_url: string | null
+          lessons_count: number | null
+          price: number | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          id?: string
+          image_url?: string | null
+          lessons_count?: number | null
+          price?: number | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          id?: string
+          image_url?: string | null
+          lessons_count?: number | null
+          price?: number | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      lessons: {
+        Row: {
+          chapter_id: string | null
+          content: string | null
+          content_html: string | null
+          course_id: string
+          created_at: string
+          id: string
+          lesson_type: string
+          order_index: number
+          status: string
+          title: string
+          video_url: string | null
+        }
+        Insert: {
+          chapter_id?: string | null
+          content?: string | null
+          content_html?: string | null
+          course_id: string
+          created_at?: string
+          id?: string
+          lesson_type?: string
+          order_index?: number
+          status?: string
+          title: string
+          video_url?: string | null
+        }
+        Update: {
+          chapter_id?: string | null
+          content?: string | null
+          content_html?: string | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          lesson_type?: string
+          order_index?: number
+          status?: string
+          title?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
