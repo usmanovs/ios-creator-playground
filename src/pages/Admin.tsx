@@ -276,20 +276,21 @@ export default function AdminPage() {
     log("reorder", "lesson", null, "lessons", { chapter_id: chapterId, order: orderedIds });
   };
 
-  const saveLessonPatch = async (patch: Partial<Lesson>) => {
+  const saveLessonPatch = async (patch: Partial<Lesson>): Promise<void> => {
     if (!editingLesson) return;
-    const wasPublished = editingLesson.status === "published";
     const updated = { ...editingLesson, ...patch } as Lesson;
     setEditingLesson(updated);
     setLessons((p) => p.map((x) => (x.id === updated.id ? updated : x)));
     const { error } = await supabase.from("lessons").update(patch).eq("id", updated.id);
-    if (error) return toast.error(error.message);
-    if (patch.status && patch.status !== editingLesson.status) {
-      log(patch.status === "published" ? "publish" : "unpublish", "lesson", updated.id, updated.title);
-    } else {
-      log("update", "lesson", updated.id, updated.title);
+    if (error) {
+      toast.error(error.message);
+      return;
     }
-    void wasPublished;
+    if (patch.status && patch.status !== editingLesson.status) {
+      await log(patch.status === "published" ? "publish" : "unpublish", "lesson", updated.id, updated.title);
+    } else {
+      await log("update", "lesson", updated.id, updated.title);
+    }
   };
 
   // Sensors for chapter drag
