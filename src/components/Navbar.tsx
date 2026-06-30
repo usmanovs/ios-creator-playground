@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Smartphone } from 'lucide-react';
 
@@ -26,6 +27,12 @@ const Navbar = () => {
               {l.label}
             </a>
           ))}
+          <Link
+            to="/course"
+            className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+          >
+            {t('nav.course')}
+          </Link>
         </div>
 
         <div className="flex items-center gap-3">

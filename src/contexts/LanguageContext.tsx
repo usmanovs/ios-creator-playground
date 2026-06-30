@@ -13,6 +13,7 @@ const translations: Record<string, Record<Language, string>> = {
   'nav.program': { en: 'Program', ru: 'Программа' },
   'nav.curriculum': { en: 'Curriculum', ru: 'Учебный план' },
   'nav.pricing': { en: 'Pricing', ru: 'Стоимость' },
+  'nav.course': { en: 'Course', ru: 'Курс' },
   'nav.enroll': { en: 'Enroll Now', ru: 'Записаться' },
 
   // Hero
