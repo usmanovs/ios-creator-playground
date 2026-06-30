@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +24,7 @@ const App = () => (
           <Route path="/support" element={<Support />} />
           <Route path="/marketing" element={<Marketing />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/course" element={<Navigate to="/course/4dcdf780-0842-449d-a1c2-bfa7acf280ce" replace />} />
           <Route path="/course/:courseId" element={<Course />} />
           <Route path="/lesson/:lessonId" element={<Lesson />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
