@@ -20,7 +20,7 @@ const toYouTubeEmbed = (url: string) => {
   return m ? `https://www.youtube.com/embed/${m[1]}` : url;
 };
 
-const Lesson = () => {
+const LessonPage = () => {
   const { lessonId } = useParams();
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,4 +100,4 @@ const Lesson = () => {
   );
 };
 
-export default Lesson;
+export default LessonPage;

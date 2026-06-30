@@ -24,7 +24,7 @@ const typeIcon = (t: string) => {
   return <FileText className="w-4 h-4 text-foreground/60" />;
 };
 
-const Course = () => {
+const CoursePage = () => {
   const { courseId } = useParams();
   const [course, setCourse] = useState<Course | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -103,4 +103,4 @@ const Course = () => {
   );
 };
 
-export default Course;
+export default CoursePage;
