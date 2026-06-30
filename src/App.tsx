@@ -10,6 +10,8 @@ import Marketing from "./pages/Marketing.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import Course from "./pages/Course.tsx";
 import Lesson from "./pages/Lesson.tsx";
+import Auth from "./pages/Auth.tsx";
+import Admin from "./pages/Admin.tsx";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/course/:courseId" element={<Course />} />
           <Route path="/lesson/:lessonId" element={<Lesson />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
