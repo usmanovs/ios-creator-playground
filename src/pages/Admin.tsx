@@ -59,6 +59,7 @@ export default function AdminPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [savingCourse, setSavingCourse] = useState(false);
+  const [courseExpanded, setCourseExpanded] = useState(false);
 
   const [confirmDeleteChapter, setConfirmDeleteChapter] = useState<Chapter | null>(null);
   const [confirmDeleteLesson, setConfirmDeleteLesson] = useState<Lesson | null>(null);
