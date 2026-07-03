@@ -76,6 +76,11 @@ const translations: Record<string, Record<Language, string>> = {
   'vibe.card3.desc': { en: 'Build a production-ready iOS app and learn monetization strategies', ru: 'Создайте готовое iOS приложение и изучите стратегии монетизации' },
   'vibe.card4.title': { en: 'App Store Launch', ru: 'Запуск в App Store' },
   'vibe.card4.desc': { en: 'We guide you through the entire process from idea to App Store submission', ru: 'Мы проведём вас через весь путь от идеи до публикации в App Store' },
+  'vibe.oldWay': { en: 'The Old Way', ru: 'Старый путь' },
+  'vibe.newWay': { en: 'The Vibe Coder Way', ru: 'Путь Vibe Coder' },
+  'vibe.vs': { en: 'VS', ru: 'VS' },
+  'vibe.chapter': { en: 'Chapter', ru: 'Глава' },
+
 
   // What You'll Get
   'get.title': { en: "What You'll Get", ru: 'Что вы получите' },
