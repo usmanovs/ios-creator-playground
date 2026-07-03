@@ -23,7 +23,7 @@ const HeroSection = () => {
   ];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6 pt-32 pb-20">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6 pt-24 md:pt-28 pb-14 md:pb-20">
       {/* Aurora layers */}
       <div
         aria-hidden
