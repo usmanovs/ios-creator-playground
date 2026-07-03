@@ -31,8 +31,8 @@ const InstructorSection = () => {
                 <img
                   src={instructorPhoto.url}
                   alt={fullName}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ filter: 'grayscale(0.55) contrast(1.08) brightness(0.97)' }}
+                  className="absolute inset-0 w-full h-full object-cover object-[center_30%]"
+                  style={{ transform: 'scaleX(-1)' }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" aria-hidden="true" />
               </div>
