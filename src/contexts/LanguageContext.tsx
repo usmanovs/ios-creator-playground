@@ -50,6 +50,7 @@ const translations: Record<string, Record<Language, string>> = {
   'instructor.techLeadAt': { en: 'Tech Lead at', ru: 'Тех-лид в' },
   'instructor.companiesHeadline': { en: 'Worked at some of the largest IT companies in the USA', ru: 'Работал в крупнейших IT-компаниях США' },
   'instructor.revenue': { en: 'revenue', ru: 'выручка' },
+  'instructor.philosophy': { en: 'I bridge enterprise-grade engineering and AI-powered product building — so beginners ship real apps, not just tutorials.', ru: 'Я соединяю корпоративный инженерный опыт и создание продуктов с помощью ИИ — чтобы новички выпускали реальные приложения, а не учебные примеры.' },
 
   // Vibe Coder
   'vibe.title': { en: 'What is a Vibe Coder?', ru: 'Что такое Vibe Coder?' },
