@@ -199,6 +199,8 @@ const translations: Record<string, Record<Language, string>> = {
   'req.s3.desc': { en: 'All the developer tools we use are free', ru: 'Все инструменты разработчика бесплатны' },
   'req.s4.title': { en: 'Age limits', ru: 'Возрастные ограничения' },
   'req.s4.desc': { en: 'Recommended 12–48, but everyone is welcome', ru: 'Рекомендуется 12–48, приветствуются все' },
+  'req.s5.title': { en: 'An iPhone', ru: 'iPhone' },
+  'req.s5.desc': { en: 'A Mac with the free Xcode Simulator is enough to build, test, and publish — no physical device needed', ru: 'Mac с бесплатным симулятором Xcode достаточно для разработки, тестирования и публикации — физическое устройство не нужно' },
 
   // Footer
   'footer.title': { en: 'Join Our Community', ru: 'Присоединяйтесь к сообществу' },
