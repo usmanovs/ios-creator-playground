@@ -191,6 +191,8 @@ const translations: Record<string, Record<Language, string>> = {
   'req.n3.desc': { en: 'Live sessions on Mon, Wed, Fri — or follow recordings at your own pace', ru: 'Живые сессии в Пн, Ср, Пт — или записи в своём темпе' },
   'req.n4.title': { en: 'Reliable internet', ru: 'Стабильный интернет' },
   'req.n4.desc': { en: 'For live sessions and AI tools (Claude Code, Google Stitch)', ru: 'Для живых сессий и ИИ-инструментов (Claude Code, Google Stitch)' },
+  'req.n5.title': { en: 'Budget ~$50 for Claude', ru: '~$50 на Claude' },
+  'req.n5.desc': { en: 'You\'ll need an active Claude subscription — plan for at least $50 over the course for the AI coding assistant', ru: 'Понадобится активная подписка Claude — заложите минимум $50 за курс на ИИ-ассистента для написания кода' },
   'req.s1.title': { en: 'Coding experience', ru: 'Опыт программирования' },
   'req.s1.desc': { en: 'Zero Swift or programming knowledge required — built for absolute beginners', ru: 'Не нужен опыт Swift или программирования — курс для абсолютных новичков' },
   'req.s2.title': { en: 'Design skills', ru: 'Навыки дизайна' },

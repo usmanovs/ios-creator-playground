@@ -5,6 +5,7 @@ import {
   Apple,
   Clock,
   Wifi,
+  Wallet,
   Code2,
   Palette,
   BadgeDollarSign,
@@ -22,6 +23,7 @@ const RequirementsSection = () => {
     { icon: Apple, key: 'n2' },
     { icon: Clock, key: 'n3' },
     { icon: Wifi, key: 'n4' },
+    { icon: Wallet, key: 'n5' },
   ];
 
   const skips = [
