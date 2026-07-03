@@ -106,8 +106,8 @@ const translations: Record<string, Record<Language, string>> = {
   'sched.subtitle': { en: 'Live sessions 3 times per week', ru: 'Живые сессии 3 раза в неделю' },
   'sched.format': { en: 'Live Online Sessions', ru: 'Живые онлайн-сессии' },
   'sched.days': { en: 'Monday, Wednesday, Friday', ru: 'понедельник, среда, пятница' },
-  'sched.time': { en: '7:00 PM (Bishkek time, UTC+6)', ru: '19:00 (время Бишкека, UTC+6)' },
-  'sched.duration': { en: '1.5 - 2 hours per session', ru: '1.5 - 2 часа за сессию' },
+  'sched.time': { en: '8:00 PM EST', ru: '20:00 EST' },
+  'sched.duration': { en: '1 hour per session', ru: '1 час за сессию' },
   'sched.recorded': { en: 'All sessions recorded — watch replays anytime', ru: 'Все сессии записываются — смотрите повторы в любое время' },
 
   // Pricing Timeline
