@@ -1,5 +1,5 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { AppWindow, Users, Clock } from 'lucide-react';
+import { Briefcase, Users, Clock } from 'lucide-react';
 import instructorPhoto from '@/assets/instructor.jpg.asset.json';
 
 const InstructorSection = () => {
