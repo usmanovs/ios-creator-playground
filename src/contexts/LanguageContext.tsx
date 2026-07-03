@@ -102,13 +102,20 @@ const translations: Record<string, Record<Language, string>> = {
   'curr.week6.desc': { en: 'App Store Connect setup, submission, the review process and going live. Finish the course with a real, published iOS app, not a demo.', ru: 'Настройка App Store Connect, сабмит, ревью и публикация. Завершаем курс реальным опубликованным iOS-приложением, а не демо.' },
 
   // Schedule
-  'sched.title': { en: 'Schedule', ru: 'Расписание' },
-  'sched.subtitle': { en: 'Live sessions 3 times per week', ru: 'Живые сессии 3 раза в неделю' },
-  'sched.format': { en: 'Live Online Sessions', ru: 'Живые онлайн-сессии' },
-  'sched.days': { en: 'Monday, Wednesday, Friday', ru: 'понедельник, среда, пятница' },
-  'sched.time': { en: '8:00 PM EST', ru: '20:00 EST' },
-  'sched.duration': { en: '1 hour per session', ru: '1 час за сессию' },
-  'sched.recorded': { en: 'All sessions recorded — watch replays anytime', ru: 'Все сессии записываются — смотрите повторы в любое время' },
+  'sched.title': { en: 'Live sessions worldwide', ru: 'Живые сессии по всему миру' },
+  'sched.titleAccent': { en: 'worldwide', ru: 'по всему миру' },
+  'sched.subtitle': { en: 'Join us 3 days a week from anywhere in the world', ru: 'Присоединяйтесь к нам 3 дня в неделю из любой точки мира' },
+  'sched.daysTitle': { en: 'Class Days', ru: 'Дни занятий' },
+  'sched.zonesTitle': { en: 'Time Zones', ru: 'Часовые пояса' },
+  'sched.yourZone': { en: 'Your time zone', ru: 'Ваш часовой пояс' },
+  'sched.nextDay': { en: 'next day', ru: 'след. день' },
+  'sched.day.mon': { en: 'Monday', ru: 'Понедельник' },
+  'sched.day.wed': { en: 'Wednesday', ru: 'Среда' },
+  'sched.day.fri': { en: 'Friday', ru: 'Пятница' },
+  'sched.city.ny': { en: 'New York', ru: 'Нью-Йорк' },
+  'sched.city.moscow': { en: 'Moscow', ru: 'Москва' },
+  'sched.city.berlin': { en: 'Berlin', ru: 'Берлин' },
+  'sched.city.bishkek': { en: 'Bishkek', ru: 'Бишкек' },
 
   // Pricing Timeline
   'price.timeline.title': { en: '⏰ Price increases as the course approaches', ru: '⏰ Цена растёт по мере приближения курса' },
