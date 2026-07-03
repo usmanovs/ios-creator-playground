@@ -1,5 +1,5 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { AppWindow, Users, Clock } from 'lucide-react';
+import { Briefcase, Users, Clock } from 'lucide-react';
 import instructorPhoto from '@/assets/instructor.jpg.asset.json';
 
 const InstructorSection = () => {
@@ -35,7 +35,7 @@ const InstructorSection = () => {
             </p>
             <div className="grid grid-cols-3 gap-6 md:gap-8 mb-10">
               {[
-                { icon: AppWindow, val: '10+', label: t('instructor.apps') },
+                { icon: Briefcase, val: '4', label: t('instructor.techLead') },
                 { icon: Users, val: '500+', label: t('instructor.students') },
                 { icon: Clock, val: '8+', label: t('instructor.experience') },
               ].map((s, i) => (

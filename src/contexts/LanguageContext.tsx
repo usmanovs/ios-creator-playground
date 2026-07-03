@@ -43,8 +43,8 @@ const translations: Record<string, Record<Language, string>> = {
   // Instructor
   'instructor.title': { en: 'Your Instructor', ru: 'Ваш инструктор' },
   'instructor.name': { en: 'Seyitbek Usmanov', ru: 'Сейитбек Усманов' },
-  'instructor.bio': { en: 'Experienced iOS developer and AI enthusiast. Has launched multiple apps on the App Store and helped hundreds of students turn their ideas into real products using AI-powered development. This course is built for absolute beginners — no prior Swift or programming experience required, just a Mac and curiosity.', ru: 'Опытный iOS-разработчик и энтузиаст ИИ. Запустил несколько приложений в App Store и помог сотням студентов превратить их идеи в реальные продукты с помощью ИИ. Курс рассчитан на абсолютных новичков — без опыта Swift и программирования, нужны только Mac и любопытство.' },
-  'instructor.apps': { en: 'Apps Launched', ru: 'Запущено приложений' },
+  'instructor.bio': { en: 'Experienced software engineer and AI enthusiast with years as a Tech Lead at Deloitte, Accenture, and other major enterprises. He now helps hundreds of students turn their ideas into real products using AI-powered development. This course is built for absolute beginners — no prior Swift or programming experience required, just a Mac and curiosity.', ru: 'Опытный инженер-программист и энтузиаст ИИ, много лет работавший тех-лидом в Deloitte, Accenture и других крупных компаниях. Теперь он помогает сотням студентов превратить их идеи в реальные продукты с помощью ИИ-ассистированной разработки. Курс рассчитан на абсолютных новичков — без опыта Swift и программирования, нужны только Mac и любопытство.' },
+  'instructor.techLead': { en: 'Tech Lead Roles', ru: 'Роли тех-лида' },
   'instructor.students': { en: 'Students Taught', ru: 'Обучено студентов' },
   'instructor.experience': { en: 'Years Experience', ru: 'Лет опыта' },
   'instructor.techLeadAt': { en: 'Tech Lead at', ru: 'Тех-лид в' },
