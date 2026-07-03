@@ -183,7 +183,33 @@ const translations: Record<string, Record<Language, string>> = {
   // Sticky CTA
   'sticky.text': { en: 'Limited spots available', ru: 'Количество мест ограничено' },
   'sticky.cta': { en: 'Enroll — $399', ru: 'Записаться — $399' },
+
+  // App Store Section
+  'as.eyebrow': { en: 'Day 15 · The finish line', ru: 'День 15 · Финиш' },
+  'as.title1': { en: 'Your app.', ru: 'Твоё приложение.' },
+  'as.title2': { en: 'Live on the', ru: 'Уже в' },
+  'as.title3': { en: 'App Store', ru: 'App Store' },
+  'as.subtitle': { en: 'Not a demo. Not a prototype. A real product downloadable by 1.8 billion iPhone users worldwide.', ru: 'Не демо. Не прототип. Реальный продукт, который могут скачать 1.8 миллиарда пользователей iPhone по всему миру.' },
+  'as.check1': { en: 'Shipped via App Store Connect', ru: 'Опубликовано через App Store Connect' },
+  'as.check2': { en: 'Passed Apple review', ru: 'Прошло проверку Apple' },
+  'as.check3': { en: 'Reachable by 1.8B iPhone users', ru: 'Доступно 1.8 млрд пользователей iPhone' },
+  'as.check4': { en: 'Ready to earn revenue', ru: 'Готово приносить доход' },
+  'as.appName': { en: 'HabitFlow', ru: 'HabitFlow' },
+  'as.appDev': { en: 'Force Academy', ru: 'Force Academy' },
+  'as.appTagline': { en: 'Habits · Focus · Growth', ru: 'Привычки · Фокус · Рост' },
+  'as.get': { en: 'GET', ru: 'ЗАГР' },
+  'as.ratings': { en: '1.2K Ratings', ru: '1.2К оценок' },
+  'as.category': { en: '#12 Productivity', ru: '#12 Продуктивность' },
+  'as.preview': { en: 'Preview', ru: 'Превью' },
+  'as.whatsNew': { en: "What's New", ru: 'Что нового' },
+  'as.version': { en: 'Version 1.0.2 · 2d ago', ru: 'Версия 1.0.2 · 2 дн. назад' },
+  'as.changelog': { en: 'New streak animations and iCloud sync improvements.', ru: 'Новые анимации серий и улучшения синхронизации iCloud.' },
+  'as.reviews': { en: 'Ratings & Reviews', ru: 'Оценки и отзывы' },
+  'as.reviewTitle': { en: 'Actually life-changing', ru: 'Реально меняет жизнь' },
+  'as.reviewBody': { en: 'Clean, fast, and beautifully designed. Built by an indie dev — respect.', ru: 'Чисто, быстро и красиво. Сделано инди-разработчиком — уважение.' },
+  'as.reviewer': { en: '— @sarah_builds', ru: '— @sarah_builds' },
 };
+
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
