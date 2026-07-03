@@ -9,6 +9,7 @@ import {
   Palette,
   BadgeDollarSign,
   Users,
+  Smartphone,
   Check,
   Sparkles,
 } from 'lucide-react';
@@ -28,6 +29,7 @@ const RequirementsSection = () => {
     { icon: Palette, key: 's2' },
     { icon: BadgeDollarSign, key: 's3' },
     { icon: Users, key: 's4' },
+    { icon: Smartphone, key: 's5' },
   ];
 
   return (
