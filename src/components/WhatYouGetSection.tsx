@@ -12,7 +12,7 @@ const WhatYouGetSection = () => {
   ];
 
   return (
-    <section className="relative py-24 md:py-32 px-6 overflow-hidden">
+    <section className="relative py-16 md:py-24 px-6 overflow-hidden">
       {/* Section aurora */}
       <div
         aria-hidden

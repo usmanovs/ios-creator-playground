@@ -25,7 +25,7 @@ const AppStoreSection = () => {
   const motionOff = prefersReducedMotion ?? false;
 
   return (
-    <section ref={sectionRef} className="relative py-24 md:py-32 overflow-hidden">
+    <section ref={sectionRef} className="relative py-16 md:py-24 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
           {/* Left: iPhone mockup */}

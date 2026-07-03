@@ -15,7 +15,7 @@ const CurriculumSection = () => {
   ];
 
   return (
-    <section id="curriculum" className="pt-24 md:pt-32 pb-12 md:pb-16 px-6 relative overflow-hidden">
+    <section id="curriculum" className="pt-16 md:pt-24 pb-8 md:pb-12 px-6 relative overflow-hidden">
       {/* Ambient aurora */}
       <div className="absolute top-1/3 -left-40 w-[500px] h-[500px] rounded-full bg-primary/10 blur-[140px] pointer-events-none" />
       <div className="absolute bottom-1/4 -right-40 w-[500px] h-[500px] rounded-full bg-accent/10 blur-[140px] pointer-events-none" />

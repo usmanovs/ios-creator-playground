@@ -17,7 +17,7 @@ const InstructorSection = () => {
   ];
 
   return (
-    <section id="program" className="py-24 md:py-32 px-6">
+    <section id="program" className="py-16 md:py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="relative">
           {/* Ambient aurora glows */}
