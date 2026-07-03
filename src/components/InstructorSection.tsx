@@ -50,14 +50,25 @@ const InstructorSection = () => {
               <div className="text-[10px] uppercase tracking-[0.2em] text-foreground/40 mb-4">
                 {t('instructor.techLeadAt')}
               </div>
-              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                {['Deloitte', 'Accenture', 'General Dynamics IT', 'Koniag Government Services'].map((c) => (
-                  <span
-                    key={c}
-                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-foreground/5 border border-foreground/10 text-foreground/70"
+              <div className="flex flex-wrap gap-6 items-center justify-center md:justify-start">
+                {[
+                  { name: 'Deloitte', domain: 'deloitte.com' },
+                  { name: 'Accenture', domain: 'accenture.com' },
+                  { name: 'General Dynamics IT', domain: 'gdit.com' },
+                  { name: 'Koniag Government Services', domain: 'koniag-gs.com' },
+                ].map((c) => (
+                  <div
+                    key={c.name}
+                    className="flex items-center justify-center h-12 px-4 rounded-lg bg-foreground/5 border border-foreground/10"
+                    title={c.name}
                   >
-                    {c}
-                  </span>
+                    <img
+                      src={`https://img.logo.dev/${c.domain}?token=${import.meta.env.VITE_LOVABLE_CONNECTOR_LOGO_DEV_API_KEY}&size=120&format=png&theme=dark`}
+                      alt={`${c.name} logo`}
+                      className="max-h-8 w-auto object-contain opacity-90"
+                      loading="lazy"
+                    />
+                  </div>
                 ))}
               </div>
             </div>
