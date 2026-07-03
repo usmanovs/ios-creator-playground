@@ -63,7 +63,7 @@ const ScheduleSection = () => {
     zones.find((z) => z.ianaZones.includes(userZone))?.key ?? 'ny';
 
   return (
-    <section className="pt-12 md:pt-16 pb-24 md:pb-32 px-6">
+    <section className="pt-8 md:pt-12 pb-16 md:pb-24 px-6">
       <div className="max-w-6xl mx-auto">
         <h2 className="font-display text-4xl md:text-5xl font-bold text-center text-foreground mb-4">
           Live sessions <span className="text-primary">{t('sched.titleAccent')}</span>
