@@ -33,7 +33,7 @@ const InstructorSection = () => {
             <p className="text-foreground/60 text-base md:text-lg leading-relaxed mb-10">
               {t('instructor.bio')}
             </p>
-            <div className="grid grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-3 gap-6 md:gap-8 mb-10">
               {[
                 { icon: AppWindow, val: '10+', label: t('instructor.apps') },
                 { icon: Users, val: '500+', label: t('instructor.students') },
@@ -44,6 +44,22 @@ const InstructorSection = () => {
                   <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/40">{s.label}</div>
                 </div>
               ))}
+            </div>
+
+            <div className="pt-8 border-t border-foreground/10">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-foreground/40 mb-4">
+                {t('instructor.techLeadAt')}
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                {['Deloitte', 'Accenture', 'General Dynamics IT', 'Koniag Government Services'].map((c) => (
+                  <span
+                    key={c}
+                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-foreground/5 border border-foreground/10 text-foreground/70"
+                  >
+                    {c}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

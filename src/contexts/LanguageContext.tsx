@@ -47,6 +47,7 @@ const translations: Record<string, Record<Language, string>> = {
   'instructor.apps': { en: 'Apps Launched', ru: 'Запущено приложений' },
   'instructor.students': { en: 'Students Taught', ru: 'Обучено студентов' },
   'instructor.experience': { en: 'Years Experience', ru: 'Лет опыта' },
+  'instructor.techLeadAt': { en: 'Tech Lead at', ru: 'Тех-лид в' },
 
   // Vibe Coder
   'vibe.title': { en: 'What is a Vibe Coder?', ru: 'Что такое Vibe Coder?' },
