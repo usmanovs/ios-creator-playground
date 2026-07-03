@@ -1,6 +1,8 @@
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
+import AppStoreSection from '@/components/AppStoreSection';
+
 import InstructorSection from '@/components/InstructorSection';
 import VibCoderSection from '@/components/VibCoderSection';
 import WhatYouGetSection from '@/components/WhatYouGetSection';
