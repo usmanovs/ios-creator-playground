@@ -46,28 +46,34 @@ const InstructorSection = () => {
               ))}
             </div>
 
-            <div className="pt-8 border-t border-foreground/10">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-foreground/40 mb-4">
+            <div className="pt-10 border-t border-foreground/10">
+              <h4 className="font-display text-xl md:text-2xl font-bold text-foreground mb-2">
+                {t('instructor.companiesHeadline')}
+              </h4>
+              <p className="text-accent text-[11px] font-semibold uppercase tracking-[0.2em] mb-6">
                 {t('instructor.techLeadAt')}
-              </div>
-              <div className="flex flex-wrap gap-6 items-center justify-center md:justify-start">
+              </p>
+              <div className="grid grid-cols-2 md:flex md:flex-wrap gap-4 md:gap-5 items-stretch justify-center md:justify-start">
                 {[
-                  { name: 'Deloitte', domain: 'deloitte.com' },
-                  { name: 'Accenture', domain: 'accenture.com' },
-                  { name: 'General Dynamics IT', domain: 'gdit.com' },
-                  { name: 'Koniag Government Services', domain: 'koniag-gs.com' },
+                  { name: 'Deloitte', domain: 'deloitte.com', revenue: '$67B' },
+                  { name: 'Accenture', domain: 'accenture.com', revenue: '$70B' },
+                  { name: 'General Dynamics IT', domain: 'gdit.com', revenue: '$8B' },
+                  { name: 'Koniag Government Services', domain: 'koniag-gs.com', revenue: '$1B' },
                 ].map((c) => (
                   <div
                     key={c.name}
-                    className="flex items-center justify-center h-12 px-4 rounded-lg bg-foreground/5 border border-foreground/10"
+                    className="group flex flex-col items-center justify-center gap-2 min-h-[5.5rem] md:min-w-[9rem] px-5 py-4 rounded-2xl bg-foreground/[0.04] border border-foreground/15 hover:border-accent/40 hover:bg-foreground/[0.07] transition-all duration-300"
                     title={c.name}
                   >
                     <img
-                      src={`https://img.logo.dev/${c.domain}?token=${import.meta.env.VITE_LOVABLE_CONNECTOR_LOGO_DEV_API_KEY}&size=120&format=png&theme=dark`}
+                      src={`https://img.logo.dev/${c.domain}?token=${import.meta.env.VITE_LOVABLE_CONNECTOR_LOGO_DEV_API_KEY}&size=200&format=png&theme=dark`}
                       alt={`${c.name} logo`}
-                      className="max-h-8 w-auto object-contain opacity-90"
+                      className="max-h-11 md:max-h-12 max-w-full w-auto object-contain opacity-85 group-hover:opacity-100 transition-opacity duration-300"
                       loading="lazy"
                     />
+                    <span className="text-[10px] uppercase tracking-[0.15em] text-foreground/35">
+                      {c.revenue} {t('instructor.revenue')}
+                    </span>
                   </div>
                 ))}
               </div>
