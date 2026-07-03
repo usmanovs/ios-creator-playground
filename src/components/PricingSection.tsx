@@ -1,15 +1,10 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Check, Clock, Tag, Zap, Star, MessageCircle } from 'lucide-react';
+import { Check, Star, MessageCircle } from 'lucide-react';
 import mbankQr from '@/assets/mbank-qr.png';
 
 const PricingSection = () => {
   const { t } = useLanguage();
 
-  const tiers = [
-    { key: 'early', icon: Tag, status: 'expired' },
-    { key: 'current', icon: Zap, status: 'active' },
-    { key: 'last', icon: Clock, status: 'upcoming' },
-  ];
 
   const recordingsFeatures = ['plan.rec.f1', 'plan.rec.f2', 'plan.rec.f3', 'plan.rec.f4'];
   const liveFeatures = ['plan.live.f1', 'plan.live.f2', 'plan.live.f3', 'plan.live.f4', 'plan.live.f5', 'plan.live.f6'];
@@ -27,53 +22,6 @@ const PricingSection = () => {
   return (
     <section id="pricing" className="py-24 md:py-32 px-6">
       <div className="max-w-6xl mx-auto">
-        {/* Price Timeline */}
-        <div className="text-center mb-12">
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-            {t('price.timeline.title')}
-          </h2>
-          <p className="text-foreground/50">{t('price.timeline.subtitle')}</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24">
-          {tiers.map((tier) => {
-            const isActive = tier.status === 'active';
-            const isExpired = tier.status === 'expired';
-            return (
-              <div
-                key={tier.key}
-                className={`relative rounded-[2rem] border backdrop-blur-2xl p-7 text-center transition-all ${
-                  isActive
-                    ? 'border-primary/60 bg-card/60'
-                    : isExpired
-                    ? 'border-foreground/5 bg-card/20 opacity-50'
-                    : 'border-foreground/10 bg-card/30'
-                }`}
-                style={isActive ? { boxShadow: 'var(--shadow-glow-violet)' } : undefined}
-              >
-                {isExpired && (
-                  <div className="absolute inset-0 flex items-center justify-center z-10">
-                    <span className="text-xs font-bold uppercase tracking-widest text-destructive bg-background/80 px-4 py-1.5 rounded-full border border-destructive/30">
-                      {t('price.expired')}
-                    </span>
-                  </div>
-                )}
-                {isActive && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-[0.2em] bg-primary text-primary-foreground px-4 py-1.5 rounded-full">
-                    {t('price.current')}
-                  </div>
-                )}
-                <tier.icon className={`w-5 h-5 mx-auto mb-3 ${isActive ? 'text-primary' : 'text-foreground/40'}`} />
-                <div className="text-xs uppercase tracking-widest text-foreground/50 mb-2">{t(`price.tier.${tier.key}`)}</div>
-                <div className={`font-display text-4xl font-bold mb-2 ${isActive ? 'text-primary' : 'text-foreground'}`}>
-                  {t(`price.tier.${tier.key}.amount`)}
-                </div>
-                <div className="text-xs text-foreground/40">{t(`price.tier.${tier.key}.when`)}</div>
-                <div className="text-xs text-foreground/40 mt-1">{t(`price.tier.${tier.key}.dates`)}</div>
-              </div>
-            );
-          })}
-        </div>
 
         {/* Plans */}
         <div className="text-center mb-16">
