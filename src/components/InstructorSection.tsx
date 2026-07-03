@@ -84,7 +84,7 @@ const InstructorSection = () => {
                 {/* Experience + philosophy */}
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 sm:items-center">
                   <div className="shrink-0">
-                    <div className="font-display text-3xl font-bold text-foreground leading-none">8+</div>
+                    <div className="font-display text-3xl font-bold text-foreground leading-none">11</div>
                     <div className="mt-1 text-xs text-foreground/40 uppercase font-bold tracking-[0.18em]">
                       {t('instructor.experience')}
                     </div>
