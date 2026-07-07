@@ -93,7 +93,7 @@ const HeroSection = () => {
             </span>
             <span className="text-2xl sm:text-3xl font-black text-accent">→ $250</span>
             <span className="text-sm sm:text-base font-bold text-foreground/80 text-center sm:text-left">
-              {t('hero.discountBanner').replace('$399 → $250 — ', '')}
+              {t('hero.discountBanner')}
             </span>
           </div>
         </div>
