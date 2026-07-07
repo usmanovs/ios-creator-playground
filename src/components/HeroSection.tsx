@@ -168,7 +168,7 @@ const HeroSection = () => {
           href="https://wa.me/12024554575"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative group px-12 py-5 md:py-6 rounded-2xl overflow-hidden transition-all active:scale-95 mb-14 animate-slide-up"
+          className="relative group px-12 py-5 md:py-6 rounded-2xl overflow-hidden transition-all active:scale-95 mb-4 animate-slide-up"
           style={{
             background: 'var(--gradient-violet)',
             boxShadow: 'var(--shadow-glow-violet)',
@@ -181,6 +181,14 @@ const HeroSection = () => {
             {t('hero.cta')}
           </span>
         </a>
+
+        {/* CTA subtext */}
+        <p
+          className="text-sm md:text-base font-bold text-accent mb-14 animate-slide-up"
+          style={{ animationDelay: '0.5s', animationFillMode: 'backwards' }}
+        >
+          {t('hero.ctaSubtext')}
+        </p>
 
         {/* Countdown */}
         <div
