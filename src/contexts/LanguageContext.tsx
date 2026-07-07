@@ -17,13 +17,15 @@ const translations: Record<string, Record<Language, string>> = {
   'nav.enroll': { en: 'Enroll Now', ru: 'Записаться' },
 
   // Hero
-  'hero.badge': { en: 'Become an iOS Vibe Coder', ru: 'Стань iOS Vibe Coder\'ом' },
+  'hero.badge': { en: 'Save $149 — Early Bird Live Sessions', ru: 'Экономия $149 — Живые Занятия Early Bird' },
   'hero.title1': { en: 'Build an iOS app', ru: 'Создай iOS приложение' },
   'hero.title2': { en: 'that earns', ru: 'которое приносит' },
   'hero.title3': { en: '$10,000/month', ru: '$10,000/месяц' },
   'hero.subtitle': { en: 'Become an iOS Vibe Coder in 15 days. Design, build and ship AI-powered apps to the App Store without writing code.', ru: 'Стань iOS Vibe Coder\'ом за 15 дней. Проектируй, создавай и публикуй AI-приложения в App Store без написания кода.' },
   'hero.subtitleAccent': { en: 'Join the Vibe Coder movement.', ru: 'Присоединяйся к Vibe Coder движению.' },
-  'hero.cta': { en: 'Enroll Now — $399', ru: 'Записаться — $399' },
+  'hero.discountBanner': { en: 'enroll now and save $149 on Live Sessions', ru: 'запишись сейчас и сэкономь $149 на Живых Занятиях' },
+  'hero.cta': { en: 'Enroll Now — $250', ru: 'Записаться — $250' },
+  'hero.ctaSubtext': { en: 'Save $149 · Limited early-bird spots', ru: 'Экономия $149 · Ограниченные места Early Bird' },
   'hero.students': { en: 'students already enrolled', ru: 'студентов уже записались' },
   'hero.revenue': { en: 'Graduates ship real App Store apps and target their first $600+ before the course ends', ru: 'Выпускники публикуют реальные приложения в App Store и стремятся к первым $600+ до конца курса' },
   'hero.stat1.val': { en: '300+', ru: '300+' },

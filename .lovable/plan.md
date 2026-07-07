@@ -1,64 +1,42 @@
+## Plan: Emphasize the Live Sessions early-bird discount in the hero section
 
-# App Store Outcome Section
+### Goal
+Make the big discount for the Live Sessions plan impossible to miss in the hero by showing the savings message in three places: the badge, a new banner under the headline, and the CTA button.
 
-Add a new section right after the Hero that visually proves the promise: by day 15, the student's app is live on the App Store — shown as a realistic iPhone displaying an App Store product page.
+### What will change
 
-## Layout
+1. **Hero badge**
+   - Keep the existing pulsing accent dot and glass-pill style.
+   - Change the text from the generic tagline to a savings-focused message, e.g.:
+     - EN: "Save $149 — Early Bird Live Sessions"
+     - RU: "Экономия $149 — Живые Занятия Early Bird"
 
-Two-column on desktop, stacked on mobile.
+2. **New discount banner below the headline**
+   - Insert a prominent banner between the subtitle block and the social-proof row.
+   - Show the crossed-out full price and the discounted price:
+     - EN: "$399 → $250 — enroll now and save $149 on Live Sessions"
+     - RU: "$399 → $250 — запишись сейчас и сэкономь $149 на Живых Занятиях"
+   - Style it with the existing accent color and a subtle glow/shimmer so it reads as urgent.
 
-```text
-┌───────────────────────────────┬──────────────────────────────┐
-│                               │  DAY 15 · THE FINISH LINE    │
-│     ┌───────────────┐         │                              │
-│     │  ▓ iPhone ▓   │         │  Your app.                   │
-│     │ ┌───────────┐ │         │  Live on the App Store.      │
-│     │ │ 9:41  ▮▮▮ │ │         │                              │
-│     │ │           │ │         │  ✓ Shipped via App Store     │
-│     │ │  [icon]   │ │         │    Connect                   │
-│     │ │  AppName  │ │         │  ✓ Passed Apple review       │
-│     │ │  Dev · GET│ │         │  ✓ Reachable by 1.8B users   │
-│     │ │  ★★★★★4.8 │ │         │  ✓ Ready to earn revenue     │
-│     │ │ [scr][scr]│ │         │                              │
-│     │ │ What's New│ │         │                              │
-│     │ └───────────┘ │         │                              │
-│     └───────────────┘         │                              │
-└───────────────────────────────┴──────────────────────────────┘
-```
+3. **CTA button**
+   - Update the button text from "Enroll Now — $399" to:
+     - EN: "Enroll Now — $250 (was $399)"
+     - RU: "Записаться — $250 (вместо $399)"
+   - Add a short savings line directly under the button:
+     - EN: "Save $149 · Limited early-bird spots"
+     - RU: "Экономия $149 · Ограниченные места Early Bird"
 
-## iPhone mockup (CSS-built)
+4. **Translations**
+   - Add new keys to `LanguageContext.tsx` for the updated badge, banner, CTA, and subtext in both English and Russian.
+   - Keep the existing keys that are not changing.
 
-- Outer frame: dark bezel, rounded ~3rem, subtle violet glow shadow, gentle float animation
-- Dynamic Island at top
-- Screen contents (light iOS App Store theme — scoped exception to the dark theme, since App Store is iconic in light mode):
-  - Status bar: 9:41 · signal · wifi · battery
-  - App header row: rounded app icon (gradient tile with SF-style glyph), app name "HabitFlow", developer "Force Academy", green "GET" pill
-  - Rating strip: ★★★★★ · 4.8 · 1.2K Ratings · #12 Productivity
-  - Horizontal screenshot carousel: 3 vertical mini phone screens (CSS-built, no AI images — cleaner, faster, always on-brand)
-  - "What's New" block with version + short changelog
-  - "Ratings & Reviews" preview with one review card
+5. **Verification**
+   - Run `bun run build` to confirm no TypeScript or build errors.
 
-Using pure CSS for in-phone screenshots (instead of generated images) keeps it crisp on any DPR, avoids off-brand AI artifacts, and loads instantly.
+### Files to edit
+- `src/components/HeroSection.tsx`
+- `src/contexts/LanguageContext.tsx`
 
-## Right column copy
-
-- Eyebrow: "Day 15 · The finish line" (violet, uppercase, tracked)
-- Headline: "Your app. Live on the **App Store**." (gradient on "App Store")
-- Subtitle: one line about shipping a real product, not a demo
-- 4 checkmark rows (green check icon + label):
-  1. Shipped via App Store Connect
-  2. Passed Apple review
-  3. Reachable by 1.8B iPhone users
-  4. Ready to earn revenue
-
-## Files
-
-- **NEW** `src/components/AppStoreSection.tsx`
-- **EDIT** `src/contexts/LanguageContext.tsx` — add `as.*` i18n keys (EN + RU) for eyebrow, title, subtitle, 4 checks, appName, appDev, GET, ratings, whatsNew, review text
-- **EDIT** `src/pages/Index.tsx` — mount `<AppStoreSection />` immediately after `<HeroSection />`
-
-## Design tokens
-
-- Uses existing `glass-card`, `gradient-text`, `gradient-violet`, `shadow-glow-violet`, `animate-float`, `animate-fade-in` from index.css
-- No new tokens needed
-- In-phone light UI uses literal light colors (scoped inside the phone frame only)
+### Out of scope
+- No changes to pricing logic or payment flow.
+- No changes to the pricing section further down the page.

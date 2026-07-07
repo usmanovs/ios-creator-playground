@@ -76,11 +76,27 @@ const HeroSection = () => {
           {t('hero.subtitle')}
         </p>
         <p
-          className="text-base md:text-lg font-semibold text-accent max-w-2xl mb-12 animate-slide-up"
+          className="text-base md:text-lg font-semibold text-accent max-w-2xl mb-6 animate-slide-up"
           style={{ animationDelay: '0.2s', animationFillMode: 'backwards' }}
         >
           {t('hero.subtitleAccent')}
         </p>
+
+        {/* Discount banner */}
+        <div
+          className="mb-12 animate-slide-up"
+          style={{ animationDelay: '0.25s', animationFillMode: 'backwards' }}
+        >
+          <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-5 py-3 rounded-2xl bg-accent/10 border border-accent/30 backdrop-blur-2xl shadow-[0_0_30px_rgba(45,212,191,0.15)]">
+            <span className="text-2xl sm:text-3xl font-black text-foreground/40 line-through decoration-2">
+              $399
+            </span>
+            <span className="text-2xl sm:text-3xl font-black text-accent">→ $250</span>
+            <span className="text-sm sm:text-base font-bold text-foreground/80 text-center sm:text-left">
+              {t('hero.discountBanner')}
+            </span>
+          </div>
+        </div>
 
         {/* Social proof + revenue pill */}
         <div
@@ -152,7 +168,7 @@ const HeroSection = () => {
           href="https://wa.me/12024554575"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative group px-12 py-5 md:py-6 rounded-2xl overflow-hidden transition-all active:scale-95 mb-14 animate-slide-up"
+          className="relative group px-12 py-5 md:py-6 rounded-2xl overflow-hidden transition-all active:scale-95 mb-4 animate-slide-up"
           style={{
             background: 'var(--gradient-violet)',
             boxShadow: 'var(--shadow-glow-violet)',
@@ -165,6 +181,14 @@ const HeroSection = () => {
             {t('hero.cta')}
           </span>
         </a>
+
+        {/* CTA subtext */}
+        <p
+          className="text-sm md:text-base font-bold text-accent mb-14 animate-slide-up"
+          style={{ animationDelay: '0.5s', animationFillMode: 'backwards' }}
+        >
+          {t('hero.ctaSubtext')}
+        </p>
 
         {/* Countdown */}
         <div
