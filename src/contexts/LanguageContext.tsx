@@ -20,7 +20,7 @@ const translations: Record<string, Record<Language, string>> = {
   'hero.badge': { en: 'Save $150 — Live Sessions', ru: 'Экономия $150 — Живые Занятия' },
   'hero.title1': { en: 'Build an iOS app', ru: 'Создай iOS приложение' },
   'hero.title2': { en: 'that earns', ru: 'которое приносит' },
-  'hero.title3': { en: '$10,000/month', ru: '$10,000/месяц' },
+  'hero.title3': { en: '$1,000/month', ru: '$1,000/месяц' },
   'hero.subtitle': { en: 'Become an iOS Vibe Coder in 15 days. Design, build and ship AI-powered apps to the App Store without writing code.', ru: 'Стань iOS Vibe Coder\'ом за 15 дней. Проектируй, создавай и публикуй AI-приложения в App Store без написания кода.' },
   'hero.subtitleAccent': { en: 'Join the Vibe Coder movement.', ru: 'Присоединяйся к Vibe Coder движению.' },
   'hero.discountBanner': { en: 'enroll now and save $150 on Live Sessions', ru: 'запишись сейчас и сэкономь $150 на Живых Занятиях' },
