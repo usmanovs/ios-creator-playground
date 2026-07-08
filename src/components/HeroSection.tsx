@@ -89,7 +89,7 @@ const HeroSection = () => {
         >
           <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-5 py-3 rounded-2xl bg-accent/10 border border-accent/30 backdrop-blur-2xl shadow-[0_0_30px_rgba(45,212,191,0.15)]">
             <span className="text-2xl sm:text-3xl font-black text-foreground/40 line-through decoration-2">
-              $399
+              $499
             </span>
             <span className="text-2xl sm:text-3xl font-black text-accent">→ $349</span>
             <span className="text-sm sm:text-base font-bold text-foreground/80 text-center sm:text-left">
