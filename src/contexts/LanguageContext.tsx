@@ -17,15 +17,15 @@ const translations: Record<string, Record<Language, string>> = {
   'nav.enroll': { en: 'Enroll Now', ru: 'Записаться' },
 
   // Hero
-  'hero.badge': { en: 'Save $50 — Live Sessions', ru: 'Экономия $50 — Живые Занятия' },
+  'hero.badge': { en: 'Save $150 — Live Sessions', ru: 'Экономия $150 — Живые Занятия' },
   'hero.title1': { en: 'Build an iOS app', ru: 'Создай iOS приложение' },
   'hero.title2': { en: 'that earns', ru: 'которое приносит' },
   'hero.title3': { en: '$10,000/month', ru: '$10,000/месяц' },
   'hero.subtitle': { en: 'Become an iOS Vibe Coder in 15 days. Design, build and ship AI-powered apps to the App Store without writing code.', ru: 'Стань iOS Vibe Coder\'ом за 15 дней. Проектируй, создавай и публикуй AI-приложения в App Store без написания кода.' },
   'hero.subtitleAccent': { en: 'Join the Vibe Coder movement.', ru: 'Присоединяйся к Vibe Coder движению.' },
-  'hero.discountBanner': { en: 'enroll now and save $50 on Live Sessions', ru: 'запишись сейчас и сэкономь $50 на Живых Занятиях' },
+  'hero.discountBanner': { en: 'enroll now and save $150 on Live Sessions', ru: 'запишись сейчас и сэкономь $150 на Живых Занятиях' },
   'hero.cta': { en: 'Enroll Now — $349', ru: 'Записаться — $349' },
-  'hero.ctaSubtext': { en: 'Save $50 · Limited spots', ru: 'Экономия $50 · Ограниченные места' },
+  'hero.ctaSubtext': { en: 'Save $150 · Limited spots', ru: 'Экономия $150 · Ограниченные места' },
   'hero.students': { en: 'students already enrolled', ru: 'студентов уже записались' },
   'hero.revenue': { en: 'Graduates ship real App Store apps and target their first $600+ before the course ends', ru: 'Выпускники публикуют реальные приложения в App Store и стремятся к первым $600+ до конца курса' },
   'hero.stat1.val': { en: '300+', ru: '300+' },
