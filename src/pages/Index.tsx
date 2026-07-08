@@ -12,6 +12,7 @@ import ScheduleSection from '@/components/ScheduleSection';
 import PricingSection from '@/components/PricingSection';
 import FooterSection from '@/components/FooterSection';
 import StickyCtaBar from '@/components/StickyCtaBar';
+import WhatsAppWidget from '@/components/WhatsAppWidget';
 
 const Index = () => {
   return (
@@ -36,6 +37,7 @@ const Index = () => {
           <StickyCtaBar />
         </div>
       </div>
+      <WhatsAppWidget />
     </LanguageProvider>
   );
 };
