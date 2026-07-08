@@ -37,6 +37,7 @@ const Index = () => {
           <StickyCtaBar />
         </div>
       </div>
+      <WhatsAppWidget />
     </LanguageProvider>
   );
 };
