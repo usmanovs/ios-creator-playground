@@ -17,15 +17,15 @@ const translations: Record<string, Record<Language, string>> = {
   'nav.enroll': { en: 'Enroll Now', ru: 'Записаться' },
 
   // Hero
-  'hero.badge': { en: 'Save $149 — Early Bird Live Sessions', ru: 'Экономия $149 — Живые Занятия Early Bird' },
+  'hero.badge': { en: 'Save $50 — Live Sessions', ru: 'Экономия $50 — Живые Занятия' },
   'hero.title1': { en: 'Build an iOS app', ru: 'Создай iOS приложение' },
   'hero.title2': { en: 'that earns', ru: 'которое приносит' },
   'hero.title3': { en: '$10,000/month', ru: '$10,000/месяц' },
   'hero.subtitle': { en: 'Become an iOS Vibe Coder in 15 days. Design, build and ship AI-powered apps to the App Store without writing code.', ru: 'Стань iOS Vibe Coder\'ом за 15 дней. Проектируй, создавай и публикуй AI-приложения в App Store без написания кода.' },
   'hero.subtitleAccent': { en: 'Join the Vibe Coder movement.', ru: 'Присоединяйся к Vibe Coder движению.' },
-  'hero.discountBanner': { en: 'enroll now and save $149 on Live Sessions', ru: 'запишись сейчас и сэкономь $149 на Живых Занятиях' },
-  'hero.cta': { en: 'Enroll Now — $250', ru: 'Записаться — $250' },
-  'hero.ctaSubtext': { en: 'Save $149 · Limited early-bird spots', ru: 'Экономия $149 · Ограниченные места Early Bird' },
+  'hero.discountBanner': { en: 'enroll now and save $50 on Live Sessions', ru: 'запишись сейчас и сэкономь $50 на Живых Занятиях' },
+  'hero.cta': { en: 'Enroll Now — $349', ru: 'Записаться — $349' },
+  'hero.ctaSubtext': { en: 'Save $50 · Limited spots', ru: 'Экономия $50 · Ограниченные места' },
   'hero.students': { en: 'students already enrolled', ru: 'студентов уже записались' },
   'hero.revenue': { en: 'Graduates ship real App Store apps and target their first $600+ before the course ends', ru: 'Выпускники публикуют реальные приложения в App Store и стремятся к первым $600+ до конца курса' },
   'hero.stat1.val': { en: '300+', ru: '300+' },
@@ -133,15 +133,15 @@ const translations: Record<string, Record<Language, string>> = {
   'price.expired': { en: 'Expired', ru: 'Истекло' },
   'price.current': { en: 'Current Price', ru: 'Текущая цена' },
   'price.tier.early': { en: 'Early Bird', ru: 'Ранняя цена' },
-  'price.tier.early.amount': { en: '$250', ru: '$250' },
+  'price.tier.early.amount': { en: '$349', ru: '$349' },
   'price.tier.early.when': { en: '2+ weeks before start', ru: '2+ недели до начала' },
   'price.tier.early.dates': { en: 'Before Apr 15, 2026', ru: 'До 15 апреля 2026' },
   'price.tier.current': { en: 'Regular Price', ru: 'Обычная цена' },
-  'price.tier.current.amount': { en: '$300', ru: '$300' },
+  'price.tier.current.amount': { en: '$349', ru: '$349' },
   'price.tier.current.when': { en: '1–2 weeks before start', ru: '1–2 недели до начала' },
   'price.tier.current.dates': { en: 'Apr 15 – Apr 26, 2026', ru: '15 апреля – 26 апреля 2026' },
   'price.tier.last': { en: 'Last Chance', ru: 'Последний шанс' },
-  'price.tier.last.amount': { en: '$399', ru: '$399' },
+  'price.tier.last.amount': { en: '$349', ru: '$349' },
   'price.tier.last.when': { en: 'Last 2 days', ru: 'Последние 2 дня' },
   'price.tier.last.dates': { en: 'Apr 27 – Apr 30, 2026', ru: '27 апреля – 30 апреля 2026' },
 
@@ -216,7 +216,7 @@ const translations: Record<string, Record<Language, string>> = {
 
   // Sticky CTA
   'sticky.text': { en: 'Limited spots available', ru: 'Количество мест ограничено' },
-  'sticky.cta': { en: 'Enroll — $399', ru: 'Записаться — $399' },
+  'sticky.cta': { en: 'Enroll — $349', ru: 'Записаться — $349' },
 
   // App Store Section
   'as.eyebrow': { en: 'Day 15 · The finish line', ru: 'День 15 · Финиш' },
