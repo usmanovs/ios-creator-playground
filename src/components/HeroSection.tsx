@@ -91,7 +91,7 @@ const HeroSection = () => {
             <span className="text-2xl sm:text-3xl font-black text-foreground/40 line-through decoration-2">
               $399
             </span>
-            <span className="text-2xl sm:text-3xl font-black text-accent">→ $250</span>
+            <span className="text-2xl sm:text-3xl font-black text-accent">→ $349</span>
             <span className="text-sm sm:text-base font-bold text-foreground/80 text-center sm:text-left">
               {t('hero.discountBanner')}
             </span>
