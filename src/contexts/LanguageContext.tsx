@@ -36,13 +36,13 @@ const translations: Record<string, Record<Language, string>> = {
   'hero.stat3.label': { en: 'days to launch', ru: 'дней до запуска' },
   'hero.stat4.val': { en: '0', ru: '0' },
   'hero.stat4.label': { en: 'lines of code to write', ru: 'строк кода писать' },
-  'hero.countdownTitle': { en: 'Course starts in', ru: 'Курс начинается через' },
+  'hero.countdownTitle': { en: 'Limited spots available', ru: 'Количество мест ограничено' },
 
   // Countdown
-  'countdown.days': { en: 'days', ru: 'дней' },
-  'countdown.hours': { en: 'hours', ru: 'часов' },
-  'countdown.minutes': { en: 'min', ru: 'мин' },
-  'countdown.seconds': { en: 'sec', ru: 'сек' },
+  'countdown.days': { en: 'd', ru: 'd' },
+  'countdown.hours': { en: 'h', ru: 'h' },
+  'countdown.minutes': { en: 'm', ru: 'm' },
+  'countdown.seconds': { en: 's', ru: 'с' },
   'countdown.starts': { en: 'Program starts in', ru: 'Программа начнётся через' },
 
   // Instructor
