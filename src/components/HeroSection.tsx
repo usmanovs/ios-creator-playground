@@ -192,25 +192,23 @@ const HeroSection = () => {
 
         {/* Countdown */}
         <div
-          className="flex flex-col items-center gap-4 animate-fade-in"
+          className="flex flex-col items-center gap-3 animate-fade-in"
           style={{ animationDelay: '0.55s', animationFillMode: 'backwards' }}
         >
-          <div className="text-[10px] uppercase tracking-[0.3em] font-black text-foreground/40">
+          <div className="text-[10px] uppercase tracking-[0.25em] font-black text-foreground/50">
             {t('hero.countdownTitle')}
           </div>
-          <div className="flex items-center gap-4 md:gap-6 font-mono">
+          <div className="flex items-center gap-2 md:gap-3 font-mono text-foreground/90">
             {countdownItems.map((item, i, arr) => (
-              <div key={i} className="flex items-center gap-4 md:gap-6">
-                <div className="flex flex-col items-center">
-                  <span className="text-3xl md:text-4xl font-bold text-foreground leading-none tabular-nums">
-                    {String(item.val).padStart(2, '0')}
-                  </span>
-                  <span className="text-[9px] uppercase font-bold text-foreground/40 mt-2 tracking-widest">
+              <div key={i} className="flex items-center gap-2 md:gap-3">
+                <span className="text-2xl md:text-3xl font-bold leading-none tabular-nums">
+                  {String(item.val).padStart(2, '0')}
+                  <span className="text-sm md:text-base font-bold text-foreground/50 ml-0.5">
                     {item.label}
                   </span>
-                </div>
+                </span>
                 {i < arr.length - 1 && (
-                  <div className="text-2xl md:text-3xl text-foreground/15 font-normal">:</div>
+                  <span className="text-xl md:text-2xl text-foreground/30">:</span>
                 )}
               </div>
             ))}
