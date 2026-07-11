@@ -1,5 +1,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCountdown } from '@/hooks/useCountdown';
+import { COURSE_START_DATE } from '@/lib/course';
 import avatar1 from '@/assets/avatar1.jpg';
 import avatar2 from '@/assets/avatar2.jpg';
 import avatar3 from '@/assets/avatar3.jpg';
@@ -7,7 +8,7 @@ import avatar4 from '@/assets/avatar4.jpg';
 
 const HeroSection = () => {
   const { t } = useLanguage();
-  const countdown = useCountdown('2026-07-24T20:00:00-04:00');
+  const countdown = useCountdown(COURSE_START_DATE);
 
   const stats = [
     { val: t('hero.stat1.val'), label: t('hero.stat1.label') },
