@@ -7,7 +7,7 @@ import avatar4 from '@/assets/avatar4.jpg';
 
 const HeroSection = () => {
   const { t } = useLanguage();
-  const countdown = useCountdown('2026-05-01T00:00:00+06:00');
+  const countdown = useCountdown('2026-07-24T20:00:00-04:00');
 
   const stats = [
     { val: t('hero.stat1.val'), label: t('hero.stat1.label') },
