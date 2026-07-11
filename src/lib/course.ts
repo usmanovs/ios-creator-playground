@@ -1,0 +1,1 @@
+export const COURSE_START_DATE = '2026-07-24T20:00:00-04:00';
