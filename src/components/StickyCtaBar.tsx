@@ -1,9 +1,10 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCountdown } from '@/hooks/useCountdown';
+import { COURSE_START_DATE } from '@/lib/course';
 
 const StickyCtaBar = () => {
   const { t } = useLanguage();
-  const countdown = useCountdown('2026-05-01T00:00:00+06:00');
+  const countdown = useCountdown(COURSE_START_DATE);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-2xl border-t border-foreground/5 py-3 px-4">
