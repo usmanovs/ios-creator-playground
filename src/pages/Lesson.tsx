@@ -1,6 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -15,6 +15,12 @@ type Lesson = {
   content: string | null;
   video_url: string | null;
   lesson_type: string;
+};
+
+type CourseNav = {
+  course: { title: string } | null;
+  chapters: { id: string; title: string; order_index: number }[];
+  lessons: { id: string; chapter_id: string; title: string; order_index: number; lesson_type: string }[];
 };
 
 const isYouTube = (url: string) => /youtube\.com|youtu\.be/.test(url);
@@ -34,6 +40,7 @@ const fetchLesson = async (lessonId: string): Promise<Lesson | null> => {
 
 const LessonPage = () => {
   const { lessonId } = useParams();
+  const queryClient = useQueryClient();
 
   const { data: lesson, isLoading } = useQuery({
     queryKey: ["lesson", lessonId],
@@ -49,6 +56,30 @@ const LessonPage = () => {
 
   // Sidebar needs a courseId; use the last-known one while a new lesson loads
   const courseId = lesson?.course_id;
+
+  // Prefetch previous and next lessons for instant navigation
+  useEffect(() => {
+    if (!courseId || !lessonId) return;
+    const nav = queryClient.getQueryData<CourseNav>(["course-nav", courseId]);
+    if (!nav) return;
+
+    const ordered = [...nav.lessons].sort((a, b) => {
+      const ai = nav.chapters.find((c) => c.id === a.chapter_id)?.order_index ?? 0;
+      const bi = nav.chapters.find((c) => c.id === b.chapter_id)?.order_index ?? 0;
+      return ai - bi || a.order_index - b.order_index;
+    });
+    const idx = ordered.findIndex((l) => l.id === lessonId);
+    if (idx === -1) return;
+
+    const neighbors = [ordered[idx - 1], ordered[idx + 1]].filter(Boolean);
+    for (const n of neighbors) {
+      queryClient.prefetchQuery({
+        queryKey: ["lesson", n!.id],
+        queryFn: () => fetchLesson(n!.id),
+        staleTime: 5 * 60 * 1000,
+      });
+    }
+  }, [courseId, lessonId, queryClient]);
 
   return (
     <SidebarProvider>
