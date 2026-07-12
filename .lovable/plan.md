@@ -1,24 +1,38 @@
 ## Goal
-Show a sidebar on the Lesson page listing all chapters and lessons of the course, so users can navigate between lessons without going back.
+Navigating between lessons should feel instant — no full-page flash, sidebar stays mounted, only the lesson content swaps.
+
+## Root cause
+`Lesson.tsx` mounts `SidebarProvider` + `CourseSidebar` per route, and returns an early `Loading...` view that replaces the whole layout on every navigation. `CourseSidebar` also refetches chapters/lessons each time.
 
 ## Changes
 
-**1. New component: `src/components/CourseSidebar.tsx`**
-- Props: `courseId`, `currentLessonId`
-- Fetches course title, chapters (ordered), and published lessons (ordered) — same queries used in `Course.tsx`
-- Renders chapters as collapsible groups (chapter containing the current lesson expanded by default) with lessons as `NavLink`s to `/lesson/:id`
-- Highlights the active lesson
-- Shows a small lesson-type icon (video / pdf / text)
-- Includes a "Back to course" link at the top
-- Uses shadcn `Sidebar` primitives (`Sidebar`, `SidebarContent`, `SidebarGroup`, `SidebarMenu`, etc.) with `collapsible="icon"` so it can collapse to a narrow rail
+**1. New route layout `src/pages/CourseLayout.tsx`**
+- Reads `:courseId` from URL (route `/course/:courseId`) or derives it from the current lesson
+- Renders `SidebarProvider` + `CourseSidebar` + header with `SidebarTrigger` once
+- Renders `<Outlet />` for the child route (course overview or lesson)
+- Fetches chapters/lessons once here and passes them to `CourseSidebar` via props (or context) so sidebar doesn't refetch per lesson
 
-**2. Update `src/pages/Lesson.tsx`**
-- Wrap page in `SidebarProvider` with a full-width flex layout: `<CourseSidebar>` on the left, lesson content on the right
-- Add a `SidebarTrigger` in a small top bar of the content area so the sidebar can be toggled/reopened on all screen sizes
-- Keep existing lesson rendering (video / pdf / text) unchanged; remove the standalone "Back to course" link (now in the sidebar)
-- On mobile the shadcn sidebar auto-switches to an off-canvas drawer opened via the trigger
+**2. Restructure routes in `src/App.tsx`**
+```
+/course/:courseId            → CourseLayout → Course (index)
+/course/:courseId/lesson/:id → CourseLayout → Lesson
+```
+Keep legacy `/lesson/:lessonId` redirecting to the nested path (look up course_id) so existing links keep working.
+
+**3. Simplify `src/pages/Lesson.tsx`**
+- Remove `SidebarProvider`, sidebar, header — layout handles those
+- Replace full-page "Loading..." with an inline skeleton in the content area only, so the sidebar and header remain visible during fetch
+- Use React Query (`useQuery` keyed by lessonId) for caching — revisiting a lesson is instant
+
+**4. Simplify `src/pages/Course.tsx`**
+- Remove its own page chrome/background wrapper; render inside the shared layout
+- Reuse the same chapters/lessons data via React Query (same key as sidebar) to avoid duplicate fetches
+
+**5. `CourseSidebar`**
+- Accept optional `chapters`/`lessons` props from layout; fall back to its own React Query fetch keyed by courseId
+- No behavior change otherwise
 
 ## Technical notes
-- Data fetching in `CourseSidebar` mirrors `Course.tsx` queries (no schema changes)
-- Active state via `useParams()` / comparison to `currentLessonId`
-- No changes to routes, backend, or other pages
+- React Query cache means the sidebar data survives navigation and lesson content is cached per id
+- No schema/backend changes
+- `aurora-bg` moves into the layout so the background doesn't repaint between routes
