@@ -1,42 +1,24 @@
-## Plan: Emphasize the Live Sessions early-bird discount in the hero section
+## Goal
+Show a sidebar on the Lesson page listing all chapters and lessons of the course, so users can navigate between lessons without going back.
 
-### Goal
-Make the big discount for the Live Sessions plan impossible to miss in the hero by showing the savings message in three places: the badge, a new banner under the headline, and the CTA button.
+## Changes
 
-### What will change
+**1. New component: `src/components/CourseSidebar.tsx`**
+- Props: `courseId`, `currentLessonId`
+- Fetches course title, chapters (ordered), and published lessons (ordered) — same queries used in `Course.tsx`
+- Renders chapters as collapsible groups (chapter containing the current lesson expanded by default) with lessons as `NavLink`s to `/lesson/:id`
+- Highlights the active lesson
+- Shows a small lesson-type icon (video / pdf / text)
+- Includes a "Back to course" link at the top
+- Uses shadcn `Sidebar` primitives (`Sidebar`, `SidebarContent`, `SidebarGroup`, `SidebarMenu`, etc.) with `collapsible="icon"` so it can collapse to a narrow rail
 
-1. **Hero badge**
-   - Keep the existing pulsing accent dot and glass-pill style.
-   - Change the text from the generic tagline to a savings-focused message, e.g.:
-     - EN: "Save $149 — Early Bird Live Sessions"
-     - RU: "Экономия $149 — Живые Занятия Early Bird"
+**2. Update `src/pages/Lesson.tsx`**
+- Wrap page in `SidebarProvider` with a full-width flex layout: `<CourseSidebar>` on the left, lesson content on the right
+- Add a `SidebarTrigger` in a small top bar of the content area so the sidebar can be toggled/reopened on all screen sizes
+- Keep existing lesson rendering (video / pdf / text) unchanged; remove the standalone "Back to course" link (now in the sidebar)
+- On mobile the shadcn sidebar auto-switches to an off-canvas drawer opened via the trigger
 
-2. **New discount banner below the headline**
-   - Insert a prominent banner between the subtitle block and the social-proof row.
-   - Show the crossed-out full price and the discounted price:
-     - EN: "$399 → $250 — enroll now and save $149 on Live Sessions"
-     - RU: "$399 → $250 — запишись сейчас и сэкономь $149 на Живых Занятиях"
-   - Style it with the existing accent color and a subtle glow/shimmer so it reads as urgent.
-
-3. **CTA button**
-   - Update the button text from "Enroll Now — $399" to:
-     - EN: "Enroll Now — $250 (was $399)"
-     - RU: "Записаться — $250 (вместо $399)"
-   - Add a short savings line directly under the button:
-     - EN: "Save $149 · Limited early-bird spots"
-     - RU: "Экономия $149 · Ограниченные места Early Bird"
-
-4. **Translations**
-   - Add new keys to `LanguageContext.tsx` for the updated badge, banner, CTA, and subtext in both English and Russian.
-   - Keep the existing keys that are not changing.
-
-5. **Verification**
-   - Run `bun run build` to confirm no TypeScript or build errors.
-
-### Files to edit
-- `src/components/HeroSection.tsx`
-- `src/contexts/LanguageContext.tsx`
-
-### Out of scope
-- No changes to pricing logic or payment flow.
-- No changes to the pricing section further down the page.
+## Technical notes
+- Data fetching in `CourseSidebar` mirrors `Course.tsx` queries (no schema changes)
+- Active state via `useParams()` / comparison to `currentLessonId`
+- No changes to routes, backend, or other pages
