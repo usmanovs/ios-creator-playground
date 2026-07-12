@@ -1,9 +1,11 @@
 import { useEffect } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { uploadLessonImage } from "@/lib/uploadLessonImage";
 import {
   Bold,
   Italic,
