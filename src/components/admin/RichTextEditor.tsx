@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -57,8 +56,9 @@ async function uploadAndInsert(files: File[], editor: Editor | null) {
 export default function RichTextEditor({ value, onChange }: Props) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Link.configure({ openOnClick: false, HTMLAttributes: { rel: "noopener noreferrer" } }),
+      StarterKit.configure({
+        link: { openOnClick: false, HTMLAttributes: { rel: "noopener noreferrer" } },
+      }),
       Image,
     ],
     content: value || "",
