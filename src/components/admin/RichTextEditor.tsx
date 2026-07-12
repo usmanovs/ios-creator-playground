@@ -40,9 +40,26 @@ export default function RichTextEditor({ value, onChange }: Props) {
         class:
           "prose prose-invert max-w-none min-h-[260px] p-4 focus:outline-none prose-headings:font-display prose-a:text-primary",
       },
+      handlePaste: (view, event) => {
+        const files = getImageFiles(event.clipboardData?.items);
+        if (files.length === 0) return false;
+        event.preventDefault();
+        uploadAndInsert(files, editorRef.current);
+        return true;
+      },
+      handleDrop: (view, event) => {
+        const files = getImageFiles(event.dataTransfer?.items);
+        if (files.length === 0) return false;
+        event.preventDefault();
+        uploadAndInsert(files, editorRef.current);
+        return true;
+      },
     },
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
+
+  // keep a ref so paste/drop handlers can access the current editor
+  const editorRef = { current: editor as Editor | null };
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
