@@ -1,38 +1,34 @@
 ## Goal
-Navigating between lessons should feel instant — no full-page flash, sidebar stays mounted, only the lesson content swaps.
+Make lesson-to-lesson navigation feel seamless by adding a visible loading state that only affects the main content area, while the sidebar and header remain fully mounted.
 
-## Root cause
-`Lesson.tsx` mounts `SidebarProvider` + `CourseSidebar` per route, and returns an early `Loading...` view that replaces the whole layout on every navigation. `CourseSidebar` also refetches chapters/lessons each time.
+## What will be built
 
-## Changes
+1. **Navigation-aware loading state in `src/pages/Lesson.tsx`**
+   - Detect when `lessonId` changes while `isFetching` is true (React Query's `isFetching` is true on any refetch, but we only show the indicator when the route `lessonId` differs from the currently rendered lesson's `id` or when `isLoading` is false but `isFetching` is true).
+   - Keep the existing `isLoading && !lesson` skeleton for first-visit cold loads.
+   - During subsequent navigations, render a slim animated progress bar at the top of the content area and slightly dim the outgoing content so users know a transition is happening.
+   - Once the new lesson data arrives, swap the content normally.
 
-**1. New route layout `src/pages/CourseLayout.tsx`**
-- Reads `:courseId` from URL (route `/course/:courseId`) or derives it from the current lesson
-- Renders `SidebarProvider` + `CourseSidebar` + header with `SidebarTrigger` once
-- Renders `<Outlet />` for the child route (course overview or lesson)
-- Fetches chapters/lessons once here and passes them to `CourseSidebar` via props (or context) so sidebar doesn't refetch per lesson
+2. **Preserve mounted layout**
+   - `SidebarProvider`, `CourseSidebar`, and the sticky header (`SidebarTrigger`) will not be re-rendered or unmounted when `lessonId` changes.
+   - The sidebar will continue to show the course tree and highlight the active lesson via `currentLessonId`.
 
-**2. Restructure routes in `src/App.tsx`**
-```
-/course/:courseId            → CourseLayout → Course (index)
-/course/:courseId/lesson/:id → CourseLayout → Lesson
-```
-Keep legacy `/lesson/:lessonId` redirecting to the nested path (look up course_id) so existing links keep working.
+3. **React Query configuration remains the same**
+   - Keep `staleTime: 5 * 60 * 1000` and `prefetchQuery` for previous/next neighbors.
+   - The smooth indicator only complements the existing prefetch; prefetched lessons will still swap instantly, and non-prefetched lessons will show the gentle indicator.
 
-**3. Simplify `src/pages/Lesson.tsx`**
-- Remove `SidebarProvider`, sidebar, header — layout handles those
-- Replace full-page "Loading..." with an inline skeleton in the content area only, so the sidebar and header remain visible during fetch
-- Use React Query (`useQuery` keyed by lessonId) for caching — revisiting a lesson is instant
+## What this achieves
 
-**4. Simplify `src/pages/Course.tsx`**
-- Remove its own page chrome/background wrapper; render inside the shared layout
-- Reuse the same chapters/lessons data via React Query (same key as sidebar) to avoid duplicate fetches
+- No full-page reloads or full-page skeleton flashes when switching lessons.
+- Sidebar and header stay in place; only the lesson content area gives feedback.
+- Users get clear, non-jarring visual feedback that the next lesson is loading.
+- Navigation between prefetched lessons remains instantaneous.
 
-**5. `CourseSidebar`**
-- Accept optional `chapters`/`lessons` props from layout; fall back to its own React Query fetch keyed by courseId
-- No behavior change otherwise
+## Files to edit
+- `src/pages/Lesson.tsx` — add `isFetching` and conditional navigation indicator.
+- `src/components/ui/skeleton.tsx` or a small inline styled bar in `Lesson.tsx` — no new component needed if we use a simple Tailwind-animate progress bar.
 
-## Technical notes
-- React Query cache means the sidebar data survives navigation and lesson content is cached per id
-- No schema/backend changes
-- `aurora-bg` moves into the layout so the background doesn't repaint between routes
+## No changes to
+- `CourseSidebar.tsx` (remains mounted and unchanged).
+- Data fetching logic (`fetchLesson`, `fetchCourseNav`, prefetching).
+- React Query keys and caching behavior.
