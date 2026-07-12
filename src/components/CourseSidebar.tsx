@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { NavLink, Link } from "react-router-dom";
 import { ArrowLeft, BookOpen, FileText, PlayCircle, FileType } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,37 +34,39 @@ const typeIcon = (t: string) => {
   return FileText;
 };
 
+const fetchCourseNav = async (courseId: string) => {
+  const [{ data: c }, { data: ch }, { data: ls }] = await Promise.all([
+    supabase.from("courses").select("title").eq("id", courseId).maybeSingle(),
+    supabase
+      .from("chapters")
+      .select("id,title,order_index")
+      .eq("course_id", courseId)
+      .order("order_index"),
+    supabase
+      .from("lessons")
+      .select("id,chapter_id,title,order_index,lesson_type")
+      .eq("course_id", courseId)
+      .eq("status", "published")
+      .order("order_index"),
+  ]);
+  return {
+    course: (c as { title: string } | null) ?? null,
+    chapters: (ch as Chapter[]) ?? [],
+    lessons: (ls as LessonItem[]) ?? [],
+  };
+};
+
 export default function CourseSidebar({ courseId, currentLessonId }: Props) {
-  const [course, setCourse] = useState<{ title: string } | null>(null);
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [lessons, setLessons] = useState<LessonItem[]>([]);
+  const { data } = useQuery({
+    queryKey: ["course-nav", courseId],
+    queryFn: () => fetchCourseNav(courseId),
+    enabled: !!courseId,
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    if (!courseId) return;
-    (async () => {
-      const { data: c } = await supabase
-        .from("courses")
-        .select("title")
-        .eq("id", courseId)
-        .maybeSingle();
-      setCourse(c as any);
-
-      const { data: ch } = await supabase
-        .from("chapters")
-        .select("id,title,order_index")
-        .eq("course_id", courseId)
-        .order("order_index");
-      setChapters((ch as Chapter[]) || []);
-
-      const { data: ls } = await supabase
-        .from("lessons")
-        .select("id,chapter_id,title,order_index,lesson_type")
-        .eq("course_id", courseId)
-        .eq("status", "published")
-        .order("order_index");
-      setLessons((ls as LessonItem[]) || []);
-    })();
-  }, [courseId]);
+  const course = data?.course;
+  const chapters = data?.chapters ?? [];
+  const lessons = data?.lessons ?? [];
 
   return (
     <Sidebar collapsible="icon">
