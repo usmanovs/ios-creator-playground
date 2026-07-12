@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
-import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import CourseSidebar from "@/components/CourseSidebar";
 
 type Lesson = {
   id: string;
@@ -27,6 +28,7 @@ const LessonPage = () => {
 
   useEffect(() => {
     if (!lessonId) return;
+    setLoading(true);
     (async () => {
       const { data } = await supabase
         .from("lessons")
@@ -47,56 +49,61 @@ const LessonPage = () => {
   if (!lesson) return <div className="p-12 text-center">Lesson not found</div>;
 
   return (
-    <div className="min-h-screen relative">
-      <div className="aurora-bg" />
-      <div className="relative max-w-4xl mx-auto px-6 py-12">
-        <Link
-          to={`/course/${lesson.course_id}`}
-          className="inline-flex items-center gap-2 text-foreground/60 hover:text-primary mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to course
-        </Link>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full relative">
+        <div className="aurora-bg" />
+        <CourseSidebar courseId={lesson.course_id} currentLessonId={lesson.id} />
 
-        <h1 className="font-display text-3xl md:text-4xl font-bold mb-8">{lesson.title}</h1>
+        <div className="flex-1 flex flex-col relative">
+          <header className="h-12 flex items-center border-b border-border/40 px-2 sticky top-0 z-10 bg-background/60 backdrop-blur">
+            <SidebarTrigger />
+          </header>
 
-        <div className="glass-card p-6 md:p-8">
-          {lesson.lesson_type === "video" && lesson.video_url && (
-            <div className="aspect-video rounded-2xl overflow-hidden bg-black">
-              {isYouTube(lesson.video_url) ? (
-                <iframe
-                  src={toYouTubeEmbed(lesson.video_url)}
-                  title={lesson.title}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <video src={lesson.video_url} controls className="w-full h-full" />
-              )}
+          <main className="flex-1">
+            <div className="max-w-4xl mx-auto px-6 py-12">
+              <h1 className="font-display text-3xl md:text-4xl font-bold mb-8">{lesson.title}</h1>
+
+              <div className="glass-card p-6 md:p-8">
+                {lesson.lesson_type === "video" && lesson.video_url && (
+                  <div className="aspect-video rounded-2xl overflow-hidden bg-black">
+                    {isYouTube(lesson.video_url) ? (
+                      <iframe
+                        src={toYouTubeEmbed(lesson.video_url)}
+                        title={lesson.title}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video src={lesson.video_url} controls className="w-full h-full" />
+                    )}
+                  </div>
+                )}
+
+                {lesson.lesson_type === "pdf" && lesson.video_url && (
+                  <iframe
+                    src={lesson.video_url}
+                    title={lesson.title}
+                    className="w-full h-[80vh] rounded-2xl bg-white"
+                  />
+                )}
+
+                {lesson.lesson_type === "text" && (
+                  <article
+                    className="prose prose-invert max-w-none prose-headings:font-display prose-a:text-primary"
+                    dangerouslySetInnerHTML={{ __html: safeHtml }}
+                  />
+                )}
+
+                {lesson.lesson_type === "video" && !lesson.video_url && (
+                  <p className="text-foreground/50">No video provided.</p>
+                )}
+              </div>
             </div>
-          )}
-
-          {lesson.lesson_type === "pdf" && lesson.video_url && (
-            <iframe
-              src={lesson.video_url}
-              title={lesson.title}
-              className="w-full h-[80vh] rounded-2xl bg-white"
-            />
-          )}
-
-          {lesson.lesson_type === "text" && (
-            <article
-              className="prose prose-invert max-w-none prose-headings:font-display prose-a:text-primary"
-              dangerouslySetInnerHTML={{ __html: safeHtml }}
-            />
-          )}
-
-          {lesson.lesson_type === "video" && !lesson.video_url && (
-            <p className="text-foreground/50">No video provided.</p>
-          )}
+          </main>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
