@@ -43,7 +43,7 @@ const LessonPage = () => {
   const { lessonId } = useParams();
   const queryClient = useQueryClient();
 
-  const { data: lesson, isLoading } = useQuery({
+  const { data: lesson, isLoading, isFetching } = useQuery({
     queryKey: ["lesson", lessonId],
     queryFn: () => fetchLesson(lessonId!),
     enabled: !!lessonId,
@@ -57,6 +57,9 @@ const LessonPage = () => {
 
   // Sidebar needs a courseId; use the last-known one while a new lesson loads
   const courseId = lesson?.course_id;
+
+  // True when we're already showing a lesson but fetching a different one
+  const navigating = isFetching && !!lesson && lesson.id !== lessonId;
 
   // Prefetch previous and next lessons for instant navigation
   useEffect(() => {
@@ -94,7 +97,12 @@ const LessonPage = () => {
           </header>
 
           <main className="flex-1">
-            <div className="max-w-4xl mx-auto px-6 py-12">
+            <div className={cn("max-w-4xl mx-auto px-6 py-12 transition-opacity duration-300", navigating && "opacity-50")}>
+              {navigating && (
+                <div className="h-1 w-full rounded-full overflow-hidden bg-primary/20 mb-8">
+                  <div className="h-full w-1/3 bg-primary rounded-full animate-[loading-bar_1.5s_ease-in-out_infinite]" />
+                </div>
+              )}
               {isLoading && !lesson ? (
                 <>
                   <Skeleton className="h-10 w-2/3 mb-8" />
