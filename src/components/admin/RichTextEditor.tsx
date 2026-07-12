@@ -27,6 +27,33 @@ type Props = {
   onChange: (html: string) => void;
 };
 
+function getImageFiles(items?: DataTransferItemList | null): File[] {
+  if (!items) return [];
+  const out: File[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const it = items[i];
+    if (it.kind === "file" && it.type.startsWith("image/")) {
+      const f = it.getAsFile();
+      if (f) out.push(f);
+    }
+  }
+  return out;
+}
+
+async function uploadAndInsert(files: File[], editor: Editor | null) {
+  if (!editor) return;
+  for (const file of files) {
+    const tId = toast.loading("Uploading image…");
+    try {
+      const url = await uploadLessonImage(file);
+      editor.chain().focus().setImage({ src: url }).run();
+      toast.success("Image inserted", { id: tId });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Upload failed", { id: tId });
+    }
+  }
+}
+
 export default function RichTextEditor({ value, onChange }: Props) {
   const editor = useEditor({
     extensions: [
