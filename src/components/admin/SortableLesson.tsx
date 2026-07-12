@@ -42,7 +42,12 @@ export default function SortableLesson({ lesson, onEdit, onDuplicate, onDelete }
       >
         <GripVertical className="w-4 h-4" />
       </button>
-      <span className="flex-1 truncate text-sm">{lesson.title}</span>
+      <button
+        onClick={onEdit}
+        className="flex-1 truncate text-sm text-left hover:text-primary transition-colors"
+      >
+        {lesson.title}
+      </button>
       <span className="text-xs px-2 py-0.5 rounded-full bg-foreground/10 hidden sm:inline">
         {lesson.lesson_type}
       </span>
