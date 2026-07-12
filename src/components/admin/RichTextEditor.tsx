@@ -1,9 +1,11 @@
 import { useEffect } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { uploadLessonImage } from "@/lib/uploadLessonImage";
 import {
   Bold,
   Italic,
@@ -25,6 +27,33 @@ type Props = {
   onChange: (html: string) => void;
 };
 
+function getImageFiles(items?: DataTransferItemList | null): File[] {
+  if (!items) return [];
+  const out: File[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const it = items[i];
+    if (it.kind === "file" && it.type.startsWith("image/")) {
+      const f = it.getAsFile();
+      if (f) out.push(f);
+    }
+  }
+  return out;
+}
+
+async function uploadAndInsert(files: File[], editor: Editor | null) {
+  if (!editor) return;
+  for (const file of files) {
+    const tId = toast.loading("Uploading image…");
+    try {
+      const url = await uploadLessonImage(file);
+      editor.chain().focus().setImage({ src: url }).run();
+      toast.success("Image inserted", { id: tId });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Upload failed", { id: tId });
+    }
+  }
+}
+
 export default function RichTextEditor({ value, onChange }: Props) {
   const editor = useEditor({
     extensions: [
@@ -38,9 +67,26 @@ export default function RichTextEditor({ value, onChange }: Props) {
         class:
           "prose prose-invert max-w-none min-h-[260px] p-4 focus:outline-none prose-headings:font-display prose-a:text-primary",
       },
+      handlePaste: (view, event) => {
+        const files = getImageFiles(event.clipboardData?.items);
+        if (files.length === 0) return false;
+        event.preventDefault();
+        uploadAndInsert(files, editorRef.current);
+        return true;
+      },
+      handleDrop: (view, event) => {
+        const files = getImageFiles(event.dataTransfer?.items);
+        if (files.length === 0) return false;
+        event.preventDefault();
+        uploadAndInsert(files, editorRef.current);
+        return true;
+      },
     },
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
+
+  // keep a ref so paste/drop handlers can access the current editor
+  const editorRef = { current: editor as Editor | null };
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
