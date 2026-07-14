@@ -15,22 +15,34 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate("/admin");
-    });
+  const redirectAfterAuth = useCallback(async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("role", "admin")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (data) navigate("/admin");
+    else navigate(`/course/${COURSE_ID}`);
   }, [navigate]);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) redirectAfterAuth(data.user.id);
+    });
+  }, [redirectAfterAuth]);
 
   const signInWithGoogle = async () => {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/admin",
+      redirect_uri: window.location.origin + "/auth",
     });
     if (result.error) {
       toast.error(result.error.message || "Google sign-in failed");
       return;
     }
     if (result.redirected) return;
-    navigate("/admin");
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData.user) await redirectAfterAuth(userData.user.id);
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -41,15 +53,15 @@ export default function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/admin` },
+          options: { emailRedirectTo: `${window.location.origin}/auth` },
         });
         if (error) throw error;
-        toast.success("Account created. Signing you in…");
+        toast.success("Account created. Check your email to confirm.");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        if (data.user) await redirectAfterAuth(data.user.id);
       }
-      navigate("/admin");
     } catch (err: any) {
       toast.error(err.message || "Auth failed");
     } finally {
