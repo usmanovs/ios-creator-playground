@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { BookOpen, ChevronRight, Play, FileText, HelpCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -124,17 +124,33 @@ export default function CoursePage() {
                   const Icon = meta.icon;
                   const isCompleted = completedIds?.has(ls.id);
                   return (
-                    <Link
+                    <NavLink
                       key={ls.id}
                       to={`/lesson/${ls.id}`}
-                      className="flex items-center gap-3 py-2.5 px-3 rounded-lg bg-card/40 hover:bg-card/60 transition-all group"
+                      className={({ isActive }) =>
+                        [
+                          "flex items-center gap-3 py-2.5 px-3 rounded-lg transition-all duration-200 group",
+                          "hover:bg-card/60 hover:translate-x-0.5",
+                          isActive
+                            ? "bg-primary/10 border border-primary/30 shadow-[inset_2px_0_0_0_hsl(var(--primary))]"
+                            : "bg-card/40 border border-transparent",
+                        ].join(" ")
+                      }
                     >
-                      <div className="flex-shrink-0 w-8 h-8 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center font-display text-sm font-bold text-primary group-hover:bg-primary/20 group-hover:border-primary/40 transition-colors">
+                      <div className={cn(
+                        "flex-shrink-0 w-8 h-8 rounded-md border flex items-center justify-center font-display text-sm font-bold transition-colors",
+                        isActive
+                          ? "bg-primary/20 border-primary/40 text-primary"
+                          : "bg-primary/10 border-primary/20 text-primary group-hover:bg-primary/20 group-hover:border-primary/40"
+                      )}>
                         {idx + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 text-foreground/90 group-hover:text-foreground font-medium truncate">
-                          <Icon className="w-3.5 h-3.5 text-primary/70 flex-shrink-0" />
+                        <div className={cn(
+                          "flex items-center gap-2 font-medium truncate",
+                          isActive ? "text-foreground" : "text-foreground/90 group-hover:text-foreground"
+                        )}>
+                          <Icon className={cn("w-3.5 h-3.5 flex-shrink-0", isActive ? "text-primary" : "text-primary/70")} />
                           <span className="truncate">{ls.title}</span>
                         </div>
                         <div className="text-xs text-foreground/50 mt-0 ml-5">
@@ -144,9 +160,12 @@ export default function CoursePage() {
                       {isCompleted ? (
                         <Check className="w-4 h-4 text-primary flex-shrink-0" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        <ChevronRight className={cn(
+                          "w-4 h-4 flex-shrink-0 transition-all",
+                          isActive ? "text-primary translate-x-0.5" : "text-foreground/30 group-hover:text-primary group-hover:translate-x-0.5"
+                        )} />
                       )}
-                    </Link>
+                    </NavLink>
                   );
                 })}
               </div>
