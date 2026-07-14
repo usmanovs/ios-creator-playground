@@ -73,7 +73,7 @@ export default function CoursePage() {
                     <Link
                       key={ls.id}
                       to={`/lesson/${ls.id}`}
-                      className="flex items-center gap-4 p-4 rounded-xl border border-border/15 bg-card/20 hover:border-border/30 hover:bg-card/40 transition-all group"
+                      className="flex items-center gap-4 p-4 rounded-xl bg-card/40 hover:bg-card/60 transition-all group"
                     >
                       <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-display font-bold text-primary group-hover:bg-primary/20 group-hover:border-primary/40 transition-colors">
                         {idx + 1}
