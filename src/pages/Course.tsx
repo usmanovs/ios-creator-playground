@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, ChevronRight } from "lucide-react";
+import { BookOpen, ChevronRight, Play, FileText, HelpCircle } from "lucide-react";
+
+const LESSON_META: Record<string, { icon: typeof Play; label: string }> = {
+  video: { icon: Play, label: "Video lesson" },
+  text: { icon: FileText, label: "Reading" },
+  quiz: { icon: HelpCircle, label: "Quiz" },
+};
 import { supabase } from "@/integrations/supabase/client";
 
 const COURSE_ID = "4dcdf780-0842-449d-a1c2-bfa7acf280ce";
