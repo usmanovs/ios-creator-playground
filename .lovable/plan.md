@@ -1,27 +1,20 @@
 ## Goal
-Allow admins to paste (Cmd/Ctrl+V) or drag-and-drop images directly into the lesson content editor. Images upload to backend storage and the resulting URL is inserted inline into the lesson HTML.
 
-## Changes
+Make lessons in the course page (`/course/:courseId`) more visually distinct from each other, instead of the current flat list of near-identical rows.
 
-1. **Create storage bucket `lesson-images`** (public read).
-   - RLS on `storage.objects`:
-     - Public `SELECT` on this bucket (so images render for any lesson viewer).
-     - `INSERT/UPDATE/DELETE` restricted to authenticated admins (using existing `has_role(auth.uid(), 'admin')`).
+## Changes (in `src/pages/Course.tsx`)
 
-2. **`src/lib/uploadLessonImage.ts` (new)** — helper that:
-   - Accepts a `File`/`Blob`, generates a unique path `${crypto.randomUUID()}.${ext}`.
-   - Uploads via `supabase.storage.from('lesson-images').upload(...)`.
-   - Returns the public URL.
+Redesign each lesson row inside a chapter card so items feel like discrete cards rather than a bare list:
 
-3. **`src/components/admin/RichTextEditor.tsx`** — extend the TipTap editor with:
-   - `handlePaste`: detect image items in clipboard, upload, insert `<img>` at cursor.
-   - `handleDrop`: same for dropped image files.
-   - Show a lightweight "Uploading…" toast (sonner) during upload; toast error on failure.
-   - Existing "Image URL" button stays as fallback.
+- **Numbered index badge** on the left: a rounded square (e.g. `w-9 h-9 rounded-lg`) with the lesson number (1, 2, 3…) in the display font, primary-tinted background (`bg-primary/10 text-primary`, border `border-primary/20`).
+- **Lesson type icon** next to the title (Play icon for `video`, FileText for `text`, HelpCircle for `quiz`) so different lesson kinds are instantly distinguishable.
+- **Two-line layout**: title on top (medium weight), small muted subtitle beneath showing the lesson type label (e.g. "Video lesson", "Reading").
+- **Card treatment per lesson**: subtle bordered surface (`border border-border/40 bg-card/20`), rounded-xl, with clear separation via `space-y-3` between rows.
+- **Hover state**: lift with `hover:border-primary/40 hover:bg-card/40`, chevron slides right (`group-hover:translate-x-0.5`), and the number badge brightens.
+- **Divider between chapters** stays as-is (chapters are already in glass cards).
 
-## Files
-- New: `src/lib/uploadLessonImage.ts`
-- Edit: `src/components/admin/RichTextEditor.tsx`
-- Migration: create bucket + policies
+No changes to data fetching, admin, or other pages. Purely presentational.
 
-No changes to lesson rendering — pasted images become normal `<img>` tags in `content_html`, already sanitized by DOMPurify on the view side.
+## Result
+
+Each lesson becomes a scannable card with a number, type icon, title, and type label — making the sequence and the kind of each lesson obvious at a glance.

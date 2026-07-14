@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, ChevronRight } from "lucide-react";
+import { BookOpen, ChevronRight, Play, FileText, HelpCircle } from "lucide-react";
+
+const LESSON_META: Record<string, { icon: typeof Play; label: string }> = {
+  video: { icon: Play, label: "Video lesson" },
+  text: { icon: FileText, label: "Reading" },
+  quiz: { icon: HelpCircle, label: "Quiz" },
+};
 import { supabase } from "@/integrations/supabase/client";
 
 const COURSE_ID = "4dcdf780-0842-449d-a1c2-bfa7acf280ce";
@@ -59,19 +65,32 @@ export default function CoursePage() {
                 <BookOpen className="w-5 h-5 text-primary" />
                 {ch.title}
               </h2>
-              <div className="space-y-2">
-                {getLessons(ch.id).map((ls) => (
-                  <Link
-                    key={ls.id}
-                    to={`/lesson/${ls.id}`}
-                    className="flex items-center justify-between p-3 rounded-xl hover:bg-card/40 transition-colors group"
-                  >
-                    <span className="text-foreground/80 group-hover:text-foreground">
-                      {ls.title}
-                    </span>
-                    <ChevronRight className="w-4 h-4 text-foreground/30 group-hover:text-primary transition-colors" />
-                  </Link>
-                ))}
+              <div className="space-y-3">
+                {getLessons(ch.id).map((ls, idx) => {
+                  const meta = LESSON_META[ls.lesson_type] ?? LESSON_META.text;
+                  const Icon = meta.icon;
+                  return (
+                    <Link
+                      key={ls.id}
+                      to={`/lesson/${ls.id}`}
+                      className="flex items-center gap-4 p-4 rounded-xl border border-border/40 bg-card/20 hover:border-primary/40 hover:bg-card/40 transition-all group"
+                    >
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-display font-bold text-primary group-hover:bg-primary/20 group-hover:border-primary/40 transition-colors">
+                        {idx + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-foreground/90 group-hover:text-foreground font-medium truncate">
+                          <Icon className="w-4 h-4 text-primary/70 flex-shrink-0" />
+                          <span className="truncate">{ls.title}</span>
+                        </div>
+                        <div className="text-xs text-foreground/50 mt-0.5 ml-6">
+                          {meta.label}
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           ))}
