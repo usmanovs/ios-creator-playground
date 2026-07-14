@@ -3,6 +3,7 @@ import { NavLink, Link } from "react-router-dom";
 import { ArrowLeft, BookOpen, FileText, PlayCircle, FileType, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserProgress } from "@/hooks/useUserProgress";
+import { cn } from "@/lib/utils";
 import {
   Sidebar,
   SidebarContent,
