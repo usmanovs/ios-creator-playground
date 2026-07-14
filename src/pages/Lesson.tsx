@@ -1,12 +1,17 @@
-import { useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Check } from "lucide-react";
 import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import CourseSidebar from "@/components/CourseSidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useUserProgress } from "@/hooks/useUserProgress";
 
 type Lesson = {
   id: string;
@@ -42,6 +47,8 @@ const fetchLesson = async (lessonId: string): Promise<Lesson | null> => {
 const LessonPage = () => {
   const { lessonId } = useParams();
   const queryClient = useQueryClient();
+  const { user, completedIds } = useUserProgress();
+  const [toggling, setToggling] = useState(false);
 
   const { data: lesson, isLoading, isFetching } = useQuery({
     queryKey: ["lesson", lessonId],
@@ -55,13 +62,44 @@ const LessonPage = () => {
     [lesson?.content_html]
   );
 
-  // Sidebar needs a courseId; use the last-known one while a new lesson loads
   const courseId = lesson?.course_id;
 
-  // True when we're already showing a lesson but fetching a different one
   const navigating = isFetching && !!lesson && lesson.id !== lessonId;
 
-  // Prefetch previous and next lessons for instant navigation
+  const completed = !!lessonId && completedIds?.has(lessonId);
+
+  const markComplete = async () => {
+    if (!user || !lessonId) return;
+    setToggling(true);
+    const { error } = await supabase
+      .from("user_progress")
+      .insert({ user_id: user.id, lesson_id: lessonId });
+    setToggling(false);
+    if (error) {
+      toast.error("Failed to mark complete");
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ["progress", user.id] });
+    toast.success("Lesson completed!");
+  };
+
+  const markIncomplete = async () => {
+    if (!user || !lessonId) return;
+    setToggling(true);
+    const { error } = await supabase
+      .from("user_progress")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("lesson_id", lessonId);
+    setToggling(false);
+    if (error) {
+      toast.error("Failed to update progress");
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ["progress", user.id] });
+    toast.success("Progress updated");
+  };
+
   useEffect(() => {
     if (!courseId || !lessonId) return;
     const nav = queryClient.getQueryData<CourseNav>(["course-nav", courseId]);
@@ -150,6 +188,34 @@ const LessonPage = () => {
 
                     {lesson.lesson_type === "video" && !lesson.video_url && (
                       <p className="text-foreground/50">No video provided.</p>
+                    )}
+                  </div>
+
+                  <div className="mt-8 flex items-center gap-3">
+                    {user ? (
+                      completed ? (
+                        <>
+                          <Badge variant="secondary" className="gap-1 text-primary">
+                            <Check className="w-3 h-3" />
+                            Completed
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            onClick={markIncomplete}
+                            disabled={toggling}
+                          >
+                            Mark as incomplete
+                          </Button>
+                        </>
+                      ) : (
+                        <Button onClick={markComplete} disabled={toggling}>
+                          Mark as complete
+                        </Button>
+                      )
+                    ) : (
+                      <Button asChild variant="outline">
+                        <Link to="/auth">Sign in to track progress</Link>
+                      </Button>
                     )}
                   </div>
                 </>

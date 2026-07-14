@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, ChevronRight, Play, FileText, HelpCircle } from "lucide-react";
+import { BookOpen, ChevronRight, Play, FileText, HelpCircle, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/integrations/supabase/client";
+import { useUserProgress } from "@/hooks/useUserProgress";
 
 const LESSON_META: Record<string, { icon: typeof Play; label: string }> = {
   video: { icon: Play, label: "Video lesson" },
   text: { icon: FileText, label: "Reading" },
   quiz: { icon: HelpCircle, label: "Quiz" },
 };
-import { supabase } from "@/integrations/supabase/client";
 
-const COURSE_ID = "4dcdf780-0842-449d-a1c2-bfa7acf280ce";
+export const COURSE_ID = "4dcdf780-0842-449d-a1c2-bfa7acf280ce";
 
 export default function CoursePage() {
   const [course, setCourse] = useState<any>(null);
   const [chapters, setChapters] = useState<any[]>([]);
   const [lessons, setLessons] = useState<any[]>([]);
+  const { user, completedIds } = useUserProgress();
 
   useEffect(() => {
     (async () => {
@@ -45,6 +49,22 @@ export default function CoursePage() {
   const getLessons = (chapterId: string) =>
     lessons.filter((l) => l.chapter_id === chapterId);
 
+  const totalLessons = lessons.length;
+  const completedCount = completedIds?.size ?? 0;
+  const percent = totalLessons
+    ? Math.round((completedCount / totalLessons) * 100)
+    : 0;
+
+  const nextLessonId = (() => {
+    if (!completedIds || totalLessons === 0) return null;
+    for (const ch of chapters) {
+      for (const ls of getLessons(ch.id)) {
+        if (!completedIds.has(ls.id)) return ls.id;
+      }
+    }
+    return null;
+  })();
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="aurora-bg" />
@@ -58,6 +78,39 @@ export default function CoursePage() {
           </p>
         </div>
 
+        {user ? (
+          <div className="glass-card rounded-2xl p-6 mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+              <div>
+                <h2 className="font-display text-xl font-bold">Your progress</h2>
+                <p className="text-sm text-foreground/60">
+                  {completedCount} of {totalLessons} lessons completed
+                </p>
+              </div>
+              <div className="text-3xl font-display font-bold text-primary">
+                {percent}%
+              </div>
+            </div>
+            <Progress value={percent} className="h-2 mb-4" />
+            {nextLessonId ? (
+              <Button asChild>
+                <Link to={`/lesson/${nextLessonId}`}>Continue learning</Link>
+              </Button>
+            ) : (
+              <p className="text-sm text-foreground/60">All lessons completed!</p>
+            )}
+          </div>
+        ) : (
+          <div className="glass-card rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <p className="text-sm text-foreground/60">
+              Sign in to track your progress and keep learning.
+            </p>
+            <Button asChild variant="outline">
+              <Link to="/auth">Sign in</Link>
+            </Button>
+          </div>
+        )}
+
         <div className="space-y-8">
           {chapters.map((ch) => (
             <div key={ch.id} className="glass-card rounded-2xl p-6">
@@ -69,6 +122,7 @@ export default function CoursePage() {
                 {getLessons(ch.id).map((ls, idx) => {
                   const meta = LESSON_META[ls.lesson_type] ?? LESSON_META.text;
                   const Icon = meta.icon;
+                  const isCompleted = completedIds?.has(ls.id);
                   return (
                     <Link
                       key={ls.id}
@@ -87,7 +141,11 @@ export default function CoursePage() {
                           {meta.label}
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      {isCompleted ? (
+                        <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                      ) : (
+                        <ChevronRight className="w-5 h-5 text-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      )}
                     </Link>
                   );
                 })}

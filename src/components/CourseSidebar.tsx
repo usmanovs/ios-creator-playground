@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { NavLink, Link } from "react-router-dom";
-import { ArrowLeft, BookOpen, FileText, PlayCircle, FileType } from "lucide-react";
+import { ArrowLeft, BookOpen, FileText, PlayCircle, FileType, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserProgress } from "@/hooks/useUserProgress";
 import {
   Sidebar,
   SidebarContent,
@@ -64,6 +65,8 @@ export default function CourseSidebar({ courseId, currentLessonId }: Props) {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { completedIds } = useUserProgress();
+
   const course = data?.course;
   const chapters = data?.chapters ?? [];
   const lessons = data?.lessons ?? [];
@@ -101,7 +104,10 @@ export default function CourseSidebar({ courseId, currentLessonId }: Props) {
                         <SidebarMenuButton asChild isActive={active}>
                           <NavLink to={`/lesson/${ls.id}`} className="flex items-center gap-2">
                             <Icon className="w-4 h-4 shrink-0" />
-                            <span className="truncate">{ls.title}</span>
+                            <span className="truncate flex-1">{ls.title}</span>
+                            {completedIds?.has(ls.id) && (
+                              <Check className="w-4 h-4 text-primary shrink-0" />
+                            )}
                           </NavLink>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
