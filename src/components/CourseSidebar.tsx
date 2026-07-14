@@ -101,10 +101,18 @@ export default function CourseSidebar({ courseId, currentLessonId }: Props) {
                     const active = ls.id === currentLessonId;
                     return (
                       <SidebarMenuItem key={ls.id}>
-                        <SidebarMenuButton asChild isActive={active} className="h-8 px-2 py-1">
-                          <NavLink to={`/lesson/${ls.id}`} className="flex items-center gap-2">
-                            <Icon className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate flex-1 text-sm">{ls.title}</span>
+                        <SidebarMenuButton asChild isActive={active} className="h-8 px-2 py-1 relative overflow-hidden">
+                          <NavLink
+                            to={`/lesson/${ls.id}`}
+                            className={({ isActive }) =>
+                              cn(
+                                "flex items-center gap-2 transition-colors duration-200",
+                                isActive && "after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:h-4 after:w-0.5 after:rounded-full after:bg-primary"
+                              )
+                            }
+                          >
+                            <Icon className={cn("w-3.5 h-3.5 shrink-0", active && "text-primary")} />
+                            <span className={cn("truncate flex-1 text-sm", active && "text-foreground font-medium")}>{ls.title}</span>
                             {completedIds?.has(ls.id) && (
                               <Check className="w-3.5 h-3.5 text-primary shrink-0" />
                             )}
