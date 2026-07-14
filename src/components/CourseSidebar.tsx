@@ -89,24 +89,24 @@ export default function CourseSidebar({ courseId, currentLessonId }: Props) {
           const chLessons = lessons.filter((l) => l.chapter_id === ch.id);
           if (!chLessons.length) return null;
           return (
-            <SidebarGroup key={ch.id}>
-              <SidebarGroupLabel className="flex items-center gap-2">
+            <SidebarGroup key={ch.id} className="py-1">
+              <SidebarGroupLabel className="flex items-center gap-2 py-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
                 <span className="truncate">{ch.title}</span>
               </SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu>
+                <SidebarMenu className="gap-0.5">
                   {chLessons.map((ls) => {
                     const Icon = typeIcon(ls.lesson_type);
                     const active = ls.id === currentLessonId;
                     return (
                       <SidebarMenuItem key={ls.id}>
-                        <SidebarMenuButton asChild isActive={active}>
+                        <SidebarMenuButton asChild isActive={active} className="h-8 px-2 py-1">
                           <NavLink to={`/lesson/${ls.id}`} className="flex items-center gap-2">
-                            <Icon className="w-4 h-4 shrink-0" />
-                            <span className="truncate flex-1">{ls.title}</span>
+                            <Icon className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate flex-1 text-sm">{ls.title}</span>
                             {completedIds?.has(ls.id) && (
-                              <Check className="w-4 h-4 text-primary shrink-0" />
+                              <Check className="w-3.5 h-3.5 text-primary shrink-0" />
                             )}
                           </NavLink>
                         </SidebarMenuButton>
