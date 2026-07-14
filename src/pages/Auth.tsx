@@ -74,7 +74,7 @@ export default function AuthPage() {
       <div className="aurora-bg" />
       <div className="relative glass-card rounded-2xl p-8 w-full max-w-md space-y-5">
         <h1 className="font-display text-2xl font-bold">
-          {mode === "signin" ? "Sign in" : "Create admin account"}
+          {mode === "signin" ? "Sign in to your account" : "Create your account"}
         </h1>
 
         <Button type="button" variant="outline" className="w-full" onClick={signInWithGoogle}>
