@@ -453,8 +453,6 @@ export default function AdminPage() {
         {/* Admins */}
         {userId && <AdminsPanel currentUserId={userId} />}
 
-        {/* Activity log */}
-        <ActivityLogPanel />
       </div>
 
       <LessonEditor
