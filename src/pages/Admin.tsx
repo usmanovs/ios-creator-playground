@@ -25,7 +25,7 @@ import { ExternalLink, LogOut, Plus, BookOpen, ChevronDown, ChevronUp } from "lu
 import SortableChapter from "@/components/admin/SortableChapter";
 import LessonEditor, { EditableLesson } from "@/components/admin/LessonEditor";
 import AdminsPanel from "@/components/admin/AdminsPanel";
-import ActivityLogPanel from "@/components/admin/ActivityLogPanel";
+
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import EmptyState from "@/components/admin/EmptyState";
 
