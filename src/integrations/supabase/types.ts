@@ -155,6 +155,7 @@ export type Database = {
           content_html: string | null
           course_id: string
           created_at: string
+          day_number: number | null
           id: string
           lesson_type: string
           order_index: number
@@ -168,6 +169,7 @@ export type Database = {
           content_html?: string | null
           course_id: string
           created_at?: string
+          day_number?: number | null
           id?: string
           lesson_type?: string
           order_index?: number
@@ -181,6 +183,7 @@ export type Database = {
           content_html?: string | null
           course_id?: string
           created_at?: string
+          day_number?: number | null
           id?: string
           lesson_type?: string
           order_index?: number

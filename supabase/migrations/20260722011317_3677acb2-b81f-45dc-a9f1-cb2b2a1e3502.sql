@@ -1,0 +1,1 @@
+ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS day_number smallint CHECK (day_number BETWEEN 1 AND 6);
