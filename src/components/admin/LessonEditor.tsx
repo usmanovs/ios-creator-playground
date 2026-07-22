@@ -34,6 +34,7 @@ export type EditableLesson = {
   video_url: string | null;
   content: string | null;
   content_html: string | null;
+  day_number: number | null;
 };
 
 type Props = {
