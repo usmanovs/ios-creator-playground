@@ -34,6 +34,7 @@ export type EditableLesson = {
   video_url: string | null;
   content: string | null;
   content_html: string | null;
+  day_number: number | null;
 };
 
 type Props = {
@@ -63,7 +64,8 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
           eq(draft.status, original.status) &&
           eq(draft.video_url, original.video_url) &&
           eq(draft.content, original.content) &&
-          eq(draft.content_html, original.content_html)
+          eq(draft.content_html, original.content_html) &&
+          eq(draft.day_number, original.day_number)
         )
       : false;
 
@@ -76,6 +78,7 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
       video_url: draft.video_url,
       content: draft.content,
       content_html: draft.content_html,
+      day_number: draft.day_number,
     });
     setOriginal(draft);
   };
@@ -137,7 +140,7 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
                     onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label>Type</Label>
                     <Select
@@ -162,6 +165,23 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
                       <SelectContent>
                         <SelectItem value="draft">Draft</SelectItem>
                         <SelectItem value="published">Published</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Day</Label>
+                    <Select
+                      value={draft.day_number ? String(draft.day_number) : "none"}
+                      onValueChange={(v) =>
+                        setDraft({ ...draft, day_number: v === "none" ? null : Number(v) })
+                      }
+                    >
+                      <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Unassigned</SelectItem>
+                        {[1, 2, 3, 4, 5, 6].map((d) => (
+                          <SelectItem key={d} value={String(d)}>Day {d}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
