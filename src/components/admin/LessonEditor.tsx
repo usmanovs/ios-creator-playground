@@ -64,7 +64,8 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
           eq(draft.status, original.status) &&
           eq(draft.video_url, original.video_url) &&
           eq(draft.content, original.content) &&
-          eq(draft.content_html, original.content_html)
+          eq(draft.content_html, original.content_html) &&
+          eq(draft.day_number, original.day_number)
         )
       : false;
 
@@ -77,6 +78,7 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
       video_url: draft.video_url,
       content: draft.content,
       content_html: draft.content_html,
+      day_number: draft.day_number,
     });
     setOriginal(draft);
   };
