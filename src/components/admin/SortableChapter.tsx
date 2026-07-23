@@ -72,8 +72,6 @@ export default function SortableChapter({
     onReorderLessons(next.map((l) => l.id));
   };
 
-  const published = lessons.filter((l) => l.status === "published").length;
-
   return (
     <div ref={setNodeRef} style={style} className="glass-card rounded-2xl p-4 md:p-6 space-y-4">
       <div className="flex items-center gap-2">
@@ -98,9 +96,6 @@ export default function SortableChapter({
           onBlur={() => title !== chapter.title && onRename(title)}
           className="font-display text-lg font-bold"
         />
-        <span className="text-xs px-2 py-1 rounded-full bg-foreground/10 whitespace-nowrap">
-          {lessons.length} · {published} pub
-        </span>
         <Button variant="ghost" size="icon" onClick={onDelete}>
           <Trash2 className="w-4 h-4 text-destructive" />
         </Button>
