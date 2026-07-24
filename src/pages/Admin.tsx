@@ -166,6 +166,11 @@ export default function AdminPage() {
     if (error) return toast.error(error.message);
     setChapters((p) => [...p, data as Chapter]);
     log("create", "chapter", data.id, data.title);
+    toast.success("Chapter added");
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`chapter-${data.id}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
   };
 
   const renameChapter = async (ch: Chapter, title: string) => {
