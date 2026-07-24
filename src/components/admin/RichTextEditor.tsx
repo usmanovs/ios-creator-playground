@@ -2,6 +2,10 @@ import { useEffect } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
+import { Table } from "@tiptap/extension-table";
+import { TableRow } from "@tiptap/extension-table-row";
+import { TableCell } from "@tiptap/extension-table-cell";
+import { TableHeader } from "@tiptap/extension-table-header";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { uploadLessonImage } from "@/lib/uploadLessonImage";
@@ -17,6 +21,10 @@ import {
   Code,
   Link as LinkIcon,
   Image as ImageIcon,
+  Table as TableIcon,
+  Rows3,
+  Columns3,
+  Trash2,
   Undo,
   Redo,
 } from "lucide-react";
@@ -60,6 +68,10 @@ export default function RichTextEditor({ value, onChange }: Props) {
         link: { openOnClick: false, HTMLAttributes: { rel: "noopener noreferrer" } },
       }),
       Image,
+      Table.configure({ resizable: true, HTMLAttributes: { class: "lesson-table" } }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: value || "",
     editorProps: {
@@ -161,6 +173,27 @@ export default function RichTextEditor({ value, onChange }: Props) {
         >
           <ImageIcon className="w-4 h-4" />
         </Btn>
+        <Btn
+          label="Insert table"
+          on={() =>
+            editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+          }
+        >
+          <TableIcon className="w-4 h-4" />
+        </Btn>
+        {editor.isActive("table") && (
+          <>
+            <Btn label="Add row" on={() => editor.chain().focus().addRowAfter().run()}>
+              <Rows3 className="w-4 h-4" />
+            </Btn>
+            <Btn label="Add column" on={() => editor.chain().focus().addColumnAfter().run()}>
+              <Columns3 className="w-4 h-4" />
+            </Btn>
+            <Btn label="Delete table" on={() => editor.chain().focus().deleteTable().run()}>
+              <Trash2 className="w-4 h-4" />
+            </Btn>
+          </>
+        )}
         <div className="flex-1" />
         <Btn label="Undo" on={() => editor.chain().focus().undo().run()}>
           <Undo className="w-4 h-4" />
