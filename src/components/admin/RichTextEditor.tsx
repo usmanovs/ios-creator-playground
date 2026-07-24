@@ -200,6 +200,18 @@ export default function RichTextEditor({ value, onChange }: Props) {
             </Btn>
           </>
         )}
+        <Btn label="Align left" on={() => editor.chain().focus().setTextAlign("left").run()} active={editor.isActive({ textAlign: "left" })}>
+          <AlignLeft className="w-4 h-4" />
+        </Btn>
+        <Btn label="Align center" on={() => editor.chain().focus().setTextAlign("center").run()} active={editor.isActive({ textAlign: "center" })}>
+          <AlignCenter className="w-4 h-4" />
+        </Btn>
+        <Btn label="Align right" on={() => editor.chain().focus().setTextAlign("right").run()} active={editor.isActive({ textAlign: "right" })}>
+          <AlignRight className="w-4 h-4" />
+        </Btn>
+        <Btn label="Justify" on={() => editor.chain().focus().setTextAlign("justify").run()} active={editor.isActive({ textAlign: "justify" })}>
+          <AlignJustify className="w-4 h-4" />
+        </Btn>
         <div className="flex-1" />
         <Btn label="Undo" on={() => editor.chain().focus().undo().run()}>
           <Undo className="w-4 h-4" />
