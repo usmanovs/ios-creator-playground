@@ -73,7 +73,7 @@ export default function SortableChapter({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="glass-card rounded-2xl p-4 md:p-6 space-y-4">
+    <div id={`chapter-${chapter.id}`} ref={setNodeRef} style={style} className="glass-card rounded-2xl p-4 md:p-6 space-y-4">
       <div className="flex items-center gap-2">
         <button
           {...attributes}
