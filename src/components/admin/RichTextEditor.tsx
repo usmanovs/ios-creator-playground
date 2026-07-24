@@ -77,6 +77,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
       TableRow,
       TableHeader,
       TableCell,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     content: value || "",
     editorProps: {
