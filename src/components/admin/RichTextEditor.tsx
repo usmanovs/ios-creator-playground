@@ -21,6 +21,10 @@ import {
   Code,
   Link as LinkIcon,
   Image as ImageIcon,
+  Table as TableIcon,
+  Rows3,
+  Columns3,
+  Trash2,
   Undo,
   Redo,
 } from "lucide-react";
