@@ -223,8 +223,8 @@ export default function AdminPage() {
         chapter_id: chapterId,
         title: "New lesson",
         order_index: next,
-        lesson_type: "video",
-        status: "draft",
+        lesson_type: "text",
+        status: "published",
       })
       .select()
       .single();
