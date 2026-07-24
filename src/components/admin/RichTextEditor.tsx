@@ -28,6 +28,10 @@ import {
   Trash2,
   Undo,
   Redo,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
 } from "lucide-react";
 
 type Props = {
