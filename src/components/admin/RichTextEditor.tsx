@@ -68,6 +68,10 @@ export default function RichTextEditor({ value, onChange }: Props) {
         link: { openOnClick: false, HTMLAttributes: { rel: "noopener noreferrer" } },
       }),
       Image,
+      Table.configure({ resizable: true, HTMLAttributes: { class: "lesson-table" } }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: value || "",
     editorProps: {
