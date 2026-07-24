@@ -6,6 +6,7 @@ import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
 import { TableCell } from "@tiptap/extension-table-cell";
 import { TableHeader } from "@tiptap/extension-table-header";
+import TextAlign from "@tiptap/extension-text-align";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { uploadLessonImage } from "@/lib/uploadLessonImage";
@@ -27,6 +28,10 @@ import {
   Trash2,
   Undo,
   Redo,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
 } from "lucide-react";
 
 type Props = {
@@ -72,6 +77,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
       TableRow,
       TableHeader,
       TableCell,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     content: value || "",
     editorProps: {
@@ -194,6 +200,18 @@ export default function RichTextEditor({ value, onChange }: Props) {
             </Btn>
           </>
         )}
+        <Btn label="Align left" on={() => editor.chain().focus().setTextAlign("left").run()} active={editor.isActive({ textAlign: "left" })}>
+          <AlignLeft className="w-4 h-4" />
+        </Btn>
+        <Btn label="Align center" on={() => editor.chain().focus().setTextAlign("center").run()} active={editor.isActive({ textAlign: "center" })}>
+          <AlignCenter className="w-4 h-4" />
+        </Btn>
+        <Btn label="Align right" on={() => editor.chain().focus().setTextAlign("right").run()} active={editor.isActive({ textAlign: "right" })}>
+          <AlignRight className="w-4 h-4" />
+        </Btn>
+        <Btn label="Justify" on={() => editor.chain().focus().setTextAlign("justify").run()} active={editor.isActive({ textAlign: "justify" })}>
+          <AlignJustify className="w-4 h-4" />
+        </Btn>
         <div className="flex-1" />
         <Btn label="Undo" on={() => editor.chain().focus().undo().run()}>
           <Undo className="w-4 h-4" />
