@@ -247,7 +247,7 @@ export default function AdminPage() {
         title: `${src.title} (copy)`,
         order_index: next,
         lesson_type: src.lesson_type,
-        status: "draft",
+        status: "published",
         video_url: src.video_url,
         content: src.content,
         content_html: src.content_html,
