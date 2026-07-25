@@ -670,7 +670,7 @@ function DayColumn({
           placeholder="Second message to send to students before class…"
         />
       )}
-      <SortableContext items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-2">
           {lessons.length === 0 && (
             <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
