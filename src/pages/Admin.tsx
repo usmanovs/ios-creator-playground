@@ -277,18 +277,77 @@ export default function AdminPage() {
     toast.success("Lesson deleted");
   };
 
-  const reorderLessons = async (chapterId: string, orderedIds: string[]) => {
-    const peers = lessons.filter((l) => l.chapter_id === chapterId);
-    const others = lessons.filter((l) => l.chapter_id !== chapterId);
-    const map = new Map(peers.map((l) => [l.id, l]));
-    const reordered = orderedIds.map((id, i) => ({ ...(map.get(id) as Lesson), order_index: i * 10 }));
-    setLessons([...others, ...reordered]);
-    await Promise.all(
-      reordered.map((l) =>
-        supabase.from("lessons").update({ order_index: l.order_index }).eq("id", l.id)
-      )
-    );
-    log("reorder", "lesson", null, "lessons", { chapter_id: chapterId, order: orderedIds });
+  const moveLesson = async (
+    lessonId: string,
+    toChapterId: string,
+    toIndex: number
+  ) => {
+    const src = lessons.find((l) => l.id === lessonId);
+    if (!src) return;
+    const fromChapterId = src.chapter_id;
+    const prev = lessons;
+
+    let nextLessons: Lesson[];
+    if (fromChapterId === toChapterId) {
+      const peers = lessons
+        .filter((l) => l.chapter_id === toChapterId)
+        .sort((a, b) => a.order_index - b.order_index);
+      const oldIdx = peers.findIndex((l) => l.id === lessonId);
+      if (oldIdx === -1) return;
+      const reordered = arrayMove(peers, oldIdx, toIndex).map((l, i) => ({
+        ...l,
+        order_index: i * 10,
+      }));
+      const others = lessons.filter((l) => l.chapter_id !== toChapterId);
+      nextLessons = [...others, ...reordered];
+    } else {
+      const target = lessons
+        .filter((l) => l.chapter_id === toChapterId && l.id !== lessonId)
+        .sort((a, b) => a.order_index - b.order_index);
+      const moved = { ...src, chapter_id: toChapterId };
+      target.splice(Math.max(0, Math.min(toIndex, target.length)), 0, moved);
+      const reorderedTarget = target.map((l, i) => ({ ...l, order_index: i * 10 }));
+      const others = lessons.filter(
+        (l) => l.chapter_id !== toChapterId && l.id !== lessonId
+      );
+      nextLessons = [...others, ...reorderedTarget];
+    }
+
+    setLessons(nextLessons);
+
+    const touched = nextLessons.filter((l) => {
+      const before = prev.find((x) => x.id === l.id);
+      return (
+        !before ||
+        before.order_index !== l.order_index ||
+        before.chapter_id !== l.chapter_id
+      );
+    });
+    const { error } = await (async () => {
+      for (const l of touched) {
+        const { error } = await supabase
+          .from("lessons")
+          .update({ order_index: l.order_index, chapter_id: l.chapter_id })
+          .eq("id", l.id);
+        if (error) return { error };
+      }
+      return { error: null as any };
+    })();
+    if (error) {
+      toast.error(error.message);
+      setLessons(prev);
+      return;
+    }
+    if (fromChapterId !== toChapterId) {
+      log("update", "lesson", lessonId, src.title, {
+        moved_to_chapter: toChapterId,
+        from_chapter: fromChapterId,
+      });
+    } else {
+      log("reorder", "lesson", null, "lessons", {
+        chapter_id: toChapterId,
+      });
+    }
   };
 
   const saveLessonPatch = async (patch: Partial<Lesson>): Promise<void> => {
