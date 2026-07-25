@@ -142,6 +142,20 @@ export default function InstructorPage() {
     saveDayField(day, "pre_class_message", value);
   }, [saveDayField]);
 
+  const toggleCompleted = useCallback(async (day: number) => {
+    const next = !completed[day];
+    setCompleted((c) => ({ ...c, [day]: next }));
+    setSavingDay(day);
+    const { error } = await supabase
+      .from("day_homework")
+      .upsert({ day_number: day, completed: next }, { onConflict: "day_number" });
+    setSavingDay((cur) => (cur === day ? null : cur));
+    if (error) {
+      toast.error(error.message);
+      setCompleted((c) => ({ ...c, [day]: !next }));
+    }
+  }, [completed]);
+
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   const chapterTitle = (id: string | null) =>
