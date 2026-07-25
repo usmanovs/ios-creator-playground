@@ -21,7 +21,14 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, GripVertical, LogOut } from "lucide-react";
+import { ArrowLeft, Eye, GripVertical, LogOut } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import LessonPreview from "@/components/admin/LessonPreview";
 
 type Lesson = {
   id: string;
