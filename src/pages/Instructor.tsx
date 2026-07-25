@@ -259,13 +259,13 @@ export default function InstructorPage() {
     return l ? columnOf(l) : null;
   };
 
-  const persist = async (updates: { id: string; day_number: number | null; order_index: number }[]) => {
+  const persist = async (updates: { id: string; day_number: number | null; schedule_order: number }[]) => {
     // update each row; run in parallel
     const results = await Promise.all(
       updates.map((u) =>
         supabase
           .from("lessons")
-          .update({ day_number: u.day_number, order_index: u.order_index })
+          .update({ day_number: u.day_number, schedule_order: u.schedule_order })
           .eq("id", u.id)
       )
     );
