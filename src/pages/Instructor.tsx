@@ -395,6 +395,10 @@ export default function InstructorPage() {
                 onPreClassChange={(v) => onPreClassChange(d, v)}
                 preClass2={preClass2[d] ?? ""}
                 onPreClass2Change={(v) => onPreClass2Change(d, v)}
+                preClassEditMode={preClassEditMode[d]?.[1] ?? false}
+                preClass2EditMode={preClassEditMode[d]?.[2] ?? false}
+                onTogglePreClassEditMode={() => togglePreClassEditMode(d, 1)}
+                onTogglePreClass2EditMode={() => togglePreClassEditMode(d, 2)}
                 homeworkSaving={savingDay === d}
                 completed={completed[d] ?? false}
                 onToggleCompleted={() => toggleCompleted(d)}
