@@ -539,7 +539,7 @@ export default function AdminPage() {
               onCta={addChapter}
             />
           ) : (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onChapterDragEnd}>
+            <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={onDndEnd}>
               <SortableContext items={chapters.map((c) => c.id)} strategy={verticalListSortingStrategy}>
                 <div className="space-y-4">
                   {chapters.map((ch) => {
