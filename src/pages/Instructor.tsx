@@ -318,19 +318,19 @@ export default function InstructorPage() {
       newFromList = fromList;
     }
 
-    // Compute new order_index using base offsets per column so we don't clash globally
+    // Compute new schedule_order using base offsets per column so we don't clash globally
     const colBase: Record<ColumnId, number> = {} as any;
     (["unassigned", ...DAYS.map((d) => `d${d}` as ColumnId)] as ColumnId[]).forEach(
       (k, i) => (colBase[k] = i * 1000)
     );
 
-    const updates: { id: string; day_number: number | null; order_index: number }[] = [];
+    const updates: { id: string; day_number: number | null; schedule_order: number }[] = [];
     const applyList = (col: ColumnId, list: Lesson[]) => {
       list.forEach((l, i) => {
         const day = col === "unassigned" ? null : Number(col.replace("d", ""));
-        const order_index = colBase[col] + i;
-        if (l.day_number !== day || l.order_index !== order_index) {
-          updates.push({ id: l.id, day_number: day, order_index });
+        const schedule_order = colBase[col] + i;
+        if (l.day_number !== day || l.schedule_order !== schedule_order) {
+          updates.push({ id: l.id, day_number: day, schedule_order });
         }
       });
     };
@@ -341,7 +341,7 @@ export default function InstructorPage() {
     const byId = new Map(lessons.map((l) => [l.id, l]));
     updates.forEach((u) => {
       const cur = byId.get(u.id);
-      if (cur) byId.set(u.id, { ...cur, day_number: u.day_number, order_index: u.order_index });
+      if (cur) byId.set(u.id, { ...cur, day_number: u.day_number, schedule_order: u.schedule_order });
     });
     setLessons(Array.from(byId.values()));
 
@@ -350,7 +350,7 @@ export default function InstructorPage() {
         updates.map((u) =>
           supabase
             .from("lessons")
-            .update({ day_number: u.day_number, order_index: u.order_index })
+            .update({ day_number: u.day_number, schedule_order: u.schedule_order })
             .eq("id", u.id)
         )
       );
