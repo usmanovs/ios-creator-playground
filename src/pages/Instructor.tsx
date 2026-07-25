@@ -93,12 +93,16 @@ export default function InstructorPage() {
   const load = useCallback(async () => {
     const { data: c } = await supabase.from("courses").select("id").limit(1).maybeSingle();
     if (!c) return;
-    const [{ data: ls }, { data: ch }] = await Promise.all([
+    const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
+      supabase.from("day_homework").select("day_number,content"),
     ]);
     setLessons((ls as Lesson[]) || []);
     setChapters((ch as Chapter[]) || []);
+    const map: Record<number, string> = {};
+    ((hw as { day_number: number; content: string }[]) || []).forEach((r) => { map[r.day_number] = r.content; });
+    setHomework(map);
   }, []);
 
   useEffect(() => {
