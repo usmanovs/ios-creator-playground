@@ -181,6 +181,7 @@ export type Database = {
           content: string | null
           content_html: string | null
           course_id: string
+          covered: boolean
           created_at: string
           day_number: number | null
           id: string
@@ -195,6 +196,7 @@ export type Database = {
           content?: string | null
           content_html?: string | null
           course_id: string
+          covered?: boolean
           created_at?: string
           day_number?: number | null
           id?: string
@@ -209,6 +211,7 @@ export type Database = {
           content?: string | null
           content_html?: string | null
           course_id?: string
+          covered?: boolean
           created_at?: string
           day_number?: number | null
           id?: string
