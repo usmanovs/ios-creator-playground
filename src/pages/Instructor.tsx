@@ -405,20 +405,8 @@ function DayColumn({
         <div className="font-display font-bold">{label}</div>
         <div className="text-xs text-foreground/50">{lessons.length}</div>
       </div>
-      <SortableContext items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-        <div className="space-y-2">
-          {lessons.length === 0 && (
-            <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
-              Drop lessons here
-            </div>
-          )}
-          {lessons.map((l) => (
-            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} />
-          ))}
-        </div>
-      </SortableContext>
       {typeof onPreClassChange === "function" && (
-        <div className="mt-3 pt-3 border-t border-border/60">
+        <div className="mb-3">
           <div className="flex items-center justify-between mb-1.5 px-1">
             <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message</div>
             {homeworkSaving && <div className="text-[10px] text-foreground/40">Saving…</div>}
@@ -431,6 +419,18 @@ function DayColumn({
           />
         </div>
       )}
+      <SortableContext items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-2">
+          {lessons.length === 0 && (
+            <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
+              Drop lessons here
+            </div>
+          )}
+          {lessons.map((l) => (
+            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} />
+          ))}
+        </div>
+      </SortableContext>
       {showHomework && (
         <div className="mt-3 pt-3 border-t border-border/60">
           <div className="flex items-center justify-between mb-1.5 px-1">
