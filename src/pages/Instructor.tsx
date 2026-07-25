@@ -286,6 +286,7 @@ export default function InstructorPage() {
                 label={`Day ${d}`}
                 lessons={grouped[`d${d}` as ColumnId]}
                 chapterTitle={chapterTitle}
+                onPreview={openPreview}
               />
             ))}
             <DayColumn
@@ -293,6 +294,7 @@ export default function InstructorPage() {
               label="Unassigned"
               lessons={grouped.unassigned}
               chapterTitle={chapterTitle}
+              onPreview={openPreview}
               muted
             />
           </div>
@@ -301,6 +303,25 @@ export default function InstructorPage() {
           </DragOverlay>
         </DndContext>
       </div>
+
+      <Dialog open={!!previewId} onOpenChange={(o) => { if (!o) { setPreviewId(null); setPreviewData(null); } }}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Lesson preview</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto flex-1">
+            {previewLoading && <div className="text-sm text-foreground/50 p-4">Loading…</div>}
+            {previewData && (
+              <LessonPreview
+                title={previewData.title}
+                lessonType={previewData.lesson_type}
+                videoUrl={previewData.video_url}
+                contentHtml={previewData.content_html}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -310,12 +331,14 @@ function DayColumn({
   label,
   lessons,
   chapterTitle,
+  onPreview,
   muted,
 }: {
   id: string;
   label: string;
   lessons: Lesson[];
   chapterTitle: (id: string | null) => string;
+  onPreview: (id: string) => void;
   muted?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id });
