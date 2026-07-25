@@ -400,7 +400,7 @@ export default function InstructorPage() {
         </p>
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCorners}
+          collisionDetection={collisionDetection}
           onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))}
           onDragEnd={onDragEnd}
           onDragCancel={() => setActiveId(null)}
