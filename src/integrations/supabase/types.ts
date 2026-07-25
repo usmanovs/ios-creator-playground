@@ -150,6 +150,7 @@ export type Database = {
       }
       day_homework: {
         Row: {
+          completed: boolean
           content: string
           day_number: number
           pre_class_message: string
@@ -157,6 +158,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          completed?: boolean
           content?: string
           day_number: number
           pre_class_message?: string
@@ -164,6 +166,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          completed?: boolean
           content?: string
           day_number?: number
           pre_class_message?: string

@@ -1,0 +1,1 @@
+ALTER TABLE public.day_homework ADD COLUMN completed boolean NOT NULL DEFAULT false;

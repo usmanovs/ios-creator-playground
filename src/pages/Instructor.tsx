@@ -21,7 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Eye, GripVertical, LogOut } from "lucide-react";
+import { ArrowLeft, Check, Eye, GripVertical, LogOut } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -52,6 +52,7 @@ export default function InstructorPage() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [homework, setHomework] = useState<Record<number, string>>({});
   const [preClass, setPreClass] = useState<Record<number, string>>({});
+  const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
@@ -97,18 +98,21 @@ export default function InstructorPage() {
     const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
-      supabase.from("day_homework").select("day_number,content,pre_class_message"),
+      supabase.from("day_homework").select("day_number,content,pre_class_message,completed"),
     ]);
     setLessons((ls as Lesson[]) || []);
     setChapters((ch as Chapter[]) || []);
     const hwMap: Record<number, string> = {};
     const pcMap: Record<number, string> = {};
-    ((hw as { day_number: number; content: string; pre_class_message: string }[]) || []).forEach((r) => {
+    const doneMap: Record<number, boolean> = {};
+    ((hw as { day_number: number; content: string; pre_class_message: string; completed: boolean }[]) || []).forEach((r) => {
       hwMap[r.day_number] = r.content;
       pcMap[r.day_number] = r.pre_class_message ?? "";
+      doneMap[r.day_number] = r.completed ?? false;
     });
     setHomework(hwMap);
     setPreClass(pcMap);
+    setCompleted(doneMap);
   }, []);
 
   useEffect(() => {
@@ -137,6 +141,20 @@ export default function InstructorPage() {
     setPreClass((h) => ({ ...h, [day]: value }));
     saveDayField(day, "pre_class_message", value);
   }, [saveDayField]);
+
+  const toggleCompleted = useCallback(async (day: number) => {
+    const next = !completed[day];
+    setCompleted((c) => ({ ...c, [day]: next }));
+    setSavingDay(day);
+    const { error } = await supabase
+      .from("day_homework")
+      .upsert({ day_number: day, completed: next }, { onConflict: "day_number" });
+    setSavingDay((cur) => (cur === day ? null : cur));
+    if (error) {
+      toast.error(error.message);
+      setCompleted((c) => ({ ...c, [day]: !next }));
+    }
+  }, [completed]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -328,6 +346,8 @@ export default function InstructorPage() {
                 preClass={preClass[d] ?? ""}
                 onPreClassChange={(v) => onPreClassChange(d, v)}
                 homeworkSaving={savingDay === d}
+                completed={completed[d] ?? false}
+                onToggleCompleted={() => toggleCompleted(d)}
               />
             ))}
             <DayColumn
@@ -379,6 +399,8 @@ function DayColumn({
   preClass,
   onPreClassChange,
   homeworkSaving,
+  completed,
+  onToggleCompleted,
 }: {
   id: string;
   label: string;
@@ -391,19 +413,38 @@ function DayColumn({
   preClass?: string;
   onPreClassChange?: (v: string) => void;
   homeworkSaving?: boolean;
+  completed?: boolean;
+  onToggleCompleted?: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id });
   const showHomework = typeof onHomeworkChange === "function";
+  const showComplete = typeof onToggleCompleted === "function";
   return (
     <div
       ref={setNodeRef}
       className={`glass-card rounded-2xl p-3 min-h-[300px] transition-colors ${
         isOver ? "ring-2 ring-primary/60 bg-primary/5" : ""
-      } ${muted ? "opacity-90" : ""}`}
+      } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""}`}
     >
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="font-display font-bold">{label}</div>
-        <div className="text-xs text-foreground/50">{lessons.length}</div>
+        <div className="flex items-center gap-2">
+          {showComplete && (
+            <button
+              onClick={onToggleCompleted}
+              title={completed ? "Mark day not completed" : "Mark day completed"}
+              className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                completed
+                  ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30"
+                  : "bg-background/50 text-foreground/60 hover:bg-background/70 hover:text-foreground"
+              }`}
+            >
+              <Check className={`w-3.5 h-3.5 ${completed ? "" : "opacity-60"}`} />
+              {completed ? "Done" : "Complete"}
+            </button>
+          )}
+          <div className="text-xs text-foreground/50">{lessons.length}</div>
+        </div>
       </div>
       {typeof onPreClassChange === "function" && (
         <div className="mb-3">
