@@ -167,6 +167,16 @@ export default function InstructorPage() {
     saveDayField(day, "pre_class_message_2", value);
   }, [saveDayField]);
 
+  const togglePreClassEditMode = useCallback((day: number, slot: 1 | 2) => {
+    setPreClassEditMode((prev) => ({
+      ...prev,
+      [day]: {
+        ...(prev[day] ?? { 1: false, 2: false }),
+        [slot]: !prev[day]?.[slot],
+      },
+    }));
+  }, []);
+
   const toggleCompleted = useCallback(async (day: number) => {
     const next = !completed[day];
     setCompleted((c) => ({ ...c, [day]: next }));
