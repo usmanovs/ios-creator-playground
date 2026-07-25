@@ -308,6 +308,9 @@ export default function InstructorPage() {
                 lessons={grouped[`d${d}` as ColumnId]}
                 chapterTitle={chapterTitle}
                 onPreview={openPreview}
+                homework={homework[d] ?? ""}
+                onHomeworkChange={(v) => onHomeworkChange(d, v)}
+                homeworkSaving={savingDay === d}
               />
             ))}
             <DayColumn
