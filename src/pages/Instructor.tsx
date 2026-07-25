@@ -441,6 +441,8 @@ function DayColumn({
   onHomeworkChange?: (v: string) => void;
   preClass?: string;
   onPreClassChange?: (v: string) => void;
+  preClass2?: string;
+  onPreClass2Change?: (v: string) => void;
   homeworkSaving?: boolean;
   completed?: boolean;
   onToggleCompleted?: () => void;
