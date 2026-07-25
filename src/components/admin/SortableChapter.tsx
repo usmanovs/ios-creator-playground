@@ -35,7 +35,19 @@ export default function SortableChapter({
   onDuplicateLesson,
   onDeleteLesson,
 }: Props) {
-  const [open, setOpen] = useState(true);
+  const storageKey = `admin.chapter.open.${chapter.id}`;
+  const [open, setOpenState] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const v = window.localStorage.getItem(storageKey);
+    return v === null ? true : v === "1";
+  });
+  const setOpen = (v: boolean | ((p: boolean) => boolean)) => {
+    setOpenState((prev) => {
+      const next = typeof v === "function" ? (v as (p: boolean) => boolean)(prev) : v;
+      try { window.localStorage.setItem(storageKey, next ? "1" : "0"); } catch {}
+      return next;
+    });
+  };
   const [title, setTitle] = useState(chapter.title);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: chapter.id,
