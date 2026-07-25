@@ -157,6 +157,18 @@ export default function InstructorPage() {
     }
   }, [completed]);
 
+  const toggleCovered = useCallback(async (lessonId: string) => {
+    const current = lessons.find((l) => l.id === lessonId);
+    if (!current) return;
+    const next = !current.covered;
+    setLessons((ls) => ls.map((l) => (l.id === lessonId ? { ...l, covered: next } : l)));
+    const { error } = await supabase.from("lessons").update({ covered: next }).eq("id", lessonId);
+    if (error) {
+      toast.error(error.message);
+      setLessons((ls) => ls.map((l) => (l.id === lessonId ? { ...l, covered: !next } : l)));
+    }
+  }, [lessons]);
+
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   const chapterTitle = (id: string | null) =>
