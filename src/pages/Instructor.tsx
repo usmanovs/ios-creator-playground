@@ -473,6 +473,10 @@ function DayColumn({
   onPreClassChange?: (v: string) => void;
   preClass2?: string;
   onPreClass2Change?: (v: string) => void;
+  preClassEditMode?: boolean;
+  preClass2EditMode?: boolean;
+  onTogglePreClassEditMode?: () => void;
+  onTogglePreClass2EditMode?: () => void;
   homeworkSaving?: boolean;
   completed?: boolean;
   onToggleCompleted?: () => void;
