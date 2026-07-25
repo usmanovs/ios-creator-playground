@@ -485,7 +485,7 @@ function DayColumn({
             </div>
           )}
           {lessons.map((l) => (
-            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} />
+            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} onToggleCovered={onToggleCovered} />
           ))}
         </div>
       </SortableContext>
