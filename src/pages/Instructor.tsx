@@ -97,7 +97,7 @@ export default function InstructorPage() {
     const { data: c } = await supabase.from("courses").select("id").limit(1).maybeSingle();
     if (!c) return;
     const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
-      supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status").eq("course_id", c.id).order("order_index"),
+      supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status,covered").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
       supabase.from("day_homework").select("day_number,content,pre_class_message,completed"),
     ]);
