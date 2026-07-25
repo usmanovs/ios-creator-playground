@@ -658,7 +658,11 @@ function DayColumn({
   completed?: boolean;
   onToggleCompleted?: () => void;
 }) {
-  const { setNodeRef, isOver } = useDroppable({ id });
+  const { setNodeRef, isOver } = useDroppable({ id, data: { columnId: id } });
+  const { setNodeRef: setTopDropRef, isOver: isTopOver } = useDroppable({
+    id: `${id}:top`,
+    data: { columnId: id, position: "start" },
+  });
   const showHomework = typeof onHomeworkChange === "function";
   const showComplete = typeof onToggleCompleted === "function";
   return (
@@ -714,6 +718,12 @@ function DayColumn({
         <div className="mt-3 pt-3 border-t border-border/60">
           <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
             <div className="space-y-2">
+              <div
+                ref={setTopDropRef}
+                className={`h-3 rounded-md border border-dashed transition-colors ${
+                  isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
+                }`}
+              />
               {lessons.length === 0 && (
                 <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
                   Drop lessons here
@@ -728,6 +738,12 @@ function DayColumn({
       ) : (
         <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-2">
+            <div
+              ref={setTopDropRef}
+              className={`h-3 rounded-md border border-dashed transition-colors ${
+                isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
+              }`}
+            />
             {lessons.length === 0 && (
               <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
                 Drop lessons here
