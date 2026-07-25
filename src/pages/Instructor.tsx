@@ -509,7 +509,7 @@ function DayColumn({
 
 
 
-function SortableLesson({ lesson, chapterTitle, onPreview }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void }) {
+function SortableLesson({ lesson, chapterTitle, onPreview, onToggleCovered }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void; onToggleCovered?: (id: string) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: lesson.id,
   });
@@ -525,6 +525,7 @@ function SortableLesson({ lesson, chapterTitle, onPreview }: { lesson: Lesson; c
         chapterTitle={chapterTitle}
         dragHandleProps={{ ...attributes, ...listeners }}
         onPreview={() => onPreview(lesson.id)}
+        onToggleCovered={onToggleCovered ? () => onToggleCovered(lesson.id) : undefined}
       />
     </div>
   );
@@ -536,18 +537,20 @@ function LessonCard({
   dragging,
   dragHandleProps,
   onPreview,
+  onToggleCovered,
 }: {
   lesson: Lesson;
   chapterTitle: string;
   dragging?: boolean;
   dragHandleProps?: any;
   onPreview?: () => void;
+  onToggleCovered?: () => void;
 }) {
   return (
     <div
       className={`rounded-lg bg-card/60 hover:bg-card border border-border/50 p-2.5 flex items-start gap-2 ${
         dragging ? "shadow-2xl ring-1 ring-primary/40" : ""
-      }`}
+      } ${lesson.covered ? "bg-emerald-500/5 border-emerald-500/30" : ""}`}
     >
       <button
         type="button"
@@ -557,8 +560,24 @@ function LessonCard({
       >
         <GripVertical className="w-3.5 h-3.5 mt-0.5 text-foreground/30 shrink-0" />
       </button>
+      {onToggleCovered && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onToggleCovered(); }}
+          onPointerDown={(e) => e.stopPropagation()}
+          className={`mt-0.5 w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
+            lesson.covered
+              ? "bg-emerald-500 border-emerald-500 text-white"
+              : "border-foreground/30 hover:border-primary bg-background/40"
+          }`}
+          aria-label={lesson.covered ? "Mark not covered" : "Mark covered"}
+          title={lesson.covered ? "Covered — click to uncheck" : "Mark as covered"}
+        >
+          {lesson.covered && <Check className="w-3 h-3" strokeWidth={3} />}
+        </button>
+      )}
       <div className="min-w-0 flex-1">
-        <div className="text-sm font-medium truncate">{lesson.title}</div>
+        <div className={`text-sm font-medium truncate ${lesson.covered ? "line-through text-foreground/60" : ""}`}>{lesson.title}</div>
         <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5">
           <span className="truncate">{chapterTitle}</span>
           {lesson.status === "draft" && (
@@ -580,4 +599,5 @@ function LessonCard({
       )}
     </div>
   );
+
 }
