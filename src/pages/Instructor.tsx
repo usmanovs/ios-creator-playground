@@ -376,6 +376,8 @@ function DayColumn({
   muted,
   homework,
   onHomeworkChange,
+  preClass,
+  onPreClassChange,
   homeworkSaving,
 }: {
   id: string;
@@ -386,6 +388,8 @@ function DayColumn({
   muted?: boolean;
   homework?: string;
   onHomeworkChange?: (v: string) => void;
+  preClass?: string;
+  onPreClassChange?: (v: string) => void;
   homeworkSaving?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id });
