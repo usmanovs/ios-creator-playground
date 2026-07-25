@@ -1,0 +1,2 @@
+ALTER TABLE public.lessons DROP CONSTRAINT IF EXISTS lessons_day_number_check;
+ALTER TABLE public.lessons ADD CONSTRAINT lessons_day_number_check CHECK (day_number IS NULL OR (day_number BETWEEN 1 AND 7));
