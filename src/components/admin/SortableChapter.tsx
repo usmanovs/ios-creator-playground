@@ -1,20 +1,10 @@
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
+import { useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  arrayMove,
 } from "@dnd-kit/sortable";
 import { ChevronDown, ChevronRight, GripVertical, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -30,7 +20,6 @@ type Props = {
   onRename: (title: string) => void;
   onDelete: () => void;
   onAddLesson: () => void;
-  onReorderLessons: (orderedIds: string[]) => void;
   onEditLesson: (id: string) => void;
   onDuplicateLesson: (id: string) => void;
   onDeleteLesson: (id: string) => void;
@@ -42,7 +31,6 @@ export default function SortableChapter({
   onRename,
   onDelete,
   onAddLesson,
-  onReorderLessons,
   onEditLesson,
   onDuplicateLesson,
   onDeleteLesson,
@@ -51,6 +39,7 @@ export default function SortableChapter({
   const [title, setTitle] = useState(chapter.title);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: chapter.id,
+    data: { type: "chapter" },
   });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -58,19 +47,10 @@ export default function SortableChapter({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
-
-  const handleDragEnd = (e: DragEndEvent) => {
-    const { active, over } = e;
-    if (!over || active.id === over.id) return;
-    const oldIdx = lessons.findIndex((l) => l.id === active.id);
-    const newIdx = lessons.findIndex((l) => l.id === over.id);
-    const next = arrayMove(lessons, oldIdx, newIdx);
-    onReorderLessons(next.map((l) => l.id));
-  };
+  const { setNodeRef: setDropRef, isOver } = useDroppable({
+    id: `chapter-drop-${chapter.id}`,
+    data: { type: "chapter-droppable", chapterId: chapter.id },
+  });
 
   return (
     <div id={`chapter-${chapter.id}`} ref={setNodeRef} style={style} className="glass-card rounded-2xl p-4 md:p-6 space-y-4">
@@ -102,29 +82,36 @@ export default function SortableChapter({
       </div>
 
       {open && (
-        <div className="space-y-2 pl-2 md:pl-8">
-          {lessons.length === 0 ? (
-            <EmptyState
-              title="No lessons yet"
-              description="Add your first lesson to this chapter."
-              ctaLabel="Add lesson"
-              onCta={onAddLesson}
-            />
-          ) : (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-                {lessons.map((l) => (
-                  <SortableLesson
-                    key={l.id}
-                    lesson={l}
-                    onEdit={() => onEditLesson(l.id)}
-                    onDuplicate={() => onDuplicateLesson(l.id)}
-                    onDelete={() => onDeleteLesson(l.id)}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-          )}
+        <div
+          ref={setDropRef}
+          className={`space-y-2 pl-2 md:pl-8 rounded-xl transition-colors ${
+            isOver ? "bg-primary/5 ring-1 ring-primary/30" : ""
+          }`}
+        >
+          <SortableContext
+            id={chapter.id}
+            items={lessons.map((l) => l.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {lessons.length === 0 ? (
+              <EmptyState
+                title="No lessons yet"
+                description="Add your first lesson or drop one here."
+                ctaLabel="Add lesson"
+                onCta={onAddLesson}
+              />
+            ) : (
+              lessons.map((l) => (
+                <SortableLesson
+                  key={l.id}
+                  lesson={l}
+                  onEdit={() => onEditLesson(l.id)}
+                  onDuplicate={() => onDuplicateLesson(l.id)}
+                  onDelete={() => onDeleteLesson(l.id)}
+                />
+              ))
+            )}
+          </SortableContext>
           {lessons.length > 0 && (
             <Button variant="outline" size="sm" onClick={onAddLesson}>
               <Plus className="w-3 h-3 mr-2" /> Add lesson
