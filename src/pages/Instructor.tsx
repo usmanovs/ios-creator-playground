@@ -129,11 +129,9 @@ export default function InstructorPage() {
     setPreClassEditMode((prev) => {
       const next: Record<number, { 1: boolean; 2: boolean }> = {};
       DAYS.forEach((d) => {
-        const empty1 = (preClass[d] ?? "").trim() === "";
-        const empty2 = (preClass2[d] ?? "").trim() === "";
         next[d] = {
-          1: empty1 ? true : (prev[d]?.[1] ?? false),
-          2: empty2 ? true : (prev[d]?.[2] ?? false),
+          1: prev[d]?.[1] ?? false,
+          2: prev[d]?.[2] ?? false,
         };
       });
       return next;
@@ -460,8 +458,14 @@ function PreClassField({
   placeholder: string;
 }) {
   const [open, setOpen] = useState(false);
+  const prevIsEditing = useRef(isEditing);
   useEffect(() => {
-    if (isEditing) setOpen(true);
+    if (isEditing && !prevIsEditing.current) {
+      setOpen(true);
+    } else if (!isEditing && prevIsEditing.current) {
+      setOpen(false);
+    }
+    prevIsEditing.current = isEditing;
   }, [isEditing]);
   return (
     <div className="mb-3">
