@@ -10,6 +10,10 @@ import {
   useSensor,
   useSensors,
   closestCorners,
+  pointerWithin,
+  rectIntersection,
+  getFirstCollision,
+  CollisionDetection,
 } from "@dnd-kit/core";
 import {
   SortableContext,
