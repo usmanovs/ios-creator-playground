@@ -97,13 +97,18 @@ export default function InstructorPage() {
     const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
-      supabase.from("day_homework").select("day_number,content"),
+      supabase.from("day_homework").select("day_number,content,pre_class_message"),
     ]);
     setLessons((ls as Lesson[]) || []);
     setChapters((ch as Chapter[]) || []);
-    const map: Record<number, string> = {};
-    ((hw as { day_number: number; content: string }[]) || []).forEach((r) => { map[r.day_number] = r.content; });
-    setHomework(map);
+    const hwMap: Record<number, string> = {};
+    const pcMap: Record<number, string> = {};
+    ((hw as { day_number: number; content: string; pre_class_message: string }[]) || []).forEach((r) => {
+      hwMap[r.day_number] = r.content;
+      pcMap[r.day_number] = r.pre_class_message ?? "";
+    });
+    setHomework(hwMap);
+    setPreClass(pcMap);
   }, []);
 
   useEffect(() => {
