@@ -5,7 +5,6 @@ import {
   closestCenter,
   pointerWithin,
   rectIntersection,
-  getFirstCollision,
   CollisionDetection,
   KeyboardSensor,
   PointerSensor,
@@ -368,11 +367,29 @@ export default function AdminPage() {
   };
 
   const collisionDetection: CollisionDetection = (args) => {
-    const pointer = pointerWithin(args);
+    const getType = (id: string | number) =>
+      args.droppableContainers.find((container) => container.id === id)?.data.current?.type;
+    const prioritize = (collisions: ReturnType<CollisionDetection>) => {
+      const activeType = args.active.data.current?.type;
+      if (activeType !== "lesson") return collisions;
+
+      const lessonTargets = collisions.filter((collision) => getType(collision.id) === "lesson");
+      if (lessonTargets.length > 0) return lessonTargets;
+
+      const chapterDropTargets = collisions.filter(
+        (collision) => getType(collision.id) === "chapter-droppable"
+      );
+      if (chapterDropTargets.length > 0) return chapterDropTargets;
+
+      const chapterTargets = collisions.filter((collision) => getType(collision.id) === "chapter");
+      return chapterTargets.length > 0 ? chapterTargets : collisions;
+    };
+
+    const pointer = prioritize(pointerWithin(args));
     if (pointer.length > 0) return pointer;
-    const rect = rectIntersection(args);
+    const rect = prioritize(rectIntersection(args));
     if (rect.length > 0) return rect;
-    return closestCenter(args);
+    return prioritize(closestCenter(args));
   };
 
   const onDndEnd = (e: DragEndEvent) => {
@@ -382,9 +399,12 @@ export default function AdminPage() {
 
     // Chapter reorder
     if (activeType === "chapter") {
-      if (active.id === over.id) return;
+      const overData = over.data.current as any;
+      const overChapterId =
+        overData?.type === "chapter-droppable" ? overData.chapterId : String(over.id);
+      if (String(active.id) === String(overChapterId)) return;
       const oldIdx = chapters.findIndex((c) => c.id === active.id);
-      const newIdx = chapters.findIndex((c) => c.id === over.id);
+      const newIdx = chapters.findIndex((c) => c.id === overChapterId);
       if (oldIdx === -1 || newIdx === -1) return;
       const next = arrayMove(chapters, oldIdx, newIdx);
       reorderChapters(next.map((c) => c.id));
@@ -402,7 +422,10 @@ export default function AdminPage() {
     if (overData?.type === "chapter-droppable") {
       toChapterId = overData.chapterId;
       toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
-    } else if (overData?.sortable?.containerId) {
+    } else if (overData?.type === "chapter") {
+      toChapterId = String(over.id);
+      toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
+    } else if (overData?.type === "lesson" && overData?.sortable?.containerId) {
       toChapterId = String(overData.sortable.containerId);
       const peers = lessons
         .filter((l) => l.chapter_id === toChapterId)

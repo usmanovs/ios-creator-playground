@@ -64,8 +64,20 @@ export default function SortableChapter({
     data: { type: "chapter-droppable", chapterId: chapter.id },
   });
 
+  const setChapterRefs = (node: HTMLDivElement | null) => {
+    setNodeRef(node);
+    setDropRef(node);
+  };
+
   return (
-    <div id={`chapter-${chapter.id}`} ref={setNodeRef} style={style} className="glass-card rounded-2xl p-4 md:p-6 space-y-4">
+    <div
+      id={`chapter-${chapter.id}`}
+      ref={setChapterRefs}
+      style={style}
+      className={`glass-card rounded-2xl p-4 md:p-6 space-y-4 transition-colors ${
+        isOver ? "bg-primary/5 ring-1 ring-primary/30" : ""
+      }`}
+    >
       <div className="flex items-center gap-2">
         <button
           {...attributes}
@@ -95,10 +107,7 @@ export default function SortableChapter({
 
       {open && (
         <div
-          ref={setDropRef}
-          className={`space-y-2 pl-2 md:pl-8 rounded-xl transition-colors ${
-            isOver ? "bg-primary/5 ring-1 ring-primary/30" : ""
-          }`}
+          className="space-y-2 pl-2 md:pl-8 rounded-xl transition-colors"
         >
           <SortableContext
             id={chapter.id}
