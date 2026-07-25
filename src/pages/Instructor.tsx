@@ -399,6 +399,8 @@ function DayColumn({
   preClass,
   onPreClassChange,
   homeworkSaving,
+  completed,
+  onToggleCompleted,
 }: {
   id: string;
   label: string;
@@ -411,19 +413,38 @@ function DayColumn({
   preClass?: string;
   onPreClassChange?: (v: string) => void;
   homeworkSaving?: boolean;
+  completed?: boolean;
+  onToggleCompleted?: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id });
   const showHomework = typeof onHomeworkChange === "function";
+  const showComplete = typeof onToggleCompleted === "function";
   return (
     <div
       ref={setNodeRef}
       className={`glass-card rounded-2xl p-3 min-h-[300px] transition-colors ${
         isOver ? "ring-2 ring-primary/60 bg-primary/5" : ""
-      } ${muted ? "opacity-90" : ""}`}
+      } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""}`}
     >
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="font-display font-bold">{label}</div>
-        <div className="text-xs text-foreground/50">{lessons.length}</div>
+        <div className="flex items-center gap-2">
+          {showComplete && (
+            <button
+              onClick={onToggleCompleted}
+              title={completed ? "Mark day not completed" : "Mark day completed"}
+              className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                completed
+                  ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30"
+                  : "bg-background/50 text-foreground/60 hover:bg-background/70 hover:text-foreground"
+              }`}
+            >
+              <Check className={`w-3.5 h-3.5 ${completed ? "" : "opacity-60"}`} />
+              {completed ? "Done" : "Complete"}
+            </button>
+          )}
+          <div className="text-xs text-foreground/50">{lessons.length}</div>
+        </div>
       </div>
       {typeof onPreClassChange === "function" && (
         <div className="mb-3">
