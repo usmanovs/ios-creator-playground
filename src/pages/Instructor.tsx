@@ -121,9 +121,10 @@ export default function InstructorPage() {
     if (hwTimers.current[key]) clearTimeout(hwTimers.current[key]);
     hwTimers.current[key] = setTimeout(async () => {
       setSavingDay(day);
+      const payload: any = { day_number: day, [field]: value };
       const { error } = await supabase
         .from("day_homework")
-        .upsert({ day_number: day, [field]: value }, { onConflict: "day_number" });
+        .upsert(payload, { onConflict: "day_number" });
       setSavingDay((cur) => (cur === day ? null : cur));
       if (error) toast.error(error.message);
     }, 600);
