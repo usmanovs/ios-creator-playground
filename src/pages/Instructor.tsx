@@ -441,7 +441,7 @@ function DayColumn({
             value={homework ?? ""}
             onChange={(e) => onHomeworkChange!(e.target.value)}
             placeholder="Add homework for this day…"
-            className="min-h-[80px] text-sm bg-background/40"
+            className="min-h-[160px] text-sm bg-background/40"
           />
         </div>
       )}
