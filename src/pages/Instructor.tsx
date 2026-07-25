@@ -132,8 +132,8 @@ export default function InstructorPage() {
         const empty1 = (preClass[d] ?? "").trim() === "";
         const empty2 = (preClass2[d] ?? "").trim() === "";
         next[d] = {
-          1: empty1 ? true : (prev[d]?.1 ?? false),
-          2: empty2 ? true : (prev[d]?.2 ?? false),
+          1: empty1 ? true : (prev[d]?.[1] ?? false),
+          2: empty2 ? true : (prev[d]?.[2] ?? false),
         };
       });
       return next;
