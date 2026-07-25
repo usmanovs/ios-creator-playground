@@ -361,7 +361,7 @@ function DayColumn({
             </div>
           )}
           {lessons.map((l) => (
-            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} />
+            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} />
           ))}
         </div>
       </SortableContext>
@@ -369,7 +369,7 @@ function DayColumn({
   );
 }
 
-function SortableLesson({ lesson, chapterTitle }: { lesson: Lesson; chapterTitle: string }) {
+function SortableLesson({ lesson, chapterTitle, onPreview }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: lesson.id,
   });
@@ -379,8 +379,13 @@ function SortableLesson({ lesson, chapterTitle }: { lesson: Lesson; chapterTitle
     opacity: isDragging ? 0.4 : 1,
   };
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <LessonCard lesson={lesson} chapterTitle={chapterTitle} />
+    <div ref={setNodeRef} style={style}>
+      <LessonCard
+        lesson={lesson}
+        chapterTitle={chapterTitle}
+        dragHandleProps={{ ...attributes, ...listeners }}
+        onPreview={() => onPreview(lesson.id)}
+      />
     </div>
   );
 }
@@ -389,18 +394,29 @@ function LessonCard({
   lesson,
   chapterTitle,
   dragging,
+  dragHandleProps,
+  onPreview,
 }: {
   lesson: Lesson;
   chapterTitle: string;
   dragging?: boolean;
+  dragHandleProps?: any;
+  onPreview?: () => void;
 }) {
   return (
     <div
-      className={`rounded-lg bg-card/60 hover:bg-card border border-border/50 p-2.5 cursor-grab active:cursor-grabbing flex items-start gap-2 ${
+      className={`rounded-lg bg-card/60 hover:bg-card border border-border/50 p-2.5 flex items-start gap-2 ${
         dragging ? "shadow-2xl ring-1 ring-primary/40" : ""
       }`}
     >
-      <GripVertical className="w-3.5 h-3.5 mt-0.5 text-foreground/30 shrink-0" />
+      <button
+        type="button"
+        className="cursor-grab active:cursor-grabbing touch-none"
+        {...dragHandleProps}
+        aria-label="Drag"
+      >
+        <GripVertical className="w-3.5 h-3.5 mt-0.5 text-foreground/30 shrink-0" />
+      </button>
       <div className="min-w-0 flex-1">
         <div className="text-sm font-medium truncate">{lesson.title}</div>
         <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5">
@@ -410,6 +426,18 @@ function LessonCard({
           )}
         </div>
       </div>
+      {onPreview && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onPreview(); }}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="p-1 rounded hover:bg-primary/10 text-foreground/60 hover:text-primary shrink-0"
+          aria-label="Preview lesson"
+          title="Preview"
+        >
+          <Eye className="w-3.5 h-3.5" />
+        </button>
+      )}
     </div>
   );
 }
