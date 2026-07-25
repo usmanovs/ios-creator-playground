@@ -41,6 +41,7 @@ type Lesson = {
   chapter_id: string | null;
   day_number: number | null;
   order_index: number;
+  schedule_order: number | null;
   status: string;
   covered: boolean;
 };
