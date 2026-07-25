@@ -240,9 +240,9 @@ export default function InstructorPage() {
     const map: Record<ColumnId, Lesson[]> = { unassigned: [] } as any;
     DAYS.forEach((d) => (map[`d${d}` as ColumnId] = []));
     for (const l of lessons) map[columnOf(l)].push(l);
-    // preserve order_index within each column
+    // preserve schedule_order within each column (fallback to order_index)
     (Object.keys(map) as ColumnId[]).forEach((k) =>
-      map[k].sort((a, b) => a.order_index - b.order_index)
+      map[k].sort((a, b) => (a.schedule_order ?? a.order_index) - (b.schedule_order ?? b.order_index))
     );
     return map;
   }, [lessons]);
