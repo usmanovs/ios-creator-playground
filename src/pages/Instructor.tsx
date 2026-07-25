@@ -100,20 +100,23 @@ export default function InstructorPage() {
     const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status,covered").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
-      supabase.from("day_homework").select("day_number,content,pre_class_message,completed"),
+      supabase.from("day_homework").select("day_number,content,pre_class_message,pre_class_message_2,completed"),
     ]);
     setLessons((ls as Lesson[]) || []);
     setChapters((ch as Chapter[]) || []);
     const hwMap: Record<number, string> = {};
     const pcMap: Record<number, string> = {};
+    const pc2Map: Record<number, string> = {};
     const doneMap: Record<number, boolean> = {};
-    ((hw as { day_number: number; content: string; pre_class_message: string; completed: boolean }[]) || []).forEach((r) => {
+    ((hw as { day_number: number; content: string; pre_class_message: string; pre_class_message_2: string; completed: boolean }[]) || []).forEach((r) => {
       hwMap[r.day_number] = r.content;
       pcMap[r.day_number] = r.pre_class_message ?? "";
+      pc2Map[r.day_number] = r.pre_class_message_2 ?? "";
       doneMap[r.day_number] = r.completed ?? false;
     });
     setHomework(hwMap);
     setPreClass(pcMap);
+    setPreClass2(pc2Map);
     setCompleted(doneMap);
   }, []);
 
