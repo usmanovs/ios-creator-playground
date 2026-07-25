@@ -325,6 +325,8 @@ export default function InstructorPage() {
                 onPreview={openPreview}
                 homework={homework[d] ?? ""}
                 onHomeworkChange={(v) => onHomeworkChange(d, v)}
+                preClass={preClass[d] ?? ""}
+                onPreClassChange={(v) => onPreClassChange(d, v)}
                 homeworkSaving={savingDay === d}
               />
             ))}
