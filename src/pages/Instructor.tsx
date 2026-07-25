@@ -742,9 +742,9 @@ function LessonCard({
 }) {
   return (
     <div
-      className={`rounded-lg bg-card/60 hover:bg-card border border-border/50 p-2.5 flex items-start gap-2 ${
+      className={`rounded-lg bg-card/60 hover:bg-card border border-muted-foreground/30 p-2.5 flex items-start gap-2 ${
         dragging ? "shadow-2xl ring-1 ring-primary/40" : ""
-      } ${lesson.covered ? "bg-emerald-500/5 border-emerald-500/30" : ""}`}
+      } ${lesson.covered ? "bg-emerald-500/5 border-emerald-500/20" : ""}`}
     >
       <button
         type="button"
