@@ -367,13 +367,63 @@ export default function AdminPage() {
     }
   };
 
-  const onChapterDragEnd = (e: DragEndEvent) => {
+  const collisionDetection: CollisionDetection = (args) => {
+    const pointer = pointerWithin(args);
+    if (pointer.length > 0) return pointer;
+    const rect = rectIntersection(args);
+    if (rect.length > 0) return rect;
+    return closestCenter(args);
+  };
+
+  const onDndEnd = (e: DragEndEvent) => {
     const { active, over } = e;
-    if (!over || active.id === over.id) return;
-    const oldIdx = chapters.findIndex((c) => c.id === active.id);
-    const newIdx = chapters.findIndex((c) => c.id === over.id);
-    const next = arrayMove(chapters, oldIdx, newIdx);
-    reorderChapters(next.map((c) => c.id));
+    if (!over) return;
+    const activeType = (active.data.current as any)?.type;
+
+    // Chapter reorder
+    if (activeType === "chapter") {
+      if (active.id === over.id) return;
+      const oldIdx = chapters.findIndex((c) => c.id === active.id);
+      const newIdx = chapters.findIndex((c) => c.id === over.id);
+      if (oldIdx === -1 || newIdx === -1) return;
+      const next = arrayMove(chapters, oldIdx, newIdx);
+      reorderChapters(next.map((c) => c.id));
+      return;
+    }
+
+    // Lesson move / reorder
+    const activeLesson = lessons.find((l) => l.id === active.id);
+    if (!activeLesson) return;
+
+    let toChapterId: string | null = null;
+    let toIndex = 0;
+
+    const overData = over.data.current as any;
+    if (overData?.type === "chapter-droppable") {
+      toChapterId = overData.chapterId;
+      toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
+    } else if (overData?.sortable?.containerId) {
+      toChapterId = String(overData.sortable.containerId);
+      const peers = lessons
+        .filter((l) => l.chapter_id === toChapterId)
+        .sort((a, b) => a.order_index - b.order_index);
+      const idx = peers.findIndex((l) => l.id === over.id);
+      toIndex = idx === -1 ? peers.length : idx;
+    } else {
+      // over a chapter card itself
+      const overChapter = chapters.find((c) => c.id === over.id);
+      if (overChapter) {
+        toChapterId = overChapter.id;
+        toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
+      }
+    }
+    if (!toChapterId) return;
+    if (
+      toChapterId === activeLesson.chapter_id &&
+      String(active.id) === String(over.id)
+    )
+      return;
+    moveLesson(String(active.id), toChapterId, toIndex);
   };
 
   const totalLessons = lessons.length;
