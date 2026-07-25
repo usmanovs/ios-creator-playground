@@ -148,6 +148,27 @@ export type Database = {
         }
         Relationships: []
       }
+      day_homework: {
+        Row: {
+          content: string
+          day_number: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          content?: string
+          day_number: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          content?: string
+          day_number?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           chapter_id: string | null
