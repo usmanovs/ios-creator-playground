@@ -9,8 +9,15 @@ import {
   useDroppable,
   useSensor,
   useSensors,
+  closestCorners,
 } from "@dnd-kit/core";
-import { useDraggable } from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -27,6 +34,7 @@ type Lesson = {
 type Chapter = { id: string; title: string };
 
 const DAYS = [1, 2, 3, 4, 5, 6, 7] as const;
+type ColumnId = `d${number}` | "unassigned";
 
 export default function InstructorPage() {
   const navigate = useNavigate();
@@ -72,33 +80,127 @@ export default function InstructorPage() {
   const chapterTitle = (id: string | null) =>
     chapters.find((c) => c.id === id)?.title ?? "—";
 
+  const columnOf = (l: Lesson): ColumnId =>
+    l.day_number ? (`d${l.day_number}` as ColumnId) : "unassigned";
+
   const grouped = useMemo(() => {
-    const map: Record<string, Lesson[]> = { unassigned: [] };
-    DAYS.forEach((d) => (map[`d${d}`] = []));
-    for (const l of lessons) {
-      const key = l.day_number ? `d${l.day_number}` : "unassigned";
-      map[key].push(l);
-    }
+    const map: Record<ColumnId, Lesson[]> = { unassigned: [] } as any;
+    DAYS.forEach((d) => (map[`d${d}` as ColumnId] = []));
+    for (const l of lessons) map[columnOf(l)].push(l);
+    // preserve order_index within each column
+    (Object.keys(map) as ColumnId[]).forEach((k) =>
+      map[k].sort((a, b) => a.order_index - b.order_index)
+    );
     return map;
   }, [lessons]);
 
   const activeLesson = activeId ? lessons.find((l) => l.id === activeId) : null;
 
+  const findColumn = (id: string): ColumnId | null => {
+    if (id === "unassigned" || id.startsWith("d")) {
+      // could be column id itself
+      if (id === "unassigned") return "unassigned";
+      if (/^d[1-7]$/.test(id)) return id as ColumnId;
+    }
+    const l = lessons.find((x) => x.id === id);
+    return l ? columnOf(l) : null;
+  };
+
+  const persist = async (updates: { id: string; day_number: number | null; order_index: number }[]) => {
+    // update each row; run in parallel
+    const results = await Promise.all(
+      updates.map((u) =>
+        supabase
+          .from("lessons")
+          .update({ day_number: u.day_number, order_index: u.order_index })
+          .eq("id", u.id)
+      )
+    );
+    const err = results.find((r) => r.error)?.error;
+    if (err) toast.error(err.message);
+  };
+
   const onDragEnd = async (e: DragEndEvent) => {
     setActiveId(null);
     const { active, over } = e;
     if (!over) return;
-    const overId = String(over.id);
-    const lesson = lessons.find((l) => l.id === active.id);
-    if (!lesson) return;
-    const nextDay = overId === "unassigned" ? null : Number(overId.replace("d", ""));
-    if (lesson.day_number === nextDay) return;
+    const activeIdStr = String(active.id);
+    const overIdStr = String(over.id);
+    const fromCol = findColumn(activeIdStr);
+    const toCol = findColumn(overIdStr);
+    if (!fromCol || !toCol) return;
+
     const prev = lessons;
-    setLessons((p) => p.map((l) => (l.id === lesson.id ? { ...l, day_number: nextDay } : l)));
-    const { error } = await supabase
-      .from("lessons")
-      .update({ day_number: nextDay })
-      .eq("id", lesson.id);
+    const fromList = [...grouped[fromCol]];
+    const toList = fromCol === toCol ? fromList : [...grouped[toCol]];
+
+    const activeIdx = fromList.findIndex((l) => l.id === activeIdStr);
+    if (activeIdx === -1) return;
+
+    let newToList: Lesson[];
+    let newFromList: Lesson[] = fromList;
+
+    if (fromCol === toCol) {
+      const overIdx =
+        overIdStr === toCol
+          ? toList.length - 1
+          : toList.findIndex((l) => l.id === overIdStr);
+      if (overIdx === -1 || overIdx === activeIdx) return;
+      newToList = arrayMove(toList, activeIdx, overIdx);
+      newFromList = newToList;
+    } else {
+      const [moved] = fromList.splice(activeIdx, 1);
+      const updatedMoved = {
+        ...moved,
+        day_number: toCol === "unassigned" ? null : Number(toCol.replace("d", "")),
+      };
+      const overIdx =
+        overIdStr === toCol
+          ? toList.length
+          : toList.findIndex((l) => l.id === overIdStr);
+      const insertAt = overIdx === -1 ? toList.length : overIdx;
+      newToList = [...toList.slice(0, insertAt), updatedMoved, ...toList.slice(insertAt)];
+      newFromList = fromList;
+    }
+
+    // Compute new order_index using base offsets per column so we don't clash globally
+    const colBase: Record<ColumnId, number> = {} as any;
+    (["unassigned", ...DAYS.map((d) => `d${d}` as ColumnId)] as ColumnId[]).forEach(
+      (k, i) => (colBase[k] = i * 1000)
+    );
+
+    const updates: { id: string; day_number: number | null; order_index: number }[] = [];
+    const applyList = (col: ColumnId, list: Lesson[]) => {
+      list.forEach((l, i) => {
+        const day = col === "unassigned" ? null : Number(col.replace("d", ""));
+        const order_index = colBase[col] + i;
+        if (l.day_number !== day || l.order_index !== order_index) {
+          updates.push({ id: l.id, day_number: day, order_index });
+        }
+      });
+    };
+    applyList(toCol, newToList);
+    if (fromCol !== toCol) applyList(fromCol, newFromList);
+
+    // Optimistic update
+    const byId = new Map(lessons.map((l) => [l.id, l]));
+    updates.forEach((u) => {
+      const cur = byId.get(u.id);
+      if (cur) byId.set(u.id, { ...cur, day_number: u.day_number, order_index: u.order_index });
+    });
+    setLessons(Array.from(byId.values()));
+
+    const { error } = await (async () => {
+      const results = await Promise.all(
+        updates.map((u) =>
+          supabase
+            .from("lessons")
+            .update({ day_number: u.day_number, order_index: u.order_index })
+            .eq("id", u.id)
+        )
+      );
+      return { error: results.find((r) => r.error)?.error };
+    })();
     if (error) {
       toast.error(error.message);
       setLessons(prev);
@@ -140,10 +242,11 @@ export default function InstructorPage() {
 
       <div className="relative max-w-[1600px] mx-auto px-4 md:px-6 py-6">
         <p className="text-sm text-foreground/60 mb-4">
-          Drag lessons into a day to plan the 7 class sessions. Changes save automatically.
+          Drag lessons between days, or reorder within a day. Changes save automatically.
         </p>
         <DndContext
           sensors={sensors}
+          collisionDetection={closestCorners}
           onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))}
           onDragEnd={onDragEnd}
           onDragCancel={() => setActiveId(null)}
@@ -154,7 +257,7 @@ export default function InstructorPage() {
                 key={d}
                 id={`d${d}`}
                 label={`Day ${d}`}
-                lessons={grouped[`d${d}`]}
+                lessons={grouped[`d${d}` as ColumnId]}
                 chapterTitle={chapterTitle}
               />
             ))}
@@ -200,29 +303,33 @@ function DayColumn({
         <div className="font-display font-bold">{label}</div>
         <div className="text-xs text-foreground/50">{lessons.length}</div>
       </div>
-      <div className="space-y-2">
-        {lessons.length === 0 && (
-          <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
-            Drop lessons here
-          </div>
-        )}
-        {lessons.map((l) => (
-          <DraggableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} />
-        ))}
-      </div>
+      <SortableContext items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-2">
+          {lessons.length === 0 && (
+            <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
+              Drop lessons here
+            </div>
+          )}
+          {lessons.map((l) => (
+            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} />
+          ))}
+        </div>
+      </SortableContext>
     </div>
   );
 }
 
-function DraggableLesson({ lesson, chapterTitle }: { lesson: Lesson; chapterTitle: string }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: lesson.id });
+function SortableLesson({ lesson, chapterTitle }: { lesson: Lesson; chapterTitle: string }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: lesson.id,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
   return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      className={`${isDragging ? "opacity-40" : ""}`}
-    >
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <LessonCard lesson={lesson} chapterTitle={chapterTitle} />
     </div>
   );
