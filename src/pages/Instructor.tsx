@@ -480,13 +480,26 @@ function DayColumn({
       {typeof onPreClassChange === "function" && (
         <div className="mb-3">
           <div className="flex items-center justify-between mb-1.5 px-1">
-            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message</div>
+            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message 1</div>
             {homeworkSaving && <div className="text-[10px] text-foreground/40">Saving…</div>}
           </div>
           <Textarea
             value={preClass ?? ""}
             onChange={(e) => onPreClassChange!(e.target.value)}
             placeholder="Message to send to students before class…"
+            className="min-h-[80px] text-sm bg-background/40"
+          />
+        </div>
+      )}
+      {typeof onPreClass2Change === "function" && (
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-1.5 px-1">
+            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message 2</div>
+          </div>
+          <Textarea
+            value={preClass2 ?? ""}
+            onChange={(e) => onPreClass2Change!(e.target.value)}
+            placeholder="Second message to send to students before class…"
             className="min-h-[80px] text-sm bg-background/40"
           />
         </div>
