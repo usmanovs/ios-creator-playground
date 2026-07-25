@@ -10,6 +10,10 @@ import {
   useSensor,
   useSensors,
   closestCorners,
+  pointerWithin,
+  rectIntersection,
+  getFirstCollision,
+  CollisionDetection,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -203,6 +207,28 @@ export default function InstructorPage() {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
+  const columnIds = useMemo<ColumnId[]>(
+    () => ["unassigned", ...DAYS.map((d) => `d${d}` as ColumnId)],
+    []
+  );
+
+  // Prefer the column the pointer is inside; if not over a column, fall back to
+  // closest corners among sibling items so reordering within a column still works.
+  const collisionDetection: CollisionDetection = useCallback(
+    (args) => {
+      const pointerHits = pointerWithin(args);
+      const columnHit = pointerHits.find((c) => columnIds.includes(c.id as ColumnId));
+      if (columnHit) return [columnHit];
+      const intersections = rectIntersection(args);
+      const intersectingColumn = intersections.find((c) => columnIds.includes(c.id as ColumnId));
+      if (intersectingColumn) return [intersectingColumn];
+      const corners = closestCorners(args);
+      const first = getFirstCollision(corners);
+      return first ? corners : intersections;
+    },
+    [columnIds]
+  );
+
   const chapterTitle = (id: string | null) =>
     chapters.find((c) => c.id === id)?.title ?? "—";
 
@@ -253,7 +279,9 @@ export default function InstructorPage() {
     const activeIdStr = String(active.id);
     const overIdStr = String(over.id);
     const fromCol = findColumn(activeIdStr);
-    const toCol = findColumn(overIdStr);
+    // Prefer the sortable container the pointer is inside; fall back to resolving from the over id.
+    const overContainer = (over.data.current as any)?.sortable?.containerId as ColumnId | undefined;
+    const toCol = overContainer ?? findColumn(overIdStr);
     if (!fromCol || !toCol) return;
 
     const prev = lessons;
@@ -372,7 +400,7 @@ export default function InstructorPage() {
         </p>
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCorners}
+          collisionDetection={collisionDetection}
           onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))}
           onDragEnd={onDragEnd}
           onDragCancel={() => setActiveId(null)}
@@ -642,7 +670,7 @@ function DayColumn({
           placeholder="Second message to send to students before class…"
         />
       )}
-      <SortableContext items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-2">
           {lessons.length === 0 && (
             <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
