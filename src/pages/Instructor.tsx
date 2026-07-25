@@ -50,6 +50,26 @@ export default function InstructorPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const [previewData, setPreviewData] = useState<{ title: string; lesson_type: string; video_url: string | null; content_html: string | null } | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  const openPreview = useCallback(async (id: string) => {
+    setPreviewId(id);
+    setPreviewData(null);
+    setPreviewLoading(true);
+    const { data, error } = await supabase
+      .from("lessons")
+      .select("title,lesson_type,video_url,content_html")
+      .eq("id", id)
+      .maybeSingle();
+    setPreviewLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (data) setPreviewData(data as any);
+  }, []);
 
   useEffect(() => {
     (async () => {
