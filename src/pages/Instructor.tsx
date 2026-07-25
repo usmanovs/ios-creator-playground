@@ -354,6 +354,7 @@ export default function InstructorPage() {
                 lessons={grouped[`d${d}` as ColumnId]}
                 chapterTitle={chapterTitle}
                 onPreview={openPreview}
+                onToggleCovered={toggleCovered}
                 homework={homework[d] ?? ""}
                 onHomeworkChange={(v) => onHomeworkChange(d, v)}
                 preClass={preClass[d] ?? ""}
@@ -369,6 +370,7 @@ export default function InstructorPage() {
               lessons={grouped.unassigned}
               chapterTitle={chapterTitle}
               onPreview={openPreview}
+              onToggleCovered={toggleCovered}
               muted
             />
           </div>
