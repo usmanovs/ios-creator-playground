@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import {
   DndContext,
   closestCenter,
+  pointerWithin,
+  rectIntersection,
+  getFirstCollision,
+  CollisionDetection,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -273,18 +277,77 @@ export default function AdminPage() {
     toast.success("Lesson deleted");
   };
 
-  const reorderLessons = async (chapterId: string, orderedIds: string[]) => {
-    const peers = lessons.filter((l) => l.chapter_id === chapterId);
-    const others = lessons.filter((l) => l.chapter_id !== chapterId);
-    const map = new Map(peers.map((l) => [l.id, l]));
-    const reordered = orderedIds.map((id, i) => ({ ...(map.get(id) as Lesson), order_index: i * 10 }));
-    setLessons([...others, ...reordered]);
-    await Promise.all(
-      reordered.map((l) =>
-        supabase.from("lessons").update({ order_index: l.order_index }).eq("id", l.id)
-      )
-    );
-    log("reorder", "lesson", null, "lessons", { chapter_id: chapterId, order: orderedIds });
+  const moveLesson = async (
+    lessonId: string,
+    toChapterId: string,
+    toIndex: number
+  ) => {
+    const src = lessons.find((l) => l.id === lessonId);
+    if (!src) return;
+    const fromChapterId = src.chapter_id;
+    const prev = lessons;
+
+    let nextLessons: Lesson[];
+    if (fromChapterId === toChapterId) {
+      const peers = lessons
+        .filter((l) => l.chapter_id === toChapterId)
+        .sort((a, b) => a.order_index - b.order_index);
+      const oldIdx = peers.findIndex((l) => l.id === lessonId);
+      if (oldIdx === -1) return;
+      const reordered = arrayMove(peers, oldIdx, toIndex).map((l, i) => ({
+        ...l,
+        order_index: i * 10,
+      }));
+      const others = lessons.filter((l) => l.chapter_id !== toChapterId);
+      nextLessons = [...others, ...reordered];
+    } else {
+      const target = lessons
+        .filter((l) => l.chapter_id === toChapterId && l.id !== lessonId)
+        .sort((a, b) => a.order_index - b.order_index);
+      const moved = { ...src, chapter_id: toChapterId };
+      target.splice(Math.max(0, Math.min(toIndex, target.length)), 0, moved);
+      const reorderedTarget = target.map((l, i) => ({ ...l, order_index: i * 10 }));
+      const others = lessons.filter(
+        (l) => l.chapter_id !== toChapterId && l.id !== lessonId
+      );
+      nextLessons = [...others, ...reorderedTarget];
+    }
+
+    setLessons(nextLessons);
+
+    const touched = nextLessons.filter((l) => {
+      const before = prev.find((x) => x.id === l.id);
+      return (
+        !before ||
+        before.order_index !== l.order_index ||
+        before.chapter_id !== l.chapter_id
+      );
+    });
+    const { error } = await (async () => {
+      for (const l of touched) {
+        const { error } = await supabase
+          .from("lessons")
+          .update({ order_index: l.order_index, chapter_id: l.chapter_id })
+          .eq("id", l.id);
+        if (error) return { error };
+      }
+      return { error: null as any };
+    })();
+    if (error) {
+      toast.error(error.message);
+      setLessons(prev);
+      return;
+    }
+    if (fromChapterId !== toChapterId) {
+      log("update", "lesson", lessonId, src.title, {
+        moved_to_chapter: toChapterId,
+        from_chapter: fromChapterId,
+      });
+    } else {
+      log("reorder", "lesson", null, "lessons", {
+        chapter_id: toChapterId,
+      });
+    }
   };
 
   const saveLessonPatch = async (patch: Partial<Lesson>): Promise<void> => {
@@ -304,13 +367,63 @@ export default function AdminPage() {
     }
   };
 
-  const onChapterDragEnd = (e: DragEndEvent) => {
+  const collisionDetection: CollisionDetection = (args) => {
+    const pointer = pointerWithin(args);
+    if (pointer.length > 0) return pointer;
+    const rect = rectIntersection(args);
+    if (rect.length > 0) return rect;
+    return closestCenter(args);
+  };
+
+  const onDndEnd = (e: DragEndEvent) => {
     const { active, over } = e;
-    if (!over || active.id === over.id) return;
-    const oldIdx = chapters.findIndex((c) => c.id === active.id);
-    const newIdx = chapters.findIndex((c) => c.id === over.id);
-    const next = arrayMove(chapters, oldIdx, newIdx);
-    reorderChapters(next.map((c) => c.id));
+    if (!over) return;
+    const activeType = (active.data.current as any)?.type;
+
+    // Chapter reorder
+    if (activeType === "chapter") {
+      if (active.id === over.id) return;
+      const oldIdx = chapters.findIndex((c) => c.id === active.id);
+      const newIdx = chapters.findIndex((c) => c.id === over.id);
+      if (oldIdx === -1 || newIdx === -1) return;
+      const next = arrayMove(chapters, oldIdx, newIdx);
+      reorderChapters(next.map((c) => c.id));
+      return;
+    }
+
+    // Lesson move / reorder
+    const activeLesson = lessons.find((l) => l.id === active.id);
+    if (!activeLesson) return;
+
+    let toChapterId: string | null = null;
+    let toIndex = 0;
+
+    const overData = over.data.current as any;
+    if (overData?.type === "chapter-droppable") {
+      toChapterId = overData.chapterId;
+      toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
+    } else if (overData?.sortable?.containerId) {
+      toChapterId = String(overData.sortable.containerId);
+      const peers = lessons
+        .filter((l) => l.chapter_id === toChapterId)
+        .sort((a, b) => a.order_index - b.order_index);
+      const idx = peers.findIndex((l) => l.id === over.id);
+      toIndex = idx === -1 ? peers.length : idx;
+    } else {
+      // over a chapter card itself
+      const overChapter = chapters.find((c) => c.id === over.id);
+      if (overChapter) {
+        toChapterId = overChapter.id;
+        toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
+      }
+    }
+    if (!toChapterId) return;
+    if (
+      toChapterId === activeLesson.chapter_id &&
+      String(active.id) === String(over.id)
+    )
+      return;
+    moveLesson(String(active.id), toChapterId, toIndex);
   };
 
   const totalLessons = lessons.length;
@@ -426,7 +539,7 @@ export default function AdminPage() {
               onCta={addChapter}
             />
           ) : (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onChapterDragEnd}>
+            <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={onDndEnd}>
               <SortableContext items={chapters.map((c) => c.id)} strategy={verticalListSortingStrategy}>
                 <div className="space-y-4">
                   {chapters.map((ch) => {
@@ -439,7 +552,6 @@ export default function AdminPage() {
                         onRename={(t) => renameChapter(ch, t)}
                         onDelete={() => setConfirmDeleteChapter(ch)}
                         onAddLesson={() => addLesson(ch.id)}
-                        onReorderLessons={(ids) => reorderLessons(ch.id, ids)}
                         onEditLesson={(id) => {
                           const l = lessons.find((x) => x.id === id);
                           if (l) setEditingLesson(l);
