@@ -125,6 +125,21 @@ export default function InstructorPage() {
     if (isAdmin) load();
   }, [isAdmin, load]);
 
+  useEffect(() => {
+    setPreClassEditMode((prev) => {
+      const next: Record<number, { 1: boolean; 2: boolean }> = {};
+      DAYS.forEach((d) => {
+        const empty1 = (preClass[d] ?? "").trim() === "";
+        const empty2 = (preClass2[d] ?? "").trim() === "";
+        next[d] = {
+          1: empty1 ? true : (prev[d]?.1 ?? false),
+          2: empty2 ? true : (prev[d]?.2 ?? false),
+        };
+      });
+      return next;
+    });
+  }, [preClass, preClass2]);
+
   const hwTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const saveDayField = useCallback((day: number, field: "content" | "pre_class_message" | "pre_class_message_2", value: string) => {
     const key = `${day}:${field}`;
