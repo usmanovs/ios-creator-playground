@@ -257,7 +257,9 @@ export default function InstructorPage() {
     const activeIdStr = String(active.id);
     const overIdStr = String(over.id);
     const fromCol = findColumn(activeIdStr);
-    const toCol = findColumn(overIdStr);
+    // Prefer the sortable container the pointer is inside; fall back to resolving from the over id.
+    const overContainer = (over.data.current as any)?.sortable?.containerId as ColumnId | undefined;
+    const toCol = overContainer ?? findColumn(overIdStr);
     if (!fromCol || !toCol) return;
 
     const prev = lessons;
