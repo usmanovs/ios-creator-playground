@@ -417,6 +417,20 @@ function DayColumn({
           ))}
         </div>
       </SortableContext>
+      {typeof onPreClassChange === "function" && (
+        <div className="mt-3 pt-3 border-t border-border/60">
+          <div className="flex items-center justify-between mb-1.5 px-1">
+            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message</div>
+            {homeworkSaving && <div className="text-[10px] text-foreground/40">Saving…</div>}
+          </div>
+          <Textarea
+            value={preClass ?? ""}
+            onChange={(e) => onPreClassChange!(e.target.value)}
+            placeholder="Message to send to students before class…"
+            className="min-h-[80px] text-sm bg-background/40"
+          />
+        </div>
+      )}
       {showHomework && (
         <div className="mt-3 pt-3 border-t border-border/60">
           <div className="flex items-center justify-between mb-1.5 px-1">
@@ -434,6 +448,7 @@ function DayColumn({
     </div>
   );
 }
+
 
 
 function SortableLesson({ lesson, chapterTitle, onPreview }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void }) {
