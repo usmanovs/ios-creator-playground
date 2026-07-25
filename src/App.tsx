@@ -12,6 +12,7 @@ import Course from "./pages/Course.tsx";
 import Lesson from "./pages/Lesson.tsx";
 import Auth from "./pages/Auth.tsx";
 import Admin from "./pages/Admin.tsx";
+import Instructor from "./pages/Instructor.tsx";
 
 const queryClient = new QueryClient();
 
