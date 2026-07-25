@@ -1,25 +1,23 @@
-## Goal
+## Problem
 
-Make the two pre-class message areas on the Instructor schedule page more spacious, and clearly show when a message has been saved rather than leaving it looking like an active text input.
+The admin course editor and the instructor class schedule both sort lessons by the same `lessons.order_index` column. So dragging to reorder in Admin reshuffles lessons in Instructor (and vice versa).
 
-## What will change
+## Fix
 
-1. **More room for each pre-class message**
-  - Increase the minimum height of the pre-class message 1 and 2 textareas from `80px` to `140px`.
-  - Add a bit more vertical spacing between the two message blocks and the lessons list so they don't feel cramped.
-2. **Clear "saved" state**
-  - After a message is saved, switch from the textarea to a read-only preview card that shows the formatted text (preserving line breaks).
-  - Add a small **Edit** button on the preview card so the instructor can switch back to the textarea when they want to make changes.
-  - While the message is in edit mode, the textarea will still auto-save on change after the existing 600ms debounce.
-3. **Save status feedback**
-  - Keep the "Saving…" indicator only during the save request, then replace it with a brief "Saved" checkmark before returning to the read-only preview.
+Give the instructor view its own independent ordering column.
 
-## Files to edit
+### Database
+- Add `lessons.schedule_order` (integer, nullable) — the per-day ordering used only by the instructor schedule.
+- Backfill it from the current `order_index` so existing days keep their current order.
 
-- `src/pages/Instructor.tsx` — the `DayColumn` component and its state for pre-class messages.
+### Instructor page (`src/pages/Instructor.tsx`)
+- Load lessons ordered by `schedule_order` (fallback `order_index` when null).
+- On drag end / reorder, write to `schedule_order` only. Never touch `order_index` or `day_number`... wait — day_number still needs updating on cross-day drops; keep that. Only `order_index` writes are removed and replaced with `schedule_order`.
 
-## Optional follow-up
+### Admin page
+- No changes. Continues to use `order_index` for course/chapter ordering.
 
-If you want the textareas to auto-grow as you type, or the read-only preview to render Markdown, just let me know and I can add that next. yes do it!
-
-&nbsp;
+### Result
+- Reordering in Admin changes only the course-view order.
+- Reordering in Instructor changes only the schedule order.
+- Moving a lesson between days in Instructor still updates `day_number` as today.
