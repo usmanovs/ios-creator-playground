@@ -458,8 +458,14 @@ function PreClassField({
   placeholder: string;
 }) {
   const [open, setOpen] = useState(false);
+  const prevIsEditing = useRef(isEditing);
   useEffect(() => {
-    if (isEditing) setOpen(true);
+    if (isEditing && !prevIsEditing.current) {
+      setOpen(true);
+    } else if (!isEditing && prevIsEditing.current) {
+      setOpen(false);
+    }
+    prevIsEditing.current = isEditing;
   }, [isEditing]);
   return (
     <div className="mb-3">
