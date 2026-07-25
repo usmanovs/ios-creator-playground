@@ -408,6 +408,7 @@ function DayColumn({
   lessons,
   chapterTitle,
   onPreview,
+  onToggleCovered,
   muted,
   homework,
   onHomeworkChange,
@@ -422,6 +423,7 @@ function DayColumn({
   lessons: Lesson[];
   chapterTitle: (id: string | null) => string;
   onPreview: (id: string) => void;
+  onToggleCovered?: (lessonId: string) => void;
   muted?: boolean;
   homework?: string;
   onHomeworkChange?: (v: string) => void;
