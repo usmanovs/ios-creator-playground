@@ -29,6 +29,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import LessonPreview from "@/components/admin/LessonPreview";
+import { Textarea } from "@/components/ui/textarea";
 
 type Lesson = {
   id: string;
