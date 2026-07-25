@@ -671,18 +671,35 @@ function DayColumn({
           placeholder="Second message to send to students before class…"
         />
       )}
-      <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-        <div className="space-y-2">
-          {lessons.length === 0 && (
-            <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
-              Drop lessons here
+      {typeof onPreClassChange === "function" ? (
+        <div className="mt-3 pt-3 border-t border-border/60">
+          <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {lessons.length === 0 && (
+                <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
+                  Drop lessons here
+                </div>
+              )}
+              {lessons.map((l) => (
+                <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} onToggleCovered={onToggleCovered} />
+              ))}
             </div>
-          )}
-          {lessons.map((l) => (
-            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} onToggleCovered={onToggleCovered} />
-          ))}
+          </SortableContext>
         </div>
-      </SortableContext>
+      ) : (
+        <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2">
+            {lessons.length === 0 && (
+              <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
+                Drop lessons here
+              </div>
+            )}
+            {lessons.map((l) => (
+              <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} onToggleCovered={onToggleCovered} />
+            ))}
+          </div>
+        </SortableContext>
+      )}
       {showHomework && (
         <div className="mt-3 pt-3 border-t border-border/60">
           <div className="flex items-center justify-between mb-1.5 px-1">

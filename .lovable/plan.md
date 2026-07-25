@@ -1,6 +1,21 @@
-Update the lesson cards on the Instructor schedule board (`src/pages/Instructor.tsx`) so their borders are less bright and more greyish.
+## Goal
+Add a visual border/divider between the pre-class message section and the lessons list in each day column on the instructor schedule board, matching the existing divider between lessons and homework.
 
-- Change the default lesson card border from `border-border/50` to a muted grey token (`border-muted-foreground/30`).
-- Tone down the covered-state border as well, using the same muted grey or a subtler emerald variant (`border-emerald-500/20`).
-- Keep the existing card background, hover, drag, and checkbox styles unchanged.
-- Verify the result by checking the preview of the `/instructor` board.
+## Current state
+In `src/pages/Instructor.tsx`, the `DayColumn` component currently renders:
+- Day header
+- Pre-class message 1
+- Pre-class message 2
+- Lessons list (`SortableContext`)
+- Homework section (separated by `border-t border-border/60`)
+
+There is no divider between the pre-class messages and the lessons list, so the sections visually run together.
+
+## Changes
+- In `src/pages/Instructor.tsx`, wrap the `SortableContext` lessons block with a top border matching the homework divider style.
+- Add `mt-3 pt-3 border-t border-border/60` to the lessons container to create a consistent visual separator.
+- Ensure spacing remains balanced so the lesson list does not feel cramped against the pre-class messages.
+
+## Verification
+- Build the project to confirm no syntax errors.
+- Check the `/instructor` preview to confirm each day column shows a clear divider between pre-class messages and lessons.
