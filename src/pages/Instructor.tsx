@@ -213,21 +213,49 @@ export default function InstructorPage() {
     []
   );
 
-  // Prefer the column the pointer is inside; if not over a column, fall back to
-  // closest corners among sibling items so reordering within a column still works.
+  const isColumnId = useCallback(
+    (id: string): id is ColumnId => columnIds.includes(id as ColumnId),
+    [columnIds]
+  );
+
+  const isTopDropId = useCallback(
+    (id: string) => id === "unassigned:top" || /^d[1-7]:top$/.test(id),
+    []
+  );
+
+  // Prefer real lesson hits for ordering. Column/list hits are only fallbacks
+  // for appending, while the explicit :top targets insert at the start of a day.
   const collisionDetection: CollisionDetection = useCallback(
     (args) => {
+      const isLessonTarget = (id: string) => !isColumnId(id) && !isTopDropId(id) && id !== String(args.active.id);
       const pointerHits = pointerWithin(args);
-      const columnHit = pointerHits.find((c) => columnIds.includes(c.id as ColumnId));
+      const lessonPointerHits = pointerHits.filter((c) => isLessonTarget(String(c.id)));
+      if (lessonPointerHits.length) return lessonPointerHits;
+
+      const topHit = pointerHits.find((c) => isTopDropId(String(c.id)));
+      if (topHit) return [topHit];
+
+      const columnHit = pointerHits.find((c) => isColumnId(String(c.id)));
       if (columnHit) return [columnHit];
+
       const intersections = rectIntersection(args);
-      const intersectingColumn = intersections.find((c) => columnIds.includes(c.id as ColumnId));
+      const lessonIntersectionHits = intersections.filter((c) => isLessonTarget(String(c.id)));
+      if (lessonIntersectionHits.length) return lessonIntersectionHits;
+
+      const intersectingTop = intersections.find((c) => isTopDropId(String(c.id)));
+      if (intersectingTop) return [intersectingTop];
+
+      const intersectingColumn = intersections.find((c) => isColumnId(String(c.id)));
       if (intersectingColumn) return [intersectingColumn];
+
       const corners = closestCorners(args);
+      const lessonCornerHits = corners.filter((c) => isLessonTarget(String(c.id)));
+      if (lessonCornerHits.length) return lessonCornerHits;
+
       const first = getFirstCollision(corners);
       return first ? corners : intersections;
     },
-    [columnIds]
+    [isColumnId, isTopDropId]
   );
 
   const chapterTitle = (id: string | null) =>
@@ -250,6 +278,10 @@ export default function InstructorPage() {
   const activeLesson = activeId ? lessons.find((l) => l.id === activeId) : null;
 
   const findColumn = (id: string): ColumnId | null => {
+    if (id.endsWith(":top")) {
+      const columnId = id.replace(":top", "");
+      return findColumn(columnId);
+    }
     if (id === "unassigned" || id.startsWith("d")) {
       // could be column id itself
       if (id === "unassigned") return "unassigned";
@@ -281,8 +313,11 @@ export default function InstructorPage() {
     const overIdStr = String(over.id);
     const fromCol = findColumn(activeIdStr);
     // Prefer the sortable container the pointer is inside; fall back to resolving from the over id.
-    const overContainer = (over.data.current as any)?.sortable?.containerId as ColumnId | undefined;
-    const toCol = overContainer ?? findColumn(overIdStr);
+    const overData = (over.data.current as any) ?? {};
+    const overContainer = overData.sortable?.containerId as ColumnId | undefined;
+    const explicitColumn = overData.columnId as ColumnId | undefined;
+    const toCol = overContainer ?? explicitColumn ?? findColumn(overIdStr);
+    const insertAtTop = overData.position === "start" || overIdStr.endsWith(":top");
     if (!fromCol || !toCol) return;
 
     const prev = lessons;
@@ -297,7 +332,9 @@ export default function InstructorPage() {
 
     if (fromCol === toCol) {
       const overIdx =
-        overIdStr === toCol
+        insertAtTop
+          ? 0
+          : overIdStr === toCol
           ? toList.length - 1
           : toList.findIndex((l) => l.id === overIdStr);
       if (overIdx === -1 || overIdx === activeIdx) return;
@@ -310,7 +347,9 @@ export default function InstructorPage() {
         day_number: toCol === "unassigned" ? null : Number(toCol.replace("d", "")),
       };
       const overIdx =
-        overIdStr === toCol
+        insertAtTop
+          ? 0
+          : overIdStr === toCol
           ? toList.length
           : toList.findIndex((l) => l.id === overIdStr);
       const insertAt = overIdx === -1 ? toList.length : overIdx;
@@ -619,12 +658,15 @@ function DayColumn({
   completed?: boolean;
   onToggleCompleted?: () => void;
 }) {
-  const { setNodeRef, isOver } = useDroppable({ id });
+  const { setNodeRef, isOver } = useDroppable({ id, data: { columnId: id } });
+  const { setNodeRef: setTopDropRef, isOver: isTopOver } = useDroppable({
+    id: `${id}:top`,
+    data: { columnId: id, position: "start" },
+  });
   const showHomework = typeof onHomeworkChange === "function";
   const showComplete = typeof onToggleCompleted === "function";
   return (
     <div
-      ref={setNodeRef}
       className={`glass-card rounded-2xl p-3 min-h-[300px] transition-colors ${
         isOver ? "ring-2 ring-primary/60 bg-primary/5" : ""
       } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""}`}
@@ -674,7 +716,13 @@ function DayColumn({
       {typeof onPreClassChange === "function" ? (
         <div className="mt-3 pt-3 border-t border-border/60">
           <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-2">
+            <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
+              <div
+                ref={setTopDropRef}
+                className={`h-3 rounded-md border border-dashed transition-colors ${
+                  isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
+                }`}
+              />
               {lessons.length === 0 && (
                 <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
                   Drop lessons here
@@ -688,7 +736,13 @@ function DayColumn({
         </div>
       ) : (
         <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
+          <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
+            <div
+              ref={setTopDropRef}
+              className={`h-3 rounded-md border border-dashed transition-colors ${
+                isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
+              }`}
+            />
             {lessons.length === 0 && (
               <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
                 Drop lessons here
