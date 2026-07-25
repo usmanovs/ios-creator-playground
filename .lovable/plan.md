@@ -1,21 +1,14 @@
-## Goal
-Add a visual border/divider between the pre-class message section and the lessons list in each day column on the instructor schedule board, matching the existing divider between lessons and homework.
+# Sticky formatting toolbar in lesson editor
 
-## Current state
-In `src/pages/Instructor.tsx`, the `DayColumn` component currently renders:
-- Day header
-- Pre-class message 1
-- Pre-class message 2
-- Lessons list (`SortableContext`)
-- Homework section (separated by `border-t border-border/60`)
+When editing a lesson, the RichTextEditor toolbar scrolls out of view along with the content. Make it stick to the top of the scrollable dialog area so it's always accessible.
 
-There is no divider between the pre-class messages and the lessons list, so the sections visually run together.
+## Change
 
-## Changes
-- In `src/pages/Instructor.tsx`, wrap the `SortableContext` lessons block with a top border matching the homework divider style.
-- Add `mt-3 pt-3 border-t border-border/60` to the lessons container to create a consistent visual separator.
-- Ensure spacing remains balanced so the lesson list does not feel cramped against the pre-class messages.
+**`src/components/admin/RichTextEditor.tsx`**
+- On the toolbar wrapper (currently `flex flex-wrap gap-1 p-2 border-b border-border`), add `sticky top-0 z-20 bg-card/95 backdrop-blur` so it pins to the top of the nearest scrolling ancestor (the dialog's scroll container in `LessonEditor`).
+- Keep existing border-b so the divider remains visible while pinned.
+
+No other files need changes — `LessonEditor.tsx` already uses `overflow-y-auto` on the grid wrapper, which acts as the sticky containing scroller.
 
 ## Verification
-- Build the project to confirm no syntax errors.
-- Check the `/instructor` preview to confirm each day column shows a clear divider between pre-class messages and lessons.
+- Open a lesson in admin, scroll content down inside the dialog: toolbar stays visible at the top of the editor column.
