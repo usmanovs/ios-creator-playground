@@ -603,15 +603,16 @@ function LessonCard({
           {lesson.covered && <Check className="w-3 h-3" strokeWidth={3} />}
         </button>
       )}
-      <div className="min-w-0 flex-1">
-        <div className={`text-sm font-medium truncate ${lesson.covered ? "line-through text-foreground/60" : ""}`}>{lesson.title}</div>
-        <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5">
+      <div className="min-w-0 flex-1 flex items-center gap-2">
+        <div className={`text-sm font-medium truncate flex-1 ${lesson.covered ? "line-through text-foreground/60" : ""}`}>{lesson.title}</div>
+        <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5 shrink min-w-0">
           <span className="truncate">{chapterTitle}</span>
           {lesson.status === "draft" && (
-            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px]">draft</span>
+            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] shrink-0">draft</span>
           )}
         </div>
       </div>
+
       {onPreview && (
         <button
           type="button"
