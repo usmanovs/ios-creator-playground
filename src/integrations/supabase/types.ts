@@ -152,18 +152,21 @@ export type Database = {
         Row: {
           content: string
           day_number: number
+          pre_class_message: string
           updated_at: string
           updated_by: string | null
         }
         Insert: {
           content?: string
           day_number: number
+          pre_class_message?: string
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
           content?: string
           day_number?: number
+          pre_class_message?: string
           updated_at?: string
           updated_by?: string | null
         }
