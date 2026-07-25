@@ -131,7 +131,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
 
   return (
     <div className="rounded-xl border border-border bg-card/40">
-      <div className="flex flex-wrap gap-1 p-2 border-b border-border">
+      <div className="sticky top-0 z-20 flex flex-wrap gap-1 p-2 border-b border-border bg-card/95 backdrop-blur">
         <Btn label="Bold" on={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
           <Bold className="w-4 h-4" />
         </Btn>
