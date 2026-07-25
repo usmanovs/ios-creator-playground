@@ -21,7 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Check, Eye, GripVertical, LogOut } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, ChevronUp, Eye, GripVertical, LogOut } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -459,32 +459,46 @@ function PreClassField({
   saving: boolean;
   placeholder: string;
 }) {
+  const [open, setOpen] = useState(true);
+  useEffect(() => {
+    if (isEditing) setOpen(true);
+  }, [isEditing]);
   return (
     <div className="mb-3">
       <div className="flex items-center justify-between mb-1.5 px-1">
-        <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">{label}</div>
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className="flex items-center gap-1 text-[11px] uppercase tracking-wide text-foreground/50 font-semibold hover:text-foreground transition-colors"
+        >
+          {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          {label}
+        </button>
         <div className="flex items-center gap-2">
           {saving && <div className="text-[10px] text-foreground/40">Saving…</div>}
-          <button
-            onClick={onToggleEdit}
-            className="text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-primary hover:bg-background/70 transition-colors"
-          >
-            {isEditing ? "Done" : "Edit"}
-          </button>
+          {open && (
+            <button
+              onClick={onToggleEdit}
+              className="text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-primary hover:bg-background/70 transition-colors"
+            >
+              {isEditing ? "Done" : "Edit"}
+            </button>
+          )}
         </div>
       </div>
-      {isEditing ? (
-        <AutoTextarea
-          value={value ?? ""}
-          onChange={onChange}
-          placeholder={placeholder}
-          className="min-h-[140px] text-sm bg-background/40"
-          autoFocus
-        />
-      ) : (
-        <div className="text-sm bg-background/40 rounded-md border border-border p-3 min-h-[56px] text-foreground/80 whitespace-pre-wrap">
-          {value ? value : <span className="text-foreground/40 italic">{placeholder}</span>}
-        </div>
+      {open && (
+        isEditing ? (
+          <AutoTextarea
+            value={value ?? ""}
+            onChange={onChange}
+            placeholder={placeholder}
+            className="min-h-[140px] text-sm bg-background/40"
+            autoFocus
+          />
+        ) : (
+          <div className="text-sm bg-background/40 rounded-md border border-border p-3 min-h-[56px] text-foreground/80 whitespace-pre-wrap">
+            {value ? value : <span className="text-foreground/40 italic">{placeholder}</span>}
+          </div>
+        )
       )}
     </div>
   );
