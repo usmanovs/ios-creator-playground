@@ -125,7 +125,7 @@ export default function InstructorPage() {
   }, [isAdmin, load]);
 
   const hwTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const saveDayField = useCallback((day: number, field: "content" | "pre_class_message", value: string) => {
+  const saveDayField = useCallback((day: number, field: "content" | "pre_class_message" | "pre_class_message_2", value: string) => {
     const key = `${day}:${field}`;
     if (hwTimers.current[key]) clearTimeout(hwTimers.current[key]);
     hwTimers.current[key] = setTimeout(async () => {
@@ -145,6 +145,10 @@ export default function InstructorPage() {
   const onPreClassChange = useCallback((day: number, value: string) => {
     setPreClass((h) => ({ ...h, [day]: value }));
     saveDayField(day, "pre_class_message", value);
+  }, [saveDayField]);
+  const onPreClass2Change = useCallback((day: number, value: string) => {
+    setPreClass2((h) => ({ ...h, [day]: value }));
+    saveDayField(day, "pre_class_message_2", value);
   }, [saveDayField]);
 
   const toggleCompleted = useCallback(async (day: number) => {
