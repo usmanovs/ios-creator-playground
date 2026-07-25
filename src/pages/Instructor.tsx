@@ -357,6 +357,9 @@ function DayColumn({
   chapterTitle,
   onPreview,
   muted,
+  homework,
+  onHomeworkChange,
+  homeworkSaving,
 }: {
   id: string;
   label: string;
@@ -364,8 +367,12 @@ function DayColumn({
   chapterTitle: (id: string | null) => string;
   onPreview: (id: string) => void;
   muted?: boolean;
+  homework?: string;
+  onHomeworkChange?: (v: string) => void;
+  homeworkSaving?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id });
+  const showHomework = typeof onHomeworkChange === "function";
   return (
     <div
       ref={setNodeRef}
@@ -389,9 +396,24 @@ function DayColumn({
           ))}
         </div>
       </SortableContext>
+      {showHomework && (
+        <div className="mt-3 pt-3 border-t border-border/60">
+          <div className="flex items-center justify-between mb-1.5 px-1">
+            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Homework</div>
+            {homeworkSaving && <div className="text-[10px] text-foreground/40">Saving…</div>}
+          </div>
+          <Textarea
+            value={homework ?? ""}
+            onChange={(e) => onHomeworkChange!(e.target.value)}
+            placeholder="Add homework for this day…"
+            className="min-h-[80px] text-sm bg-background/40"
+          />
+        </div>
+      )}
     </div>
   );
 }
+
 
 function SortableLesson({ lesson, chapterTitle, onPreview }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
