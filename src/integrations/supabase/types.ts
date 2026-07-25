@@ -190,6 +190,7 @@ export type Database = {
           id: string
           lesson_type: string
           order_index: number
+          schedule_order: number | null
           status: string
           title: string
           video_url: string | null
@@ -205,6 +206,7 @@ export type Database = {
           id?: string
           lesson_type?: string
           order_index?: number
+          schedule_order?: number | null
           status?: string
           title: string
           video_url?: string | null
@@ -220,6 +222,7 @@ export type Database = {
           id?: string
           lesson_type?: string
           order_index?: number
+          schedule_order?: number | null
           status?: string
           title?: string
           video_url?: string | null
