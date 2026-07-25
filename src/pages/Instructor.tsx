@@ -51,6 +51,7 @@ export default function InstructorPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [homework, setHomework] = useState<Record<number, string>>({});
+  const [preClass, setPreClass] = useState<Record<number, string>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
@@ -96,32 +97,46 @@ export default function InstructorPage() {
     const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
-      supabase.from("day_homework").select("day_number,content"),
+      supabase.from("day_homework").select("day_number,content,pre_class_message"),
     ]);
     setLessons((ls as Lesson[]) || []);
     setChapters((ch as Chapter[]) || []);
-    const map: Record<number, string> = {};
-    ((hw as { day_number: number; content: string }[]) || []).forEach((r) => { map[r.day_number] = r.content; });
-    setHomework(map);
+    const hwMap: Record<number, string> = {};
+    const pcMap: Record<number, string> = {};
+    ((hw as { day_number: number; content: string; pre_class_message: string }[]) || []).forEach((r) => {
+      hwMap[r.day_number] = r.content;
+      pcMap[r.day_number] = r.pre_class_message ?? "";
+    });
+    setHomework(hwMap);
+    setPreClass(pcMap);
   }, []);
 
   useEffect(() => {
     if (isAdmin) load();
   }, [isAdmin, load]);
 
-  const hwTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
-  const onHomeworkChange = useCallback((day: number, value: string) => {
-    setHomework((h) => ({ ...h, [day]: value }));
-    if (hwTimers.current[day]) clearTimeout(hwTimers.current[day]);
-    hwTimers.current[day] = setTimeout(async () => {
+  const hwTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const saveDayField = useCallback((day: number, field: "content" | "pre_class_message", value: string) => {
+    const key = `${day}:${field}`;
+    if (hwTimers.current[key]) clearTimeout(hwTimers.current[key]);
+    hwTimers.current[key] = setTimeout(async () => {
       setSavingDay(day);
+      const payload: any = { day_number: day, [field]: value };
       const { error } = await supabase
         .from("day_homework")
-        .upsert({ day_number: day, content: value }, { onConflict: "day_number" });
+        .upsert(payload, { onConflict: "day_number" });
       setSavingDay((cur) => (cur === day ? null : cur));
       if (error) toast.error(error.message);
     }, 600);
   }, []);
+  const onHomeworkChange = useCallback((day: number, value: string) => {
+    setHomework((h) => ({ ...h, [day]: value }));
+    saveDayField(day, "content", value);
+  }, [saveDayField]);
+  const onPreClassChange = useCallback((day: number, value: string) => {
+    setPreClass((h) => ({ ...h, [day]: value }));
+    saveDayField(day, "pre_class_message", value);
+  }, [saveDayField]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -310,6 +325,8 @@ export default function InstructorPage() {
                 onPreview={openPreview}
                 homework={homework[d] ?? ""}
                 onHomeworkChange={(v) => onHomeworkChange(d, v)}
+                preClass={preClass[d] ?? ""}
+                onPreClassChange={(v) => onPreClassChange(d, v)}
                 homeworkSaving={savingDay === d}
               />
             ))}
@@ -359,6 +376,8 @@ function DayColumn({
   muted,
   homework,
   onHomeworkChange,
+  preClass,
+  onPreClassChange,
   homeworkSaving,
 }: {
   id: string;
@@ -369,6 +388,8 @@ function DayColumn({
   muted?: boolean;
   homework?: string;
   onHomeworkChange?: (v: string) => void;
+  preClass?: string;
+  onPreClassChange?: (v: string) => void;
   homeworkSaving?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id });
@@ -396,6 +417,20 @@ function DayColumn({
           ))}
         </div>
       </SortableContext>
+      {typeof onPreClassChange === "function" && (
+        <div className="mt-3 pt-3 border-t border-border/60">
+          <div className="flex items-center justify-between mb-1.5 px-1">
+            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message</div>
+            {homeworkSaving && <div className="text-[10px] text-foreground/40">Saving…</div>}
+          </div>
+          <Textarea
+            value={preClass ?? ""}
+            onChange={(e) => onPreClassChange!(e.target.value)}
+            placeholder="Message to send to students before class…"
+            className="min-h-[80px] text-sm bg-background/40"
+          />
+        </div>
+      )}
       {showHomework && (
         <div className="mt-3 pt-3 border-t border-border/60">
           <div className="flex items-center justify-between mb-1.5 px-1">
@@ -413,6 +448,7 @@ function DayColumn({
     </div>
   );
 }
+
 
 
 function SortableLesson({ lesson, chapterTitle, onPreview }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void }) {

@@ -1,0 +1,1 @@
+ALTER TABLE public.day_homework ADD COLUMN pre_class_message text NOT NULL DEFAULT '';
