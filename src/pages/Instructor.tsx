@@ -109,6 +109,20 @@ export default function InstructorPage() {
     if (isAdmin) load();
   }, [isAdmin, load]);
 
+  const hwTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const onHomeworkChange = useCallback((day: number, value: string) => {
+    setHomework((h) => ({ ...h, [day]: value }));
+    if (hwTimers.current[day]) clearTimeout(hwTimers.current[day]);
+    hwTimers.current[day] = setTimeout(async () => {
+      setSavingDay(day);
+      const { error } = await supabase
+        .from("day_homework")
+        .upsert({ day_number: day, content: value }, { onConflict: "day_number" });
+      setSavingDay((cur) => (cur === day ? null : cur));
+      if (error) toast.error(error.message);
+    }, 600);
+  }, []);
+
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   const chapterTitle = (id: string | null) =>
