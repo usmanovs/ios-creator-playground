@@ -1,0 +1,1 @@
+ALTER TABLE public.day_homework ADD COLUMN IF NOT EXISTS pre_class_message_2 text NOT NULL DEFAULT '';
