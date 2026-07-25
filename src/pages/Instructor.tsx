@@ -424,6 +424,8 @@ function DayColumn({
   onHomeworkChange,
   preClass,
   onPreClassChange,
+  preClass2,
+  onPreClass2Change,
   homeworkSaving,
   completed,
   onToggleCompleted,
