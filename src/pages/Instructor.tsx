@@ -667,7 +667,6 @@ function DayColumn({
   const showComplete = typeof onToggleCompleted === "function";
   return (
     <div
-      ref={setNodeRef}
       className={`glass-card rounded-2xl p-3 min-h-[300px] transition-colors ${
         isOver ? "ring-2 ring-primary/60 bg-primary/5" : ""
       } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""}`}
@@ -717,7 +716,7 @@ function DayColumn({
       {typeof onPreClassChange === "function" ? (
         <div className="mt-3 pt-3 border-t border-border/60">
           <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-2">
+            <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
               <div
                 ref={setTopDropRef}
                 className={`h-3 rounded-md border border-dashed transition-colors ${
@@ -737,7 +736,7 @@ function DayColumn({
         </div>
       ) : (
         <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
+          <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
             <div
               ref={setTopDropRef}
               className={`h-3 rounded-md border border-dashed transition-colors ${
