@@ -367,6 +367,8 @@ export default function InstructorPage() {
                 onHomeworkChange={(v) => onHomeworkChange(d, v)}
                 preClass={preClass[d] ?? ""}
                 onPreClassChange={(v) => onPreClassChange(d, v)}
+                preClass2={preClass2[d] ?? ""}
+                onPreClass2Change={(v) => onPreClass2Change(d, v)}
                 homeworkSaving={savingDay === d}
                 completed={completed[d] ?? false}
                 onToggleCompleted={() => toggleCompleted(d)}
