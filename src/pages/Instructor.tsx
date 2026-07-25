@@ -38,6 +38,7 @@ type Lesson = {
   day_number: number | null;
   order_index: number;
   status: string;
+  covered: boolean;
 };
 type Chapter = { id: string; title: string };
 
@@ -96,7 +97,7 @@ export default function InstructorPage() {
     const { data: c } = await supabase.from("courses").select("id").limit(1).maybeSingle();
     if (!c) return;
     const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
-      supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status").eq("course_id", c.id).order("order_index"),
+      supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status,covered").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
       supabase.from("day_homework").select("day_number,content,pre_class_message,completed"),
     ]);
@@ -155,6 +156,18 @@ export default function InstructorPage() {
       setCompleted((c) => ({ ...c, [day]: !next }));
     }
   }, [completed]);
+
+  const toggleCovered = useCallback(async (lessonId: string) => {
+    const current = lessons.find((l) => l.id === lessonId);
+    if (!current) return;
+    const next = !current.covered;
+    setLessons((ls) => ls.map((l) => (l.id === lessonId ? { ...l, covered: next } : l)));
+    const { error } = await supabase.from("lessons").update({ covered: next }).eq("id", lessonId);
+    if (error) {
+      toast.error(error.message);
+      setLessons((ls) => ls.map((l) => (l.id === lessonId ? { ...l, covered: !next } : l)));
+    }
+  }, [lessons]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -341,6 +354,7 @@ export default function InstructorPage() {
                 lessons={grouped[`d${d}` as ColumnId]}
                 chapterTitle={chapterTitle}
                 onPreview={openPreview}
+                onToggleCovered={toggleCovered}
                 homework={homework[d] ?? ""}
                 onHomeworkChange={(v) => onHomeworkChange(d, v)}
                 preClass={preClass[d] ?? ""}
@@ -356,6 +370,7 @@ export default function InstructorPage() {
               lessons={grouped.unassigned}
               chapterTitle={chapterTitle}
               onPreview={openPreview}
+              onToggleCovered={toggleCovered}
               muted
             />
           </div>
@@ -393,6 +408,7 @@ function DayColumn({
   lessons,
   chapterTitle,
   onPreview,
+  onToggleCovered,
   muted,
   homework,
   onHomeworkChange,
@@ -407,6 +423,7 @@ function DayColumn({
   lessons: Lesson[];
   chapterTitle: (id: string | null) => string;
   onPreview: (id: string) => void;
+  onToggleCovered?: (lessonId: string) => void;
   muted?: boolean;
   homework?: string;
   onHomeworkChange?: (v: string) => void;
@@ -468,7 +485,7 @@ function DayColumn({
             </div>
           )}
           {lessons.map((l) => (
-            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} />
+            <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} onToggleCovered={onToggleCovered} />
           ))}
         </div>
       </SortableContext>
@@ -492,7 +509,7 @@ function DayColumn({
 
 
 
-function SortableLesson({ lesson, chapterTitle, onPreview }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void }) {
+function SortableLesson({ lesson, chapterTitle, onPreview, onToggleCovered }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void; onToggleCovered?: (id: string) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: lesson.id,
   });
@@ -508,6 +525,7 @@ function SortableLesson({ lesson, chapterTitle, onPreview }: { lesson: Lesson; c
         chapterTitle={chapterTitle}
         dragHandleProps={{ ...attributes, ...listeners }}
         onPreview={() => onPreview(lesson.id)}
+        onToggleCovered={onToggleCovered ? () => onToggleCovered(lesson.id) : undefined}
       />
     </div>
   );
@@ -519,18 +537,20 @@ function LessonCard({
   dragging,
   dragHandleProps,
   onPreview,
+  onToggleCovered,
 }: {
   lesson: Lesson;
   chapterTitle: string;
   dragging?: boolean;
   dragHandleProps?: any;
   onPreview?: () => void;
+  onToggleCovered?: () => void;
 }) {
   return (
     <div
       className={`rounded-lg bg-card/60 hover:bg-card border border-border/50 p-2.5 flex items-start gap-2 ${
         dragging ? "shadow-2xl ring-1 ring-primary/40" : ""
-      }`}
+      } ${lesson.covered ? "bg-emerald-500/5 border-emerald-500/30" : ""}`}
     >
       <button
         type="button"
@@ -540,8 +560,24 @@ function LessonCard({
       >
         <GripVertical className="w-3.5 h-3.5 mt-0.5 text-foreground/30 shrink-0" />
       </button>
+      {onToggleCovered && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onToggleCovered(); }}
+          onPointerDown={(e) => e.stopPropagation()}
+          className={`mt-0.5 w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
+            lesson.covered
+              ? "bg-emerald-500 border-emerald-500 text-white"
+              : "border-foreground/30 hover:border-primary bg-background/40"
+          }`}
+          aria-label={lesson.covered ? "Mark not covered" : "Mark covered"}
+          title={lesson.covered ? "Covered — click to uncheck" : "Mark as covered"}
+        >
+          {lesson.covered && <Check className="w-3 h-3" strokeWidth={3} />}
+        </button>
+      )}
       <div className="min-w-0 flex-1">
-        <div className="text-sm font-medium truncate">{lesson.title}</div>
+        <div className={`text-sm font-medium truncate ${lesson.covered ? "line-through text-foreground/60" : ""}`}>{lesson.title}</div>
         <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5">
           <span className="truncate">{chapterTitle}</span>
           {lesson.status === "draft" && (
@@ -563,4 +599,5 @@ function LessonCard({
       )}
     </div>
   );
+
 }
