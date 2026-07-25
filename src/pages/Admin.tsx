@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import {
   DndContext,
   closestCenter,
+  pointerWithin,
+  rectIntersection,
+  getFirstCollision,
+  CollisionDetection,
   KeyboardSensor,
   PointerSensor,
   useSensor,
