@@ -207,6 +207,28 @@ export default function InstructorPage() {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
+  const columnIds = useMemo<ColumnId[]>(
+    () => ["unassigned", ...DAYS.map((d) => `d${d}` as ColumnId)],
+    []
+  );
+
+  // Prefer the column the pointer is inside; if not over a column, fall back to
+  // closest corners among sibling items so reordering within a column still works.
+  const collisionDetection: CollisionDetection = useCallback(
+    (args) => {
+      const pointerHits = pointerWithin(args);
+      const columnHit = pointerHits.find((c) => columnIds.includes(c.id as ColumnId));
+      if (columnHit) return [columnHit];
+      const intersections = rectIntersection(args);
+      const intersectingColumn = intersections.find((c) => columnIds.includes(c.id as ColumnId));
+      if (intersectingColumn) return [intersectingColumn];
+      const corners = closestCorners(args);
+      const first = getFirstCollision(corners);
+      return first ? corners : intersections;
+    },
+    [columnIds]
+  );
+
   const chapterTitle = (id: string | null) =>
     chapters.find((c) => c.id === id)?.title ?? "—";
 
