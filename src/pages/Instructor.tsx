@@ -346,6 +346,8 @@ export default function InstructorPage() {
                 preClass={preClass[d] ?? ""}
                 onPreClassChange={(v) => onPreClassChange(d, v)}
                 homeworkSaving={savingDay === d}
+                completed={completed[d] ?? false}
+                onToggleCompleted={() => toggleCompleted(d)}
               />
             ))}
             <DayColumn
