@@ -552,7 +552,6 @@ export default function AdminPage() {
                         onRename={(t) => renameChapter(ch, t)}
                         onDelete={() => setConfirmDeleteChapter(ch)}
                         onAddLesson={() => addLesson(ch.id)}
-                        onAddLesson={() => addLesson(ch.id)}
                         onEditLesson={(id) => {
                           const l = lessons.find((x) => x.id === id);
                           if (l) setEditingLesson(l);
