@@ -154,6 +154,7 @@ export type Database = {
           content: string
           day_number: number
           pre_class_message: string
+          pre_class_message_2: string
           updated_at: string
           updated_by: string | null
         }
@@ -162,6 +163,7 @@ export type Database = {
           content?: string
           day_number: number
           pre_class_message?: string
+          pre_class_message_2?: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -170,6 +172,7 @@ export type Database = {
           content?: string
           day_number?: number
           pre_class_message?: string
+          pre_class_message_2?: string
           updated_at?: string
           updated_by?: string | null
         }

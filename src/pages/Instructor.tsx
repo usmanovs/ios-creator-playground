@@ -53,6 +53,7 @@ export default function InstructorPage() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [homework, setHomework] = useState<Record<number, string>>({});
   const [preClass, setPreClass] = useState<Record<number, string>>({});
+  const [preClass2, setPreClass2] = useState<Record<number, string>>({});
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -99,20 +100,23 @@ export default function InstructorPage() {
     const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,status,covered").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
-      supabase.from("day_homework").select("day_number,content,pre_class_message,completed"),
+      supabase.from("day_homework").select("day_number,content,pre_class_message,pre_class_message_2,completed"),
     ]);
     setLessons((ls as Lesson[]) || []);
     setChapters((ch as Chapter[]) || []);
     const hwMap: Record<number, string> = {};
     const pcMap: Record<number, string> = {};
+    const pc2Map: Record<number, string> = {};
     const doneMap: Record<number, boolean> = {};
-    ((hw as { day_number: number; content: string; pre_class_message: string; completed: boolean }[]) || []).forEach((r) => {
+    ((hw as { day_number: number; content: string; pre_class_message: string; pre_class_message_2: string; completed: boolean }[]) || []).forEach((r) => {
       hwMap[r.day_number] = r.content;
       pcMap[r.day_number] = r.pre_class_message ?? "";
+      pc2Map[r.day_number] = r.pre_class_message_2 ?? "";
       doneMap[r.day_number] = r.completed ?? false;
     });
     setHomework(hwMap);
     setPreClass(pcMap);
+    setPreClass2(pc2Map);
     setCompleted(doneMap);
   }, []);
 
@@ -121,7 +125,7 @@ export default function InstructorPage() {
   }, [isAdmin, load]);
 
   const hwTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const saveDayField = useCallback((day: number, field: "content" | "pre_class_message", value: string) => {
+  const saveDayField = useCallback((day: number, field: "content" | "pre_class_message" | "pre_class_message_2", value: string) => {
     const key = `${day}:${field}`;
     if (hwTimers.current[key]) clearTimeout(hwTimers.current[key]);
     hwTimers.current[key] = setTimeout(async () => {
@@ -141,6 +145,10 @@ export default function InstructorPage() {
   const onPreClassChange = useCallback((day: number, value: string) => {
     setPreClass((h) => ({ ...h, [day]: value }));
     saveDayField(day, "pre_class_message", value);
+  }, [saveDayField]);
+  const onPreClass2Change = useCallback((day: number, value: string) => {
+    setPreClass2((h) => ({ ...h, [day]: value }));
+    saveDayField(day, "pre_class_message_2", value);
   }, [saveDayField]);
 
   const toggleCompleted = useCallback(async (day: number) => {
@@ -359,6 +367,8 @@ export default function InstructorPage() {
                 onHomeworkChange={(v) => onHomeworkChange(d, v)}
                 preClass={preClass[d] ?? ""}
                 onPreClassChange={(v) => onPreClassChange(d, v)}
+                preClass2={preClass2[d] ?? ""}
+                onPreClass2Change={(v) => onPreClass2Change(d, v)}
                 homeworkSaving={savingDay === d}
                 completed={completed[d] ?? false}
                 onToggleCompleted={() => toggleCompleted(d)}
@@ -414,6 +424,8 @@ function DayColumn({
   onHomeworkChange,
   preClass,
   onPreClassChange,
+  preClass2,
+  onPreClass2Change,
   homeworkSaving,
   completed,
   onToggleCompleted,
@@ -429,6 +441,8 @@ function DayColumn({
   onHomeworkChange?: (v: string) => void;
   preClass?: string;
   onPreClassChange?: (v: string) => void;
+  preClass2?: string;
+  onPreClass2Change?: (v: string) => void;
   homeworkSaving?: boolean;
   completed?: boolean;
   onToggleCompleted?: () => void;
@@ -466,13 +480,26 @@ function DayColumn({
       {typeof onPreClassChange === "function" && (
         <div className="mb-3">
           <div className="flex items-center justify-between mb-1.5 px-1">
-            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message</div>
+            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message 1</div>
             {homeworkSaving && <div className="text-[10px] text-foreground/40">Saving…</div>}
           </div>
           <Textarea
             value={preClass ?? ""}
             onChange={(e) => onPreClassChange!(e.target.value)}
             placeholder="Message to send to students before class…"
+            className="min-h-[80px] text-sm bg-background/40"
+          />
+        </div>
+      )}
+      {typeof onPreClass2Change === "function" && (
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-1.5 px-1">
+            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message 2</div>
+          </div>
+          <Textarea
+            value={preClass2 ?? ""}
+            onChange={(e) => onPreClass2Change!(e.target.value)}
+            placeholder="Second message to send to students before class…"
             className="min-h-[80px] text-sm bg-background/40"
           />
         </div>
