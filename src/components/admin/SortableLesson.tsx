@@ -21,6 +21,7 @@ type Props = {
 export default function SortableLesson({ lesson, onEdit, onDuplicate, onDelete }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: lesson.id,
+    data: { type: "lesson" },
   });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -32,7 +33,9 @@ export default function SortableLesson({ lesson, onEdit, onDuplicate, onDelete }
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-2 p-3 rounded-xl bg-card/40 border border-border"
+      className={`relative flex items-center gap-2 p-3 rounded-xl bg-card/40 border border-border ${
+        isDragging ? "z-50 ring-1 ring-primary/40 bg-card" : ""
+      }`}
     >
       <button
         {...attributes}
