@@ -179,7 +179,7 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
                       <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">Unassigned</SelectItem>
-                        {[1, 2, 3, 4, 5, 6].map((d) => (
+                        {[1, 2, 3, 4, 5, 6, 7].map((d) => (
                           <SelectItem key={d} value={String(d)}>Day {d}</SelectItem>
                         ))}
                       </SelectContent>
