@@ -54,6 +54,7 @@ export default function InstructorPage() {
   const [homework, setHomework] = useState<Record<number, string>>({});
   const [preClass, setPreClass] = useState<Record<number, string>>({});
   const [preClass2, setPreClass2] = useState<Record<number, string>>({});
+  const [preClassEditMode, setPreClassEditMode] = useState<Record<number, { 1: boolean; 2: boolean }>>({});
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -124,6 +125,21 @@ export default function InstructorPage() {
     if (isAdmin) load();
   }, [isAdmin, load]);
 
+  useEffect(() => {
+    setPreClassEditMode((prev) => {
+      const next: Record<number, { 1: boolean; 2: boolean }> = {};
+      DAYS.forEach((d) => {
+        const empty1 = (preClass[d] ?? "").trim() === "";
+        const empty2 = (preClass2[d] ?? "").trim() === "";
+        next[d] = {
+          1: empty1 ? true : (prev[d]?.[1] ?? false),
+          2: empty2 ? true : (prev[d]?.[2] ?? false),
+        };
+      });
+      return next;
+    });
+  }, [preClass, preClass2]);
+
   const hwTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const saveDayField = useCallback((day: number, field: "content" | "pre_class_message" | "pre_class_message_2", value: string) => {
     const key = `${day}:${field}`;
@@ -150,6 +166,16 @@ export default function InstructorPage() {
     setPreClass2((h) => ({ ...h, [day]: value }));
     saveDayField(day, "pre_class_message_2", value);
   }, [saveDayField]);
+
+  const togglePreClassEditMode = useCallback((day: number, slot: 1 | 2) => {
+    setPreClassEditMode((prev) => ({
+      ...prev,
+      [day]: {
+        ...(prev[day] ?? { 1: false, 2: false }),
+        [slot]: !prev[day]?.[slot],
+      },
+    }));
+  }, []);
 
   const toggleCompleted = useCallback(async (day: number) => {
     const next = !completed[day];
@@ -369,6 +395,10 @@ export default function InstructorPage() {
                 onPreClassChange={(v) => onPreClassChange(d, v)}
                 preClass2={preClass2[d] ?? ""}
                 onPreClass2Change={(v) => onPreClass2Change(d, v)}
+                preClassEditMode={preClassEditMode[d]?.[1] ?? false}
+                preClass2EditMode={preClassEditMode[d]?.[2] ?? false}
+                onTogglePreClassEditMode={() => togglePreClassEditMode(d, 1)}
+                onTogglePreClass2EditMode={() => togglePreClassEditMode(d, 2)}
                 homeworkSaving={savingDay === d}
                 completed={completed[d] ?? false}
                 onToggleCompleted={() => toggleCompleted(d)}
@@ -412,6 +442,87 @@ export default function InstructorPage() {
   );
 }
 
+function PreClassField({
+  label,
+  value,
+  isEditing,
+  onToggleEdit,
+  onChange,
+  saving,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  isEditing: boolean;
+  onToggleEdit: () => void;
+  onChange: (v: string) => void;
+  saving: boolean;
+  placeholder: string;
+}) {
+  return (
+    <div className="mb-3">
+      <div className="flex items-center justify-between mb-1.5 px-1">
+        <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">{label}</div>
+        <div className="flex items-center gap-2">
+          {saving && <div className="text-[10px] text-foreground/40">Saving…</div>}
+          <button
+            onClick={onToggleEdit}
+            className="text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-primary hover:bg-background/70 transition-colors"
+          >
+            {isEditing ? "Done" : "Edit"}
+          </button>
+        </div>
+      </div>
+      {isEditing ? (
+        <AutoTextarea
+          value={value ?? ""}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="min-h-[140px] text-sm bg-background/40"
+          autoFocus
+        />
+      ) : (
+        <div className="text-sm bg-background/40 rounded-md border border-border p-3 min-h-[56px] text-foreground/80 whitespace-pre-wrap">
+          {value ? value : <span className="text-foreground/40 italic">{placeholder}</span>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AutoTextarea({
+  value,
+  onChange,
+  placeholder,
+  className,
+  autoFocus,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  className?: string;
+  autoFocus?: boolean;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.max(el.scrollHeight, el.offsetHeight)}px`;
+  }, [value]);
+  return (
+    <Textarea
+      ref={ref}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className={className}
+      autoFocus={autoFocus}
+      rows={1}
+    />
+  );
+}
+
 function DayColumn({
   id,
   label,
@@ -426,6 +537,10 @@ function DayColumn({
   onPreClassChange,
   preClass2,
   onPreClass2Change,
+  preClassEditMode,
+  preClass2EditMode,
+  onTogglePreClassEditMode,
+  onTogglePreClass2EditMode,
   homeworkSaving,
   completed,
   onToggleCompleted,
@@ -443,6 +558,10 @@ function DayColumn({
   onPreClassChange?: (v: string) => void;
   preClass2?: string;
   onPreClass2Change?: (v: string) => void;
+  preClassEditMode?: boolean;
+  preClass2EditMode?: boolean;
+  onTogglePreClassEditMode?: () => void;
+  onTogglePreClass2EditMode?: () => void;
   homeworkSaving?: boolean;
   completed?: boolean;
   onToggleCompleted?: () => void;
@@ -478,31 +597,26 @@ function DayColumn({
         </div>
       </div>
       {typeof onPreClassChange === "function" && (
-        <div className="mb-3">
-          <div className="flex items-center justify-between mb-1.5 px-1">
-            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message 1</div>
-            {homeworkSaving && <div className="text-[10px] text-foreground/40">Saving…</div>}
-          </div>
-          <Textarea
-            value={preClass ?? ""}
-            onChange={(e) => onPreClassChange!(e.target.value)}
-            placeholder="Message to send to students before class…"
-            className="min-h-[80px] text-sm bg-background/40"
-          />
-        </div>
+        <PreClassField
+          label="Pre-class message 1"
+          value={preClass ?? ""}
+          isEditing={preClassEditMode ?? false}
+          onToggleEdit={onTogglePreClassEditMode!}
+          onChange={onPreClassChange!}
+          saving={homeworkSaving ?? false}
+          placeholder="Message to send to students before class…"
+        />
       )}
       {typeof onPreClass2Change === "function" && (
-        <div className="mb-3">
-          <div className="flex items-center justify-between mb-1.5 px-1">
-            <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Pre-class message 2</div>
-          </div>
-          <Textarea
-            value={preClass2 ?? ""}
-            onChange={(e) => onPreClass2Change!(e.target.value)}
-            placeholder="Second message to send to students before class…"
-            className="min-h-[80px] text-sm bg-background/40"
-          />
-        </div>
+        <PreClassField
+          label="Pre-class message 2"
+          value={preClass2 ?? ""}
+          isEditing={preClass2EditMode ?? false}
+          onToggleEdit={onTogglePreClass2EditMode!}
+          onChange={onPreClass2Change!}
+          saving={homeworkSaving ?? false}
+          placeholder="Second message to send to students before class…"
+        />
       )}
       <SortableContext items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-2">
