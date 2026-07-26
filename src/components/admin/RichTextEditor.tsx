@@ -250,30 +250,46 @@ export default function RichTextEditor({ value, onChange }: Props) {
           const oldSrc = cropSrc;
           if (!oldSrc) return;
           const { state } = editor;
-          let pos: number | null = null;
+          const matches: { pos: number; typeName: string }[] = [];
           state.doc.descendants((node, p) => {
-            if (node.type.name === "image" && node.attrs.src === oldSrc) {
-              pos = p;
-              return false;
+            if (
+              (node.type.name === "image" ||
+                node.type.name === "imageResize") &&
+              node.attrs?.src === oldSrc
+            ) {
+              matches.push({ pos: p, typeName: node.type.name });
             }
             return true;
           });
-          if (pos === null) {
-            toast.error("Could not locate image to replace");
+          if (matches.length === 0) {
+            // Fallback: string-replace in HTML
+            const html = editor.getHTML();
+            if (html.includes(oldSrc)) {
+              editor
+                .chain()
+                .focus()
+                .setContent(html.split(oldSrc).join(url), true)
+                .run();
+              toast.success("Image replaced");
+            } else {
+              toast.error("Could not locate image to replace");
+            }
             return;
           }
           editor
             .chain()
             .focus()
             .command(({ tr }) => {
-              const node = tr.doc.nodeAt(pos!);
-              if (!node) return false;
-              tr.setNodeMarkup(pos!, undefined, {
-                ...node.attrs,
-                src: url,
-                width: null,
-                height: null,
-              });
+              for (const m of matches) {
+                const node = tr.doc.nodeAt(m.pos);
+                if (!node) continue;
+                tr.setNodeMarkup(m.pos, undefined, {
+                  ...node.attrs,
+                  src: url,
+                  width: null,
+                  height: null,
+                });
+              }
               return true;
             })
             .run();
