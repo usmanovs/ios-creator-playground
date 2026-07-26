@@ -60,7 +60,16 @@ async function uploadAndInsert(files: File[], editor: Editor | null) {
     const tId = toast.loading("Uploading image…");
     try {
       const url = await uploadLessonImage(file);
-      editor.chain().focus().setImage({ src: url }).run();
+      // If an image node is currently selected, move caret just after it
+      // so setImage inserts a new node instead of replacing the selected one.
+      const { state } = editor;
+      const selectedNode = (state.selection as any).node;
+      if (selectedNode && (selectedNode.type.name === "image" || selectedNode.type.name === "imageResize")) {
+        const to = state.selection.to;
+        editor.chain().focus().insertContentAt(to, { type: selectedNode.type.name, attrs: { src: url } }).run();
+      } else {
+        editor.chain().focus().setImage({ src: url }).run();
+      }
       toast.success("Image inserted", { id: tId });
     } catch (e: any) {
       toast.error(e?.message ?? "Upload failed", { id: tId });
