@@ -247,7 +247,32 @@ export default function RichTextEditor({ value, onChange }: Props) {
         src={cropSrc}
         onClose={() => setCropSrc(null)}
         onCropped={(url) => {
-          editor.chain().focus().updateAttributes("image", { src: url }).run();
+          const oldSrc = cropSrc;
+          // Try selection-based update first
+          const ok = editor.chain().focus().updateAttributes("image", { src: url }).run();
+          if (!ok || !oldSrc) return;
+          // Fallback: find the node by matching src and update it
+          const { state } = editor;
+          let pos: number | null = null;
+          state.doc.descendants((node, p) => {
+            if (node.type.name === "image" && node.attrs.src === oldSrc) {
+              pos = p;
+              return false;
+            }
+            return true;
+          });
+          if (pos !== null) {
+            editor
+              .chain()
+              .focus()
+              .command(({ tr }) => {
+                const node = state.doc.nodeAt(pos!);
+                if (!node) return false;
+                tr.setNodeMarkup(pos!, undefined, { ...node.attrs, src: url });
+                return true;
+              })
+              .run();
+          }
         }}
       />
     </div>
