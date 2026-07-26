@@ -230,11 +230,20 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
               onClick={async () => {
                 await persist();
                 toast.success("Saved");
-                onClose();
               }}
               disabled={!dirty}
             >
               Save
+            </Button>
+            <Button
+              onClick={async () => {
+                await persist();
+                toast.success("Saved");
+                onClose();
+              }}
+              disabled={!dirty}
+            >
+              Save and Close
             </Button>
           </DialogFooter>
         </DialogContent>
