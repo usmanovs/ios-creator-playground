@@ -72,7 +72,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
       StarterKit.configure({
         link: { openOnClick: false, HTMLAttributes: { rel: "noopener noreferrer" } },
       }),
-      Image,
+      ImageResize,
       Table.configure({ resizable: true, HTMLAttributes: { class: "lesson-table" } }),
       TableRow,
       TableHeader,
