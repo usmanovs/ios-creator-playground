@@ -183,17 +183,24 @@ export default function RichTextEditor({ value, onChange }: Props) {
         >
           <ImageIcon className="w-4 h-4" />
         </Btn>
-        {editor.isActive("image") && (
-          <Btn
-            label="Crop image"
-            on={() => {
-              const src = editor.getAttributes("image").src as string | undefined;
-              if (src) setCropSrc(src);
-            }}
-          >
-            <Crop className="w-4 h-4" />
-          </Btn>
-        )}
+        <Btn
+          label="Crop image (click image first)"
+          on={() => {
+            let src = editor.getAttributes("image").src as string | undefined;
+            if (!src) src = editor.getAttributes("imageResize").src as string | undefined;
+            if (!src) {
+              // Fallback: find selected image in DOM
+              const el = editor.view.dom.querySelector<HTMLImageElement>(
+                "img.ProseMirror-selectednode, .ProseMirror-selectednode img"
+              );
+              src = el?.src;
+            }
+            if (src) setCropSrc(src);
+            else toast.error("Click an image first, then press crop");
+          }}
+        >
+          <Crop className="w-4 h-4" />
+        </Btn>
         <Btn
           label="Insert table"
           on={() =>
@@ -240,7 +247,32 @@ export default function RichTextEditor({ value, onChange }: Props) {
         src={cropSrc}
         onClose={() => setCropSrc(null)}
         onCropped={(url) => {
-          editor.chain().focus().updateAttributes("image", { src: url }).run();
+          const oldSrc = cropSrc;
+          // Try selection-based update first
+          const ok = editor.chain().focus().updateAttributes("image", { src: url }).run();
+          if (!ok || !oldSrc) return;
+          // Fallback: find the node by matching src and update it
+          const { state } = editor;
+          let pos: number | null = null;
+          state.doc.descendants((node, p) => {
+            if (node.type.name === "image" && node.attrs.src === oldSrc) {
+              pos = p;
+              return false;
+            }
+            return true;
+          });
+          if (pos !== null) {
+            editor
+              .chain()
+              .focus()
+              .command(({ tr }) => {
+                const node = state.doc.nodeAt(pos!);
+                if (!node) return false;
+                tr.setNodeMarkup(pos!, undefined, { ...node.attrs, src: url });
+                return true;
+              })
+              .run();
+          }
         }}
       />
     </div>
