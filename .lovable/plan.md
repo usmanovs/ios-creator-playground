@@ -1,20 +1,60 @@
-## Plan
 
-1. **Make day lesson areas the active drop targets**
-   - Put the droppable ref on the lessons list area inside each day, not only the full day card.
-   - Keep the day card highlight behavior, but make insertion target detection more precise.
+## What "retro" means here
 
-2. **Fix top-of-day insertion**
-   - Update drag-end logic so dropping over the first lesson in Day 2 inserts before it.
-   - If the pointer is over the Day 2 empty/list area itself, append to the end as before.
+The reference repo's `retro` page is a **retrospective feedback board**, not a vintage aesthetic. Attendees post two kinds of notes — "what went well" and "what to improve" — vote on each other's notes, and admins move improvement items across a status pipeline (open → planned → in progress → done). I'll port that feature to this project, matching the current site's aurora/glass look so it feels native rather than pasted-in.
 
-3. **Improve collision detection for nested schedule items**
-   - Prefer actual lesson item collisions for ordering.
-   - Fall back to the day column/list only when no lesson item is under the pointer.
+## Route & scope
 
-4. **Verify the reported case**
-   - Test dragging `#BeLikeImanbek` into Day 2 at the top and confirm it saves with the correct Day 2 `schedule_order`.
+- New standalone route at **`/retro`**, registered in `src/App.tsx`.
+- Existing pages, nav, and homepage untouched.
+- Bilingual (EN/RU) via the existing `LanguageContext` — new keys added there.
 
-## Technical notes
+## Page structure
 
-The current instructor schedule uses `@dnd-kit` with one droppable per day column and sortable lesson items. The fix will stay in `src/pages/Instructor.tsx` and only change the instructor board drag/drop behavior.
+```text
+┌──────────────────────────────────────────────┐
+│ Header: back-to-home · logo · share · EN/RU  │
+├──────────────────────────────────────────────┤
+│ Hero: badge, title, subtitle, 3 stat cards   │
+│       (Ideas / Wins / Improvements)          │
+├──────────────────────────────────────────────┤
+│ Submission form (category · name · content)  │
+├─────────────────────┬────────────────────────┤
+│ ✅ What went well   │ 💡 What to improve     │
+│  · upvote button    │  · upvote button       │
+│  · content + author │  · status chip + select│
+│  · vote count       │  · content + author    │
+└─────────────────────┴────────────────────────┘
+```
+
+- Voting: one vote per browser (anonymous voter id in `localStorage`), optimistic UI with rollback on error.
+- Status pipeline (improvement column only): `open | planned | in_progress | done`, changeable via a dropdown on each card. Everyone can change status for now — mirrors the reference. If you want it admin-only, say so and I'll gate it behind `useAuthUser` + the existing admin role check.
+- Sorting: by vote count desc, then newest.
+- Sharing: "Share" button copies the `/retro` URL (Web Share API when available, clipboard fallback).
+
+## Backend (Lovable Cloud)
+
+Two new tables in one migration, with grants and RLS:
+
+- `retro_items(id uuid pk, category text check in ('well','improve'), content text, author text null, status text check in ('open','planned','in_progress','done') default 'open', created_at timestamptz default now())`
+- `retro_votes(id uuid pk, item_id uuid fk → retro_items on delete cascade, voter_id text, created_at timestamptz default now(), unique(item_id, voter_id))`
+
+Policies:
+- `retro_items`: anyone (anon + authenticated) can `SELECT` and `INSERT`; only authenticated can `UPDATE` status (simple bar to avoid drive-by tampering). No delete from the client.
+- `retro_votes`: anyone can `SELECT` and `INSERT`; the unique constraint prevents double-voting per browser.
+- Grants written per the project's grant rules (anon read+insert on items/votes; authenticated for updates; service_role all).
+
+## Design
+
+Reuse the existing tokens (`--background`, `--card`, `--primary` violet, `--accent` green) and glass utilities from `index.css` so the page matches the site — glass cards, aurora background, Space Grotesk display font. No new palette. The reference's "mint/amber" accents map to the project's existing `accent` (green) and a soft amber for "in progress" chips only.
+
+## Files
+
+- **New**: `src/pages/Retro.tsx`, `supabase/migrations/<ts>_retro.sql`
+- **Edited**: `src/App.tsx` (add `<Route path="/retro">`), `src/contexts/LanguageContext.tsx` (EN/RU strings for hero, form, columns, statuses, empty states, share)
+
+## Out of scope (ask if you want them)
+
+- Admin-only status control
+- Realtime updates (currently reloads after submit; can add Supabase realtime if needed)
+- Adding a link to `/retro` in the main navbar (kept standalone per your answer)
