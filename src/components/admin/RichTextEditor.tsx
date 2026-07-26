@@ -115,6 +115,8 @@ export default function RichTextEditor({ value, onChange }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+
   if (!editor) return null;
 
   const Btn = ({ on, active, children, label }: any) => (
