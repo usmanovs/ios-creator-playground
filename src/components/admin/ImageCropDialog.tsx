@@ -23,6 +23,14 @@ export default function ImageCropDialog({ src, onClose, onCropped }: Props) {
   const [crop, setCrop] = useState<Crop>();
   const [completed, setCompleted] = useState<PixelCrop | null>(null);
   const [busy, setBusy] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const handleClose = () => {
+    setPreviewUrl(null);
+    setCrop(undefined);
+    setCompleted(null);
+    onClose();
+  };
 
   const apply = async () => {
     if (!imgRef.current || !completed || !completed.width || !completed.height) {
@@ -55,8 +63,8 @@ export default function ImageCropDialog({ src, onClose, onCropped }: Props) {
       );
       const url = await uploadLessonImage(blob);
       onCropped(url);
-      toast.success("Image cropped");
-      onClose();
+      setPreviewUrl(url);
+      toast.success("Image cropped and updated");
     } catch (e: any) {
       toast.error(e?.message ?? "Crop failed");
     } finally {
@@ -65,50 +73,79 @@ export default function ImageCropDialog({ src, onClose, onCropped }: Props) {
   };
 
   return (
-    <Dialog open={!!src} onOpenChange={(o) => !o && onClose()}>
+    <Dialog open={!!src} onOpenChange={(o) => !o && handleClose()}>
       <DialogContent className="max-w-3xl max-h-[92vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle>Crop image</DialogTitle>
+          <DialogTitle>{previewUrl ? "Cropped image preview" : "Crop image"}</DialogTitle>
         </DialogHeader>
-        <div className="overflow-auto flex-1 flex items-center justify-center bg-black/20 rounded-lg p-2">
-          {src && (
-            <ReactCrop
-              crop={crop}
-              onChange={(c) => setCrop(c)}
-              onComplete={(c) => setCompleted(c)}
-            >
+
+        {previewUrl ? (
+          <div className="flex-1 overflow-auto flex flex-col items-center justify-center gap-3 p-2">
+            <div className="w-full rounded-md border border-green-500/40 bg-green-500/10 text-green-200 text-sm px-3 py-2">
+              ✓ Image cropped successfully and updated in the lesson.
+            </div>
+            <div className="bg-black/20 rounded-lg p-2 flex items-center justify-center w-full">
               <img
-                ref={imgRef}
-                src={src}
-                crossOrigin="anonymous"
-                alt="to crop"
-                style={{ maxHeight: "70vh" }}
-                onLoad={(e) => {
-                  const img = e.currentTarget;
-                  const w = img.width;
-                  const h = img.height;
-                  const size = Math.min(w, h) * 0.8;
-                  const initial: PixelCrop = {
-                    unit: "px",
-                    x: (w - size) / 2,
-                    y: (h - size) / 2,
-                    width: size,
-                    height: size,
-                  };
-                  setCrop(initial);
-                  setCompleted(initial);
-                }}
+                src={previewUrl}
+                alt="cropped preview"
+                style={{ maxHeight: "60vh" }}
+                className="rounded"
               />
-            </ReactCrop>
-          )}
-        </div>
+            </div>
+          </div>
+        ) : (
+          <div className="overflow-auto flex-1 flex items-center justify-center bg-black/20 rounded-lg p-2">
+            {src && (
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompleted(c)}
+              >
+                <img
+                  ref={imgRef}
+                  src={src}
+                  crossOrigin="anonymous"
+                  alt="to crop"
+                  style={{ maxHeight: "70vh" }}
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    const w = img.width;
+                    const h = img.height;
+                    const size = Math.min(w, h) * 0.8;
+                    const initial: PixelCrop = {
+                      unit: "px",
+                      x: (w - size) / 2,
+                      y: (h - size) / 2,
+                      width: size,
+                      height: size,
+                    };
+                    setCrop(initial);
+                    setCompleted(initial);
+                  }}
+                />
+              </ReactCrop>
+            )}
+          </div>
+        )}
+
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={busy}>
-            Cancel
-          </Button>
-          <Button onClick={apply} disabled={busy}>
-            {busy ? "Cropping…" : "Apply crop"}
-          </Button>
+          {previewUrl ? (
+            <>
+              <Button variant="outline" onClick={() => setPreviewUrl(null)} disabled={busy}>
+                Crop again
+              </Button>
+              <Button onClick={handleClose}>Done</Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={handleClose} disabled={busy}>
+                Cancel
+              </Button>
+              <Button onClick={apply} disabled={busy}>
+                {busy ? "Cropping…" : "Apply crop"}
+              </Button>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
