@@ -183,6 +183,17 @@ export default function RichTextEditor({ value, onChange }: Props) {
         >
           <ImageIcon className="w-4 h-4" />
         </Btn>
+        {editor.isActive("image") && (
+          <Btn
+            label="Crop image"
+            on={() => {
+              const src = editor.getAttributes("image").src as string | undefined;
+              if (src) setCropSrc(src);
+            }}
+          >
+            <Crop className="w-4 h-4" />
+          </Btn>
+        )}
         <Btn
           label="Insert table"
           on={() =>
