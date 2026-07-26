@@ -236,6 +236,13 @@ export default function RichTextEditor({ value, onChange }: Props) {
         </Btn>
       </div>
       <EditorContent editor={editor} />
+      <ImageCropDialog
+        src={cropSrc}
+        onClose={() => setCropSrc(null)}
+        onCropped={(url) => {
+          editor.chain().focus().updateAttributes("image", { src: url }).run();
+        }}
+      />
     </div>
   );
 }
