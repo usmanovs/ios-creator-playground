@@ -242,6 +242,58 @@ const translations: Record<string, Record<Language, string>> = {
   'as.reviewTitle': { en: 'Actually life-changing', ru: 'Реально меняет жизнь' },
   'as.reviewBody': { en: 'Clean, fast, and beautifully designed. Built by an indie dev — respect.', ru: 'Чисто, быстро и красиво. Сделано инди-разработчиком — уважение.' },
   'as.reviewer': { en: '— @sarah_builds', ru: '— @sarah_builds' },
+
+  // Retro (retrospective feedback board)
+  'retro.brand': { en: 'Retro Board', ru: 'Ретро-доска' },
+  'retro.back': { en: 'Back to home', ru: 'На главную' },
+  'retro.badge': { en: 'Retrospective', ru: 'Ретроспектива' },
+  'retro.title.a': { en: 'iOS Vibe Coding', ru: 'iOS Vibe Coding' },
+  'retro.title.b': { en: 'let\'s grow together', ru: 'растём вместе' },
+  'retro.subtitle': {
+    en: 'Share what worked and what we can improve for the next cohort. Vote on ideas you love.',
+    ru: 'Поделись, что получилось, и что стоит улучшить в следующем потоке. Голосуй за идеи, которые тебе близки.',
+  },
+  'retro.stat.ideas': { en: 'Ideas', ru: 'Идей' },
+  'retro.stat.wins': { en: 'Wins', ru: 'Побед' },
+  'retro.stat.improvements': { en: 'Improvements', ru: 'Улучшений' },
+  'retro.cta.share': { en: 'Share feedback', ru: 'Оставить отзыв' },
+  'retro.share': { en: 'Share', ru: 'Поделиться' },
+  'retro.share.copied': { en: 'Link copied', ru: 'Ссылка скопирована' },
+  'retro.share.title': { en: 'iOS Vibe Coding — Retro', ru: 'iOS Vibe Coding — Ретро' },
+
+  'retro.form.title': { en: 'Add your voice', ru: 'Добавь свой голос' },
+  'retro.form.category': { en: 'Category', ru: 'Категория' },
+  'retro.form.cat.well': { en: '✅ What went well', ru: '✅ Что получилось' },
+  'retro.form.cat.improve': { en: '💡 What to improve', ru: '💡 Что улучшить' },
+  'retro.form.author': { en: 'Your name (optional)', ru: 'Твоё имя (необязательно)' },
+  'retro.form.author.ph': { en: 'Anonymous', ru: 'Аноним' },
+  'retro.form.content': { en: 'Your feedback', ru: 'Твой отзыв' },
+  'retro.form.content.ph': {
+    en: 'Tell us what you think…',
+    ru: 'Расскажи, что думаешь…',
+  },
+  'retro.form.submit': { en: 'Submit', ru: 'Отправить' },
+  'retro.form.sending': { en: 'Sending…', ru: 'Отправляем…' },
+  'retro.form.success': { en: 'Thanks — your feedback was added.', ru: 'Спасибо — твой отзыв добавлен.' },
+  'retro.form.err': { en: 'Something went wrong. Please try again.', ru: 'Что-то пошло не так. Попробуй ещё раз.' },
+  'retro.form.err.empty': { en: 'Please write at least a couple of words.', ru: 'Напиши хотя бы пару слов.' },
+
+  'retro.well.title': { en: 'What went well', ru: 'Что получилось' },
+  'retro.improve.title': { en: 'What to improve', ru: 'Что улучшить' },
+  'retro.empty.well': { en: 'Be the first to share a win.', ru: 'Стань первым, кто поделится победой.' },
+  'retro.empty.improve': { en: 'No suggestions yet — add one!', ru: 'Пока нет предложений — добавь своё!' },
+  'retro.anon': { en: 'Anonymous', ru: 'Аноним' },
+  'retro.vote': { en: 'Upvote', ru: 'Голос за' },
+  'retro.voted': { en: 'Voted', ru: 'Ты проголосовал' },
+  'retro.votes': { en: 'votes', ru: 'голосов' },
+
+  'retro.status.label': { en: 'Status', ru: 'Статус' },
+  'retro.status.open': { en: 'Open', ru: 'Открыто' },
+  'retro.status.planned': { en: 'Planned', ru: 'В планах' },
+  'retro.status.in_progress': { en: 'In progress', ru: 'В работе' },
+  'retro.status.done': { en: 'Done', ru: 'Готово' },
+
+  'retro.footer': { en: 'iOS Vibe Coding · Retro board', ru: 'iOS Vibe Coding · Ретро-доска' },
 };
 
 
