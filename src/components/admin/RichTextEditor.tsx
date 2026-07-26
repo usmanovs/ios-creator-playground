@@ -268,7 +268,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
               editor
                 .chain()
                 .focus()
-                .setContent(html.split(oldSrc).join(url), true)
+                .setContent(html.split(oldSrc).join(url))
                 .run();
               toast.success("Image replaced");
             } else {
