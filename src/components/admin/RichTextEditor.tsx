@@ -183,12 +183,15 @@ export default function RichTextEditor({ value, onChange }: Props) {
         >
           <ImageIcon className="w-4 h-4" />
         </Btn>
-        {editor.isActive("image") && (
+        {(editor.isActive("image") || editor.isActive("imageResize")) && (
           <Btn
             label="Crop image"
             on={() => {
-              const src = editor.getAttributes("image").src as string | undefined;
+              const src =
+                (editor.getAttributes("image").src as string | undefined) ??
+                (editor.getAttributes("imageResize").src as string | undefined);
               if (src) setCropSrc(src);
+              else toast.error("Select an image first");
             }}
           >
             <Crop className="w-4 h-4" />
