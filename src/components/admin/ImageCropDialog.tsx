@@ -83,6 +83,21 @@ export default function ImageCropDialog({ src, onClose, onCropped }: Props) {
                 crossOrigin="anonymous"
                 alt="to crop"
                 style={{ maxHeight: "70vh" }}
+                onLoad={(e) => {
+                  const img = e.currentTarget;
+                  const w = img.width;
+                  const h = img.height;
+                  const size = Math.min(w, h) * 0.8;
+                  const initial: PixelCrop = {
+                    unit: "px",
+                    x: (w - size) / 2,
+                    y: (h - size) / 2,
+                    width: size,
+                    height: size,
+                  };
+                  setCrop(initial);
+                  setCompleted(initial);
+                }}
               />
             </ReactCrop>
           )}
