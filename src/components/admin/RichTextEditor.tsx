@@ -248,10 +248,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         onClose={() => setCropSrc(null)}
         onCropped={(url) => {
           const oldSrc = cropSrc;
-          // Try selection-based update first
-          const ok = editor.chain().focus().updateAttributes("image", { src: url }).run();
-          if (!ok || !oldSrc) return;
-          // Fallback: find the node by matching src and update it
+          if (!oldSrc) return;
           const { state } = editor;
           let pos: number | null = null;
           state.doc.descendants((node, p) => {
@@ -261,18 +258,25 @@ export default function RichTextEditor({ value, onChange }: Props) {
             }
             return true;
           });
-          if (pos !== null) {
-            editor
-              .chain()
-              .focus()
-              .command(({ tr }) => {
-                const node = state.doc.nodeAt(pos!);
-                if (!node) return false;
-                tr.setNodeMarkup(pos!, undefined, { ...node.attrs, src: url });
-                return true;
-              })
-              .run();
+          if (pos === null) {
+            toast.error("Could not locate image to replace");
+            return;
           }
+          editor
+            .chain()
+            .focus()
+            .command(({ tr }) => {
+              const node = tr.doc.nodeAt(pos!);
+              if (!node) return false;
+              tr.setNodeMarkup(pos!, undefined, {
+                ...node.attrs,
+                src: url,
+                width: null,
+                height: null,
+              });
+              return true;
+            })
+            .run();
         }}
       />
     </div>
