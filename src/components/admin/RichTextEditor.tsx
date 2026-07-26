@@ -33,6 +33,7 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
+  Crop,
 } from "lucide-react";
 
 type Props = {
