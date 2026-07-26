@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import ImageCropDialog from "./ImageCropDialog";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import ImageResize from "tiptap-extension-resize-image";
@@ -32,6 +33,7 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
+  Crop,
 } from "lucide-react";
 
 type Props = {
@@ -113,6 +115,8 @@ export default function RichTextEditor({ value, onChange }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+
   if (!editor) return null;
 
   const Btn = ({ on, active, children, label }: any) => (
@@ -179,6 +183,17 @@ export default function RichTextEditor({ value, onChange }: Props) {
         >
           <ImageIcon className="w-4 h-4" />
         </Btn>
+        {editor.isActive("image") && (
+          <Btn
+            label="Crop image"
+            on={() => {
+              const src = editor.getAttributes("image").src as string | undefined;
+              if (src) setCropSrc(src);
+            }}
+          >
+            <Crop className="w-4 h-4" />
+          </Btn>
+        )}
         <Btn
           label="Insert table"
           on={() =>
@@ -221,6 +236,13 @@ export default function RichTextEditor({ value, onChange }: Props) {
         </Btn>
       </div>
       <EditorContent editor={editor} />
+      <ImageCropDialog
+        src={cropSrc}
+        onClose={() => setCropSrc(null)}
+        onCropped={(url) => {
+          editor.chain().focus().updateAttributes("image", { src: url }).run();
+        }}
+      />
     </div>
   );
 }
