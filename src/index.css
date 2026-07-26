@@ -209,3 +209,15 @@ html {
 .prose p:has(+ ol) {
   margin-bottom: 0;
 }
+
+/* Remove vertical spacing around images */
+.ProseMirror img,
+.prose img {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.ProseMirror p:has(> img),
+.prose p:has(> img) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
