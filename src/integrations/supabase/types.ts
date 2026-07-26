@@ -244,6 +244,62 @@ export type Database = {
           },
         ]
       }
+      retro_items: {
+        Row: {
+          author: string | null
+          category: string
+          content: string
+          created_at: string
+          id: string
+          status: string
+        }
+        Insert: {
+          author?: string | null
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Update: {
+          author?: string | null
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      retro_votes: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          voter_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          voter_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          voter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retro_votes_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "retro_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_progress: {
         Row: {
           completed_at: string
