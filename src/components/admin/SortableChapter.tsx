@@ -112,6 +112,9 @@ export default function SortableChapter({
             className="font-display text-lg font-bold bg-transparent border-0 border-b border-transparent px-1 py-0.5 focus-visible:ring-0 focus-visible:border-primary/50 focus-visible:bg-primary/5 hover:border-primary/30 focus-visible:rounded-md transition-colors w-auto min-w-[6rem] max-w-xs"
           />
           <Pencil className="w-3.5 h-3.5 text-foreground/30 opacity-0 group-hover/chapter:opacity-100 transition-opacity ml-1.5 pointer-events-none" />
+          <span className="ml-2 inline-flex items-center justify-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            {lessons.length}
+          </span>
         </div>
         <Button variant="ghost" size="icon" className="ml-auto text-foreground/40 hover:text-destructive" onClick={onDelete}>
           <Trash2 className="w-4 h-4" />
