@@ -245,38 +245,6 @@ export default function AdminPage() {
     setEditingLesson(data as Lesson);
   };
 
-  const duplicateLesson = async (id: string) => {
-    const src = lessons.find((l) => l.id === id);
-    if (!src || !course) return;
-    // Fetch full source row (list only has light fields).
-    const { data: full, error: fetchErr } = await supabase
-      .from("lessons")
-      .select("video_url,content,content_html")
-      .eq("id", id)
-      .maybeSingle();
-    if (fetchErr) return toast.error(fetchErr.message);
-    const inCh = lessons.filter((l) => l.chapter_id === src.chapter_id);
-    const next = (inCh.at(-1)?.order_index ?? -1) + 10;
-    const { data, error } = await supabase
-      .from("lessons")
-      .insert({
-        course_id: course.id,
-        chapter_id: src.chapter_id,
-        title: `${src.title} (copy)`,
-        order_index: next,
-        lesson_type: src.lesson_type,
-        status: "published",
-        video_url: (full as any)?.video_url ?? null,
-        content: (full as any)?.content ?? null,
-        content_html: (full as any)?.content_html ?? null,
-      })
-      .select()
-      .single();
-    if (error) return toast.error(error.message);
-    setLessons((p) => [...p, data as Lesson]);
-    log("create", "lesson", data.id, data.title, { duplicated_from: id });
-    toast.success("Lesson duplicated");
-  };
 
   const deleteLesson = async (l: Lesson) => {
     const prev = lessons;
@@ -608,7 +576,6 @@ export default function AdminPage() {
                             }
                           }
                         }}
-                        onDuplicateLesson={duplicateLesson}
                         onDeleteLesson={(id) => {
                           const l = lessons.find((x) => x.id === id);
                           if (l) setConfirmDeleteLesson(l);
