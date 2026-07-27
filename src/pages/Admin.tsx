@@ -100,8 +100,13 @@ export default function AdminPage() {
   );
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (!session) navigate("/auth");
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      // Only redirect on explicit sign-out. Ignore transient null sessions
+      // (e.g. INITIAL_SESSION before hydration) that would kick the user
+      // out on page reload.
+      if (event === "SIGNED_OUT" || (event === "TOKEN_REFRESHED" && !session)) {
+        navigate("/auth");
+      }
     });
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
