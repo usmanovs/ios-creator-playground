@@ -22,6 +22,7 @@ type Props = {
   onAddLesson: () => void;
   onEditLesson: (id: string) => void;
   onDeleteLesson: (id: string) => void;
+  onExpand?: (chapterId: string) => void;
 };
 
 export default function SortableChapter({
