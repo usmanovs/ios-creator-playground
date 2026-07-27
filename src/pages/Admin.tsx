@@ -509,7 +509,7 @@ export default function AdminPage() {
             </span>
           )}
           <Button variant="outline" size="sm" onClick={() => navigate("/instructor")}>
-            <span className="hidden md:inline">Schedule</span><span className="md:hidden">📅</span>
+            <span className="hidden md:inline">Instructor</span><span className="md:hidden">👨‍🏫</span>
           </Button>
           <Button variant="outline" size="sm" onClick={() => course && window.open(`/course/${course.id}`, "_blank")}>
             <ExternalLink className="w-4 h-4 md:mr-2" /> <span className="hidden md:inline">Preview</span>
