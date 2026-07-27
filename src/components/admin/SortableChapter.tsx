@@ -103,7 +103,7 @@ export default function SortableChapter({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => title !== chapter.title && onRename(title)}
-          className="font-display text-lg font-bold"
+          className="font-display text-lg font-bold max-w-xs"
         />
         <Button variant="ghost" size="icon" onClick={onDelete}>
           <Trash2 className="w-4 h-4 text-destructive" />
