@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, ExternalLink, Pencil, Trash2, Copy } from "lucide-react";
+import { GripVertical, ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -14,11 +14,10 @@ export type SortableLessonItem = {
 type Props = {
   lesson: SortableLessonItem;
   onEdit: () => void;
-  onDuplicate: () => void;
   onDelete: () => void;
 };
 
-export default function SortableLesson({ lesson, onEdit, onDuplicate, onDelete }: Props) {
+export default function SortableLesson({ lesson, onEdit, onDelete }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: lesson.id,
     data: { type: "lesson" },
@@ -70,9 +69,6 @@ export default function SortableLesson({ lesson, onEdit, onDuplicate, onDelete }
       </Button>
       <Button variant="ghost" size="icon" onClick={onEdit} title="Edit">
         <Pencil className="w-4 h-4" />
-      </Button>
-      <Button variant="ghost" size="icon" onClick={onDuplicate} title="Duplicate">
-        <Copy className="w-4 h-4" />
       </Button>
       <Button variant="ghost" size="icon" onClick={onDelete} title="Delete">
         <Trash2 className="w-4 h-4 text-destructive" />

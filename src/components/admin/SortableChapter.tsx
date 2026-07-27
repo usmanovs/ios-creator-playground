@@ -21,7 +21,6 @@ type Props = {
   onDelete: () => void;
   onAddLesson: () => void;
   onEditLesson: (id: string) => void;
-  onDuplicateLesson: (id: string) => void;
   onDeleteLesson: (id: string) => void;
 };
 
@@ -32,7 +31,6 @@ export default function SortableChapter({
   onDelete,
   onAddLesson,
   onEditLesson,
-  onDuplicateLesson,
   onDeleteLesson,
 }: Props) {
   const storageKey = `admin.chapter.open.${chapter.id}`;
