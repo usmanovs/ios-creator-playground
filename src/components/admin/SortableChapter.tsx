@@ -125,7 +125,6 @@ export default function SortableChapter({
                   key={l.id}
                   lesson={l}
                   onEdit={() => onEditLesson(l.id)}
-                  onDuplicate={() => onDuplicateLesson(l.id)}
                   onDelete={() => onDeleteLesson(l.id)}
                 />
               ))
