@@ -587,6 +587,7 @@ export default function AdminPage() {
                         key={ch.id}
                         chapter={ch}
                         lessons={chLessons}
+                        onExpand={prefetchChapterLessons}
                         onRename={(t) => renameChapter(ch, t)}
                         onDelete={() => setConfirmDeleteChapter(ch)}
                         onAddLesson={() => addLesson(ch.id)}
