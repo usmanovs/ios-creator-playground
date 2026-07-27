@@ -66,6 +66,38 @@ export default function AdminPage() {
 
   const [confirmDeleteChapter, setConfirmDeleteChapter] = useState<Chapter | null>(null);
   const [confirmDeleteLesson, setConfirmDeleteLesson] = useState<Lesson | null>(null);
+  const [hydratedChapters, setHydratedChapters] = useState<Set<string>>(new Set());
+
+  const prefetchChapterLessons = useCallback(
+    async (chapterId: string) => {
+      if (hydratedChapters.has(chapterId)) return;
+      setHydratedChapters((prev) => {
+        const next = new Set(prev);
+        next.add(chapterId);
+        return next;
+      });
+      const ids = lessons
+        .filter(
+          (l) =>
+            l.chapter_id === chapterId &&
+            l.content_html == null &&
+            l.content == null &&
+            l.video_url == null
+        )
+        .map((l) => l.id);
+      if (ids.length === 0) return;
+      const { data, error } = await supabase
+        .from("lessons")
+        .select("id,video_url,content,content_html")
+        .in("id", ids);
+      if (error || !data) return;
+      const byId = new Map(data.map((r: any) => [r.id, r]));
+      setLessons((p) =>
+        p.map((l) => (byId.has(l.id) ? { ...l, ...(byId.get(l.id) as any) } : l))
+      );
+    },
+    [lessons, hydratedChapters]
+  );
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -555,6 +587,7 @@ export default function AdminPage() {
                         key={ch.id}
                         chapter={ch}
                         lessons={chLessons}
+                        onExpand={prefetchChapterLessons}
                         onRename={(t) => renameChapter(ch, t)}
                         onDelete={() => setConfirmDeleteChapter(ch)}
                         onAddLesson={() => addLesson(ch.id)}
