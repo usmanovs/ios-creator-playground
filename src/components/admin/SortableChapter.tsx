@@ -33,6 +33,7 @@ export default function SortableChapter({
   onAddLesson,
   onEditLesson,
   onDeleteLesson,
+  onExpand,
 }: Props) {
   const storageKey = `admin.chapter.open.${chapter.id}`;
   const [open, setOpenState] = useState<boolean>(() => {
@@ -44,9 +45,14 @@ export default function SortableChapter({
     setOpenState((prev) => {
       const next = typeof v === "function" ? (v as (p: boolean) => boolean)(prev) : v;
       try { window.localStorage.setItem(storageKey, next ? "1" : "0"); } catch {}
+      if (next) onExpand?.(chapter.id);
       return next;
     });
   };
+  useEffect(() => {
+    if (open) onExpand?.(chapter.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [title, setTitle] = useState(chapter.title);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: chapter.id,
