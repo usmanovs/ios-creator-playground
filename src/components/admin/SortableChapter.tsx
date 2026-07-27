@@ -6,7 +6,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { ChevronDown, ChevronRight, GripVertical, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SortableLesson, { SortableLessonItem } from "./SortableLesson";
