@@ -548,6 +548,20 @@ function PreClassField({
         <div className="flex items-center gap-2">
           {saving && <div className="text-[10px] text-foreground/40">Saving…</div>}
           <button
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(value ?? "");
+                toast.success("Copied to clipboard");
+              } catch {
+                toast.error("Failed to copy");
+              }
+            }}
+            className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-foreground/70 hover:bg-background/70 hover:text-foreground transition-colors"
+            title="Copy message"
+          >
+            <Copy className="w-3 h-3" />
+          </button>
+          <button
             onClick={onToggleEdit}
             className="text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-primary hover:bg-background/70 transition-colors"
           >
