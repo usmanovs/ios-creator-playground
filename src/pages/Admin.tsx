@@ -71,11 +71,6 @@ export default function AdminPage() {
   const prefetchChapterLessons = useCallback(
     async (chapterId: string) => {
       if (hydratedChapters.has(chapterId)) return;
-      setHydratedChapters((prev) => {
-        const next = new Set(prev);
-        next.add(chapterId);
-        return next;
-      });
       const ids = lessons
         .filter(
           (l) =>
@@ -85,6 +80,16 @@ export default function AdminPage() {
             l.video_url == null
         )
         .map((l) => l.id);
+      // Defer marking hydrated until lessons for this chapter exist in state,
+      // otherwise a mount-time call before lessons load would mark it hydrated
+      // with nothing fetched and never retry.
+      const chapterHasLessons = lessons.some((l) => l.chapter_id === chapterId);
+      if (!chapterHasLessons) return;
+      setHydratedChapters((prev) => {
+        const next = new Set(prev);
+        next.add(chapterId);
+        return next;
+      });
       if (ids.length === 0) return;
       const { data, error } = await supabase
         .from("lessons")
@@ -98,6 +103,21 @@ export default function AdminPage() {
     },
     [lessons, hydratedChapters]
   );
+
+  // After lessons load, auto-prefetch content for any chapter currently open
+  // in the UI (persisted in localStorage by SortableChapter).
+  useEffect(() => {
+    if (lessons.length === 0 || chapters.length === 0) return;
+    for (const ch of chapters) {
+      if (hydratedChapters.has(ch.id)) continue;
+      let isOpen = true;
+      try {
+        const v = window.localStorage.getItem(`admin.chapter.open.${ch.id}`);
+        isOpen = v === null ? true : v === "1";
+      } catch {}
+      if (isOpen) prefetchChapterLessons(ch.id);
+    }
+  }, [lessons, chapters, hydratedChapters, prefetchChapterLessons]);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
