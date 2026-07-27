@@ -103,12 +103,20 @@ export default function AdminPage() {
       .eq("course_id", c.id)
       .order("order_index");
     setChapters((ch as Chapter[]) || []);
+    // Only fetch light columns for the list; heavy fields (content_html etc.)
+    // are loaded on demand when opening/duplicating a lesson.
     const { data: ls } = await supabase
       .from("lessons")
-      .select("*")
+      .select("id,course_id,chapter_id,title,order_index,lesson_type,status,day_number")
       .eq("course_id", c.id)
       .order("order_index");
-    setLessons((ls as Lesson[]) || []);
+    const light = (ls || []).map((l: any) => ({
+      ...l,
+      video_url: null,
+      content: null,
+      content_html: null,
+    })) as Lesson[];
+    setLessons(light);
   }, []);
 
   useEffect(() => {
@@ -240,6 +248,13 @@ export default function AdminPage() {
   const duplicateLesson = async (id: string) => {
     const src = lessons.find((l) => l.id === id);
     if (!src || !course) return;
+    // Fetch full source row (list only has light fields).
+    const { data: full, error: fetchErr } = await supabase
+      .from("lessons")
+      .select("video_url,content,content_html")
+      .eq("id", id)
+      .maybeSingle();
+    if (fetchErr) return toast.error(fetchErr.message);
     const inCh = lessons.filter((l) => l.chapter_id === src.chapter_id);
     const next = (inCh.at(-1)?.order_index ?? -1) + 10;
     const { data, error } = await supabase
@@ -251,9 +266,9 @@ export default function AdminPage() {
         order_index: next,
         lesson_type: src.lesson_type,
         status: "published",
-        video_url: src.video_url,
-        content: src.content,
-        content_html: src.content_html,
+        video_url: (full as any)?.video_url ?? null,
+        content: (full as any)?.content ?? null,
+        content_html: (full as any)?.content_html ?? null,
       })
       .select()
       .single();
@@ -575,9 +590,23 @@ export default function AdminPage() {
                         onRename={(t) => renameChapter(ch, t)}
                         onDelete={() => setConfirmDeleteChapter(ch)}
                         onAddLesson={() => addLesson(ch.id)}
-                        onEditLesson={(id) => {
+                        onEditLesson={async (id) => {
                           const l = lessons.find((x) => x.id === id);
-                          if (l) setEditingLesson(l);
+                          if (!l) return;
+                          // Open immediately with what we have, then hydrate heavy fields.
+                          setEditingLesson(l);
+                          if (l.content_html == null && l.content == null && l.video_url == null) {
+                            const { data: full } = await supabase
+                              .from("lessons")
+                              .select("video_url,content,content_html")
+                              .eq("id", id)
+                              .maybeSingle();
+                            if (full) {
+                              const hydrated: Lesson = { ...l, ...(full as any) };
+                              setLessons((p) => p.map((x) => (x.id === id ? hydrated : x)));
+                              setEditingLesson((cur) => (cur && cur.id === id ? hydrated : cur));
+                            }
+                          }
                         }}
                         onDuplicateLesson={duplicateLesson}
                         onDeleteLesson={(id) => {
