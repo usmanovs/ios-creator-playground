@@ -103,12 +103,20 @@ export default function AdminPage() {
       .eq("course_id", c.id)
       .order("order_index");
     setChapters((ch as Chapter[]) || []);
+    // Only fetch light columns for the list; heavy fields (content_html etc.)
+    // are loaded on demand when opening/duplicating a lesson.
     const { data: ls } = await supabase
       .from("lessons")
-      .select("*")
+      .select("id,course_id,chapter_id,title,order_index,lesson_type,status,day_number")
       .eq("course_id", c.id)
       .order("order_index");
-    setLessons((ls as Lesson[]) || []);
+    const light = (ls || []).map((l: any) => ({
+      ...l,
+      video_url: null,
+      content: null,
+      content_html: null,
+    })) as Lesson[];
+    setLessons(light);
   }, []);
 
   useEffect(() => {
