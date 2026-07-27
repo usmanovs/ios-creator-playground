@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,12 +18,60 @@ import Retro from "./pages/Retro.tsx";
 
 const queryClient = new QueryClient();
 
+const ADMIN_RELOAD_KEY = "admin.reload.path";
+
+const AdminReloadKeeper = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.pathname === "/") {
+      const raw = window.sessionStorage.getItem(ADMIN_RELOAD_KEY);
+      if (!raw) return;
+
+      window.sessionStorage.removeItem(ADMIN_RELOAD_KEY);
+
+      try {
+        const saved = JSON.parse(raw) as { path?: string; savedAt?: number };
+        const isFresh = Date.now() - (saved.savedAt ?? 0) < 5 * 60 * 1000;
+        if (saved.path?.startsWith("/admin") && isFresh) {
+          navigate(saved.path, { replace: true });
+        }
+      } catch {
+        // Ignore malformed session storage from older visits.
+      }
+    } else if (!location.pathname.startsWith("/admin")) {
+      window.sessionStorage.removeItem(ADMIN_RELOAD_KEY);
+    }
+  }, [location.pathname, navigate]);
+
+  useEffect(() => {
+    const rememberAdminRoute = () => {
+      if (!location.pathname.startsWith("/admin")) return;
+
+      window.sessionStorage.setItem(
+        ADMIN_RELOAD_KEY,
+        JSON.stringify({
+          path: `${location.pathname}${location.search}${location.hash}`,
+          savedAt: Date.now(),
+        })
+      );
+    };
+
+    window.addEventListener("beforeunload", rememberAdminRoute);
+    return () => window.removeEventListener("beforeunload", rememberAdminRoute);
+  }, [location.hash, location.pathname, location.search]);
+
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <AdminReloadKeeper />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/support" element={<Support />} />
