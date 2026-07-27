@@ -6,7 +6,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { ChevronDown, ChevronRight, GripVertical, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SortableLesson, { SortableLessonItem } from "./SortableLesson";
@@ -99,14 +99,22 @@ export default function SortableChapter({
         >
           {open ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
         </button>
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onBlur={() => title !== chapter.title && onRename(title)}
-          className="font-display text-lg font-bold max-w-xs"
-        />
-        <Button variant="ghost" size="icon" onClick={onDelete}>
-          <Trash2 className="w-4 h-4 text-destructive" />
+        <div className="group/chapter relative flex items-center min-w-0">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={() => title !== chapter.title && onRename(title)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
+            className="font-display text-lg font-bold bg-transparent border-0 border-b border-transparent px-1 py-0.5 focus-visible:ring-0 focus-visible:border-primary/50 focus-visible:bg-primary/5 hover:border-primary/30 focus-visible:rounded-md transition-colors w-auto min-w-[6rem] max-w-xs"
+          />
+          <Pencil className="w-3.5 h-3.5 text-foreground/30 opacity-0 group-hover/chapter:opacity-100 transition-opacity ml-1.5 pointer-events-none" />
+        </div>
+        <Button variant="ghost" size="icon" className="ml-auto text-foreground/40 hover:text-destructive" onClick={onDelete}>
+          <Trash2 className="w-4 h-4" />
         </Button>
       </div>
 
