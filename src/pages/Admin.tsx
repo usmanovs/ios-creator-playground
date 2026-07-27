@@ -248,6 +248,13 @@ export default function AdminPage() {
   const duplicateLesson = async (id: string) => {
     const src = lessons.find((l) => l.id === id);
     if (!src || !course) return;
+    // Fetch full source row (list only has light fields).
+    const { data: full, error: fetchErr } = await supabase
+      .from("lessons")
+      .select("video_url,content,content_html")
+      .eq("id", id)
+      .maybeSingle();
+    if (fetchErr) return toast.error(fetchErr.message);
     const inCh = lessons.filter((l) => l.chapter_id === src.chapter_id);
     const next = (inCh.at(-1)?.order_index ?? -1) + 10;
     const { data, error } = await supabase
@@ -259,9 +266,9 @@ export default function AdminPage() {
         order_index: next,
         lesson_type: src.lesson_type,
         status: "published",
-        video_url: src.video_url,
-        content: src.content,
-        content_html: src.content_html,
+        video_url: (full as any)?.video_url ?? null,
+        content: (full as any)?.content ?? null,
+        content_html: (full as any)?.content_html ?? null,
       })
       .select()
       .single();
