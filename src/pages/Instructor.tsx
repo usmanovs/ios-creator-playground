@@ -123,8 +123,10 @@ export default function InstructorPage() {
   }, [navigate]);
 
   const load = useCallback(async () => {
-    const { data: c } = await supabase.from("courses").select("id").limit(1).maybeSingle();
+    const { data: c } = await supabase.from("courses").select("id,start_date").limit(1).maybeSingle();
     if (!c) return;
+    setCourseId(c.id);
+    setStartDate((c as any).start_date ?? null);
     const [{ data: ls }, { data: ch }, { data: hw }, { data: nt }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,schedule_order,status,covered").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
