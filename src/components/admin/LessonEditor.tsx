@@ -69,8 +69,11 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
         )
       : false;
 
+  const dayMissing = !!draft && !draft.day_number;
+
   const persist = async () => {
-    if (!draft || !dirty) return;
+    if (!draft || !dirty) return false;
+    if (!draft.day_number) return false;
     await onSave({
       title: draft.title,
       lesson_type: draft.lesson_type,
@@ -81,6 +84,7 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
       day_number: draft.day_number,
     });
     setOriginal(draft);
+    return true;
   };
 
   // Autosave (debounced 2s)
@@ -102,7 +106,9 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
-        persist().then(() => toast.success("Saved"));
+        persist().then((ok) =>
+          ok ? toast.success("Saved") : dayMissing && toast.error("Please select a day before saving")
+        );
       }
     };
     window.addEventListener("keydown", handler);
@@ -169,21 +175,25 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Day</Label>
+                    <Label>Day <span className="text-destructive">*</span></Label>
                     <Select
-                      value={draft.day_number ? String(draft.day_number) : "none"}
+                      value={draft.day_number ? String(draft.day_number) : ""}
                       onValueChange={(v) =>
-                        setDraft({ ...draft, day_number: v === "none" ? null : Number(v) })
+                        setDraft({ ...draft, day_number: Number(v) })
                       }
                     >
-                      <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                      <SelectTrigger className={dayMissing ? "border-destructive" : ""}>
+                        <SelectValue placeholder="Select day" />
+                      </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Unassigned</SelectItem>
                         {[1, 2, 3, 4, 5, 6, 7].map((d) => (
                           <SelectItem key={d} value={String(d)}>Day {d}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    {dayMissing && (
+                      <p className="text-xs text-destructive">Day is required</p>
+                    )}
                   </div>
                 </div>
                 {(draft.lesson_type === "video" || draft.lesson_type === "pdf") && (
@@ -228,20 +238,20 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
             </Button>
             <Button
               onClick={async () => {
-                await persist();
-                toast.success("Saved");
+                if (await persist()) toast.success("Saved");
               }}
-              disabled={!dirty}
+              disabled={!dirty || dayMissing}
             >
               Save
             </Button>
             <Button
               onClick={async () => {
-                await persist();
-                toast.success("Saved");
-                onClose();
+                if (await persist()) {
+                  toast.success("Saved");
+                  onClose();
+                }
               }}
-              disabled={!dirty}
+              disabled={!dirty || dayMissing}
             >
               Save and Close
             </Button>
