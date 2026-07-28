@@ -596,6 +596,67 @@ function PreClassField({
   );
 }
 
+function HomeworkField({
+  value,
+  onChange,
+  saving,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  saving: boolean;
+  placeholder: string;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5 px-1">
+        <div className="text-[11px] uppercase tracking-wide text-foreground/50 font-semibold">Homework</div>
+        <div className="flex items-center gap-2">
+          {saving && <div className="text-[10px] text-foreground/40">Saving…</div>}
+          <button
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(value ?? "");
+                toast.success("Copied to clipboard");
+              } catch {
+                toast.error("Failed to copy");
+              }
+            }}
+            className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-foreground/70 hover:bg-background/70 hover:text-foreground transition-colors"
+            title="Copy homework"
+          >
+            <Copy className="w-3 h-3" />
+          </button>
+          <button
+            onClick={() => setIsEditing((e) => !e)}
+            className="text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-primary hover:bg-background/70 transition-colors"
+          >
+            {isEditing ? "Done" : "Edit"}
+          </button>
+        </div>
+      </div>
+      {isEditing ? (
+        <AutoTextarea
+          value={value ?? ""}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="min-h-[160px] text-sm bg-background/40"
+          autoFocus
+          onBlur={() => setIsEditing(false)}
+        />
+      ) : (
+        <button
+          onClick={() => setIsEditing(true)}
+          className="w-full text-left text-sm bg-background/40 rounded-md border border-border p-3 min-h-[160px] text-foreground/80 whitespace-pre-wrap hover:bg-background/50 transition-colors"
+        >
+          {value ? value : <span className="text-foreground/40 italic">{placeholder}</span>}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function AutoTextarea({
   value,
   onChange,
