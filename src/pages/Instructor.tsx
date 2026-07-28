@@ -25,7 +25,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, LogOut, StickyNote, Trash2 } from "lucide-react";
+import { ArrowLeft, Calendar as CalendarIcon, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, ListChecks, LogOut, StickyNote, Trash2, TrendingUp } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +34,10 @@ import {
 } from "@/components/ui/dialog";
 import LessonPreview from "@/components/admin/LessonPreview";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { classDates, isSameDay, parseDateOnly, toDateOnly } from "@/lib/schedule";
 
 type Lesson = {
   id: string;
@@ -80,6 +84,8 @@ export default function InstructorPage() {
   const [preClassEditMode, setPreClassEditMode] = useState<Record<number, { 1: boolean; 2: boolean }>>({});
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
+  const [courseId, setCourseId] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<{ title: string; lesson_type: string; video_url: string | null; content_html: string | null } | null>(null);
@@ -119,8 +125,10 @@ export default function InstructorPage() {
   }, [navigate]);
 
   const load = useCallback(async () => {
-    const { data: c } = await supabase.from("courses").select("id").limit(1).maybeSingle();
+    const { data: c } = await supabase.from("courses").select("id,start_date").limit(1).maybeSingle();
     if (!c) return;
+    setCourseId(c.id);
+    setStartDate((c as any).start_date ?? null);
     const [{ data: ls }, { data: ch }, { data: hw }, { data: nt }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,schedule_order,status,covered").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
@@ -481,6 +489,41 @@ export default function InstructorPage() {
     }
   };
 
+  const saveStartDate = useCallback(async (d: Date | undefined) => {
+    if (!courseId || !d) return;
+    const value = toDateOnly(d);
+    const prev = startDate;
+    setStartDate(value);
+    const { error } = await supabase.from("courses").update({ start_date: value } as any).eq("id", courseId);
+    if (error) {
+      toast.error(error.message);
+      setStartDate(prev);
+    } else {
+      toast.success("Day 1 date saved");
+    }
+  }, [courseId, startDate]);
+
+  const day1 = parseDateOnly(startDate);
+  const dayDates = useMemo(
+    () => (day1 ? classDates(day1, DAYS.length) : null),
+    [startDate],
+  );
+
+  const stats = useMemo(() => {
+    const scheduled = [
+      ...lessons.filter((l) => l.day_number != null),
+      ...notes.filter((n) => n.day_number != null),
+    ];
+    const total = scheduled.length;
+    const covered = scheduled.filter((i) => i.covered).length;
+    const pct = total ? Math.round((covered / total) * 100) : 0;
+    const daysDone = DAYS.filter((d) => completed[d]).length;
+    const nextDayIndex = DAYS.findIndex((d) => !completed[d]);
+    const nextDate =
+      dayDates && nextDayIndex >= 0 ? dayDates[nextDayIndex] : null;
+    return { total, covered, pct, daysDone, nextDayIndex, nextDate };
+  }, [lessons, notes, completed, dayDates]);
+
 
   if (!ready) return <div className="p-10 text-foreground/60">Loading…</div>;
   if (!isAdmin)
@@ -516,6 +559,76 @@ export default function InstructorPage() {
       </div>
 
       <div className="relative max-w-[1600px] mx-auto px-4 md:px-6 py-6">
+        {/* KPI strip */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-5">
+          <div className="glass-card rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
+              <TrendingUp className="w-3.5 h-3.5" /> Course completed
+            </div>
+            <div className="font-display text-3xl font-bold">{stats.pct}%</div>
+            <div className="mt-2 h-2 rounded-full bg-foreground/10 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${stats.pct}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="glass-card rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
+              <ListChecks className="w-3.5 h-3.5" /> Items covered
+            </div>
+            <div className="font-display text-3xl font-bold">
+              {stats.covered}
+              <span className="text-foreground/40 text-lg font-semibold"> / {stats.total}</span>
+            </div>
+            <div className="mt-2 text-xs text-foreground/50">Lessons + notes on the schedule</div>
+          </div>
+
+          <div className="glass-card rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
+              <Check className="w-3.5 h-3.5" /> Days completed
+            </div>
+            <div className="font-display text-3xl font-bold">
+              {stats.daysDone}
+              <span className="text-foreground/40 text-lg font-semibold"> / {DAYS.length}</span>
+            </div>
+            <div className="mt-2 text-xs text-foreground/50">
+              {stats.nextDate
+                ? `Next class: ${format(stats.nextDate, "EEE, MMM d")}`
+                : stats.nextDayIndex >= 0
+                ? `Next: Day ${DAYS[stats.nextDayIndex]}`
+                : "All days done 🎉"}
+            </div>
+          </div>
+
+          <div className="glass-card rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
+              <CalendarIcon className="w-3.5 h-3.5" /> Day 1 date
+            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full justify-start text-left font-normal">
+                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  {day1 ? format(day1, "EEE, MMM d, yyyy") : <span className="text-muted-foreground">Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={day1 ?? undefined}
+                  onSelect={(d) => saveStartDate(d)}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+            <div className="mt-2 text-xs text-foreground/50">
+              Following days fall on Mon / Wed / Fri.
+            </div>
+          </div>
+        </div>
+
         <p className="text-sm text-foreground/60 mb-4">
           Drag lessons between days, or reorder within a day. Changes save automatically.
         </p>
@@ -527,12 +640,15 @@ export default function InstructorPage() {
           onDragCancel={() => setActiveId(null)}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-            {DAYS.map((d) => (
+            {DAYS.map((d, i) => (
               <DayColumn
                 key={d}
                 id={`d${d}`}
                 label={`Day ${d}`}
+                dateLabel={dayDates ? format(dayDates[i], "EEE, MMM d") : undefined}
+                isToday={dayDates ? isSameDay(dayDates[i], new Date()) : false}
                 items={grouped[`d${d}` as ColumnId]}
+
                 chapterTitle={chapterTitle}
                 onPreview={openPreview}
                 onToggleCovered={toggleCovered}
@@ -790,6 +906,8 @@ function AutoTextarea({
 function DayColumn({
   id,
   label,
+  dateLabel,
+  isToday,
   items,
   chapterTitle,
   onPreview,
@@ -814,6 +932,8 @@ function DayColumn({
 }: {
   id: string;
   label: string;
+  dateLabel?: string;
+  isToday?: boolean;
   items: BoardItem[];
   chapterTitle: (id: string | null) => string;
   onPreview: (id: string) => void;
@@ -886,10 +1006,22 @@ function DayColumn({
     <div
       className={`glass-card rounded-2xl p-3 min-h-[300px] transition-colors ${
         isOver ? "ring-2 ring-primary/60 bg-primary/5" : ""
-      } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""}`}
+      } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""} ${
+        isToday && !completed ? "ring-2 ring-primary/50" : ""
+      }`}
     >
       <div className="flex items-center justify-between mb-3 px-1">
-        <div className="font-display font-bold">{label}</div>
+        <div className="min-w-0">
+          <div className="font-display font-bold flex items-center gap-2">
+            {label}
+            {isToday && (
+              <span className="px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-semibold uppercase">
+                Today
+              </span>
+            )}
+          </div>
+          {dateLabel && <div className="text-[11px] text-foreground/50">{dateLabel}</div>}
+        </div>
         <div className="flex items-center gap-2">
           {showComplete && (
             <button
