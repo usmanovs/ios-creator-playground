@@ -69,8 +69,11 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
         )
       : false;
 
+  const dayMissing = !!draft && !draft.day_number;
+
   const persist = async () => {
-    if (!draft || !dirty) return;
+    if (!draft || !dirty) return false;
+    if (!draft.day_number) return false;
     await onSave({
       title: draft.title,
       lesson_type: draft.lesson_type,
@@ -81,6 +84,7 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
       day_number: draft.day_number,
     });
     setOriginal(draft);
+    return true;
   };
 
   // Autosave (debounced 2s)
