@@ -532,10 +532,13 @@ export default function InstructorPage() {
                 key={d}
                 id={`d${d}`}
                 label={`Day ${d}`}
-                lessons={grouped[`d${d}` as ColumnId]}
+                items={grouped[`d${d}` as ColumnId]}
                 chapterTitle={chapterTitle}
                 onPreview={openPreview}
                 onToggleCovered={toggleCovered}
+                onAddNote={() => addNote(d)}
+                onRenameNote={updateNoteTitle}
+                onDeleteNote={deleteNote}
                 homework={homework[d] ?? ""}
                 onHomeworkChange={(v) => onHomeworkChange(d, v)}
                 preClass={preClass[d] ?? ""}
@@ -554,16 +557,26 @@ export default function InstructorPage() {
             <DayColumn
               id="unassigned"
               label="Unassigned"
-              lessons={grouped.unassigned}
+              items={grouped.unassigned}
               chapterTitle={chapterTitle}
               onPreview={openPreview}
               onToggleCovered={toggleCovered}
+              onAddNote={() => addNote(null)}
+              onRenameNote={updateNoteTitle}
+              onDeleteNote={deleteNote}
               muted
             />
           </div>
           <DragOverlay>
-            {activeLesson ? <LessonCard lesson={activeLesson} chapterTitle={chapterTitle(activeLesson.chapter_id)} dragging /> : null}
+            {activeItem ? (
+              activeItem.kind === "note" ? (
+                <NoteCard item={activeItem} dragging />
+              ) : (
+                <LessonCard item={activeItem} chapterTitle={chapterTitle(activeItem.chapter_id)} dragging />
+              )
+            ) : null}
           </DragOverlay>
+
         </DndContext>
       </div>
 
