@@ -210,17 +210,37 @@ export default function InstructorPage() {
 
   const toggleCompleted = useCallback(async (day: number) => {
     const next = !completed[day];
+    const prevLessons = lessons;
+    const prevNotes = notes;
+    const dayLessonIds = lessons.filter((l) => l.day_number === day).map((l) => l.id);
+    const dayNoteIds = notes.filter((n) => n.day_number === day).map((n) => n.id);
+
     setCompleted((c) => ({ ...c, [day]: next }));
+    // Marking a day complete implies every item scheduled that day was covered.
+    setLessons((ls) => ls.map((l) => (l.day_number === day ? { ...l, covered: next } : l)));
+    setNotes((ns) => ns.map((n) => (n.day_number === day ? { ...n, covered: next } : n)));
     setSavingDay(day);
-    const { error } = await supabase
-      .from("day_homework")
-      .upsert({ day_number: day, completed: next }, { onConflict: "day_number" });
+
+    const [dayRes, lessonRes, noteRes] = await Promise.all([
+      supabase.from("day_homework").upsert({ day_number: day, completed: next }, { onConflict: "day_number" }),
+      dayLessonIds.length
+        ? supabase.from("lessons").update({ covered: next }).in("id", dayLessonIds)
+        : Promise.resolve({ error: null } as { error: null }),
+      dayNoteIds.length
+        ? supabase.from("instructor_notes").update({ covered: next }).in("id", dayNoteIds)
+        : Promise.resolve({ error: null } as { error: null }),
+    ]);
     setSavingDay((cur) => (cur === day ? null : cur));
+
+    const error = dayRes.error || lessonRes.error || noteRes.error;
     if (error) {
       toast.error(error.message);
       setCompleted((c) => ({ ...c, [day]: !next }));
+      setLessons(prevLessons);
+      setNotes(prevNotes);
     }
-  }, [completed]);
+  }, [completed, lessons, notes]);
+
 
   const toggleCovered = useCallback(async (itemId: string, kind: "lesson" | "note") => {
     if (kind === "note") {
