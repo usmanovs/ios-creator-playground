@@ -25,7 +25,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, LogOut, StickyNote, Trash2 } from "lucide-react";
+import { ArrowLeft, Calendar as CalendarIcon, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, ListChecks, LogOut, StickyNote, Trash2, TrendingUp } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +34,10 @@ import {
 } from "@/components/ui/dialog";
 import LessonPreview from "@/components/admin/LessonPreview";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { classDates, isSameDay, parseDateOnly, toDateOnly } from "@/lib/schedule";
 
 type Lesson = {
   id: string;
