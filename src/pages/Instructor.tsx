@@ -582,44 +582,43 @@ export default function InstructorPage() {
 
       <div className="relative max-w-[1600px] mx-auto px-4 md:px-6 py-6">
         {/* KPI strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-5">
-          <div className="glass-card rounded-2xl p-4">
-            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
-              <TrendingUp className="w-3.5 h-3.5" /> Course completed
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 mb-4">
+          <div className="glass-card rounded-2xl p-3">
+            <div className="flex items-center gap-1.5 text-[11px] text-foreground/60 mb-1">
+              <TrendingUp className="w-3 h-3" /> Course completed
             </div>
-            <div className="font-display text-3xl font-bold">{stats.pct}%</div>
-            <div className="mt-2 h-2 rounded-full bg-foreground/10 overflow-hidden">
+            <div className="font-display text-2xl font-bold leading-none">{stats.pct}%</div>
+            <div className="mt-1.5 h-1.5 rounded-full bg-foreground/10 overflow-hidden">
               <div
                 className="h-full rounded-full bg-primary transition-all"
                 style={{ width: `${stats.pct}%` }}
               />
             </div>
-            <div className="mt-1.5 text-[11px] text-foreground/50">
+            <div className="mt-1 text-[11px] text-foreground/50">
               {stats.daysDone} of {DAYS.length} class days completed
             </div>
-
           </div>
 
-          <div className="glass-card rounded-2xl p-4">
-            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
-              <ListChecks className="w-3.5 h-3.5" /> Items covered
+          <div className="glass-card rounded-2xl p-3">
+            <div className="flex items-center gap-1.5 text-[11px] text-foreground/60 mb-1">
+              <ListChecks className="w-3 h-3" /> Items covered
             </div>
-            <div className="font-display text-3xl font-bold">
+            <div className="font-display text-2xl font-bold leading-none">
               {stats.covered}
-              <span className="text-foreground/40 text-lg font-semibold"> / {stats.total}</span>
+              <span className="text-foreground/40 text-base font-semibold"> / {stats.total}</span>
             </div>
-            <div className="mt-2 text-xs text-foreground/50">Lessons + notes on the schedule</div>
+            <div className="mt-1 text-[11px] text-foreground/50">Lessons + notes on the schedule</div>
           </div>
 
-          <div className="glass-card rounded-2xl p-4">
-            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
-              <Check className="w-3.5 h-3.5" /> Days completed
+          <div className="glass-card rounded-2xl p-3">
+            <div className="flex items-center gap-1.5 text-[11px] text-foreground/60 mb-1">
+              <Check className="w-3 h-3" /> Days completed
             </div>
-            <div className="font-display text-3xl font-bold">
+            <div className="font-display text-2xl font-bold leading-none">
               {stats.daysDone}
-              <span className="text-foreground/40 text-lg font-semibold"> / {DAYS.length}</span>
+              <span className="text-foreground/40 text-base font-semibold"> / {DAYS.length}</span>
             </div>
-            <div className="mt-2 text-xs text-foreground/50">
+            <div className="mt-1 text-[11px] text-foreground/50">
               {stats.nextDate
                 ? `Next class: ${format(stats.nextDate, "EEE, MMM d")}`
                 : stats.nextDayIndex >= 0
@@ -628,14 +627,14 @@ export default function InstructorPage() {
             </div>
           </div>
 
-          <div className="glass-card rounded-2xl p-4">
-            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
-              <CalendarIcon className="w-3.5 h-3.5" /> Day 1 date
+          <div className="glass-card rounded-2xl p-3">
+            <div className="flex items-center gap-1.5 text-[11px] text-foreground/60 mb-1">
+              <CalendarIcon className="w-3 h-3" /> Day 1 date
             </div>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full justify-start text-left font-normal">
-                  <CalendarIcon className="w-4 h-4 mr-2" />
+                <Button variant="outline" size="sm" className="w-full h-8 justify-start text-left font-normal text-xs">
+                  <CalendarIcon className="w-3.5 h-3.5 mr-1.5" />
                   {day1 ? format(day1, "EEE, MMM d, yyyy") : <span className="text-muted-foreground">Pick a date</span>}
                 </Button>
               </PopoverTrigger>
@@ -649,7 +648,7 @@ export default function InstructorPage() {
                 />
               </PopoverContent>
             </Popover>
-            <div className="mt-2 text-xs text-foreground/50">
+            <div className="mt-1 text-[11px] text-foreground/50">
               Following days fall on Mon / Wed / Fri.
             </div>
           </div>
