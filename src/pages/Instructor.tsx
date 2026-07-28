@@ -995,6 +995,8 @@ function DayColumn({
   homeworkSaving?: boolean;
   completed?: boolean;
   onToggleCompleted?: () => void;
+  collapsed?: boolean;
+  onToggleCollapsed?: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id, data: { columnId: id } });
   const { setNodeRef: setTopDropRef, isOver: isTopOver } = useDroppable({
