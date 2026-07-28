@@ -121,12 +121,14 @@ export default function InstructorPage() {
   const load = useCallback(async () => {
     const { data: c } = await supabase.from("courses").select("id").limit(1).maybeSingle();
     if (!c) return;
-    const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
+    const [{ data: ls }, { data: ch }, { data: hw }, { data: nt }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,schedule_order,status,covered").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
       supabase.from("day_homework").select("day_number,content,pre_class_message,pre_class_message_2,completed"),
+      supabase.from("instructor_notes").select("id,title,day_number,schedule_order,covered").order("schedule_order"),
     ]);
     setLessons((ls as Lesson[]) || []);
+    setNotes((nt as Note[]) || []);
     setChapters((ch as Chapter[]) || []);
     const hwMap: Record<number, string> = {};
     const pcMap: Record<number, string> = {};
