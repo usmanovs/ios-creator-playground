@@ -582,7 +582,7 @@ export default function InstructorPage() {
 
       <div className="relative max-w-[1600px] mx-auto px-4 md:px-6 py-6">
         {/* KPI strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 mb-4">
+        <div className="grid grid-cols-4 gap-2 mb-4">
           <div className="glass-card rounded-2xl p-3">
             <div className="flex items-center gap-1.5 text-[11px] text-foreground/60 mb-1">
               <TrendingUp className="w-3 h-3" /> Course completed
