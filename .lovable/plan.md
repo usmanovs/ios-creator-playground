@@ -1,28 +1,31 @@
 ## Goal
 
-Add to the Instructor board:
-1. A KPI strip at the top showing overall course progress.
-2. A Day 1 date picker; dates for Days 2–7 are computed automatically on a Monday/Wednesday/Friday cadence.
+Make the KPI strip at the top of the Instructor page take less vertical space without removing any information or functionality.
 
-## 1. KPI strip
+## Current state
 
-A row of compact stat cards above the day columns:
+`src/pages/Instructor.tsx` has a 4-column KPI strip above the day columns:
+- Course completed (large percentage + progress bar + sub-label)
+- Items covered (large count / total + sub-label)
+- Days completed (large count / total + next-class date)
+- Day 1 date picker (label + button)
 
-- **Course completed %** — share of all schedule items (lessons + notes assigned to a day) marked "covered". Big number + progress bar.
-- **Items covered** — e.g. "24 / 61".
-- **Days completed** — e.g. "2 / 7" from the existing per-day "Done" toggle.
-- **Next class** — the date of the first not-completed day (once a start date is set).
+Each card uses `p-4` padding, `text-3xl` numbers, `mt-2` spacing, and a fairly tall progress bar.
 
-## 2. Day 1 date + MWF schedule
+## Changes
 
-- A "Day 1 date" picker sits in the KPI strip.
-- Given the Day 1 date, each following class day is the next date that falls on Monday, Wednesday, or Friday. Example: Day 1 = Fri Jul 24 → Mon Jul 27, Wed Jul 29, Fri Jul 31, Mon Aug 3, Wed Aug 5, Fri Aug 7.
-- If the chosen Day 1 date is not a Mon/Wed/Fri, it is still honored as-is for Day 1 and the following days snap to the MWF cadence (a small hint notes this).
-- Each day column header shows its computed date (e.g. "Day 3 · Wed, Jul 29"), and today's class day is highlighted.
+Update only the KPI strip markup in `src/pages/Instructor.tsx` (around lines 585–660):
 
-## Technical notes
+- Reduce card padding from `p-4` to `p-3`.
+- Reduce grid gap from `gap-3` to `gap-2`.
+- Shrink large numbers from `text-3xl` to `text-2xl`.
+- Shrink the progress bar from `h-2` to `h-1.5`.
+- Tighten vertical margins: sub-labels become `mt-1` and helper text uses `text-[11px]` consistently.
+- Keep the date picker button compact (`size="sm"` remains).
+- Preserve all existing logic, icons, and text content.
 
-- Store the start date on the existing `courses` row as a new `start_date` column (date, nullable) via a migration, so it is shared across devices/admins rather than living in one browser's storage.
-- Date math is a small pure helper (`src/lib/schedule.ts`): `classDates(day1: Date, count: number)` walking forward and keeping only weekdays 1/3/5.
-- KPI values are derived from state already loaded in `src/pages/Instructor.tsx` (`lessons`, `notes`, `completed`) — no extra queries.
-- Styling reuses existing `glass-card` tokens; no new colors.
+No other files, components, or data logic are touched.
+
+## Verification
+
+After the change, the KPI strip should still show the same four items with the same numbers and date picker, but with noticeably less vertical height.
