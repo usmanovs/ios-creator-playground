@@ -602,12 +602,14 @@ function AutoTextarea({
   placeholder,
   className,
   autoFocus,
+  onBlur,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   className?: string;
   autoFocus?: boolean;
+  onBlur?: () => void;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
@@ -621,6 +623,7 @@ function AutoTextarea({
       ref={ref}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      onBlur={onBlur}
       placeholder={placeholder}
       className={className}
       autoFocus={autoFocus}
