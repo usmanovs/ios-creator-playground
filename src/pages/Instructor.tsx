@@ -83,6 +83,7 @@ export default function InstructorPage() {
   const [preClass2, setPreClass2] = useState<Record<number, string>>({});
   const [preClassEditMode, setPreClassEditMode] = useState<Record<number, { 1: boolean; 2: boolean }>>({});
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
+  const [expandedOverride, setExpandedOverride] = useState<Record<number, boolean>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
   const [courseId, setCourseId] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string | null>(null);
