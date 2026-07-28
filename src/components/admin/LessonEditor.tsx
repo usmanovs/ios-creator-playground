@@ -175,21 +175,25 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Day</Label>
+                    <Label>Day <span className="text-destructive">*</span></Label>
                     <Select
-                      value={draft.day_number ? String(draft.day_number) : "none"}
+                      value={draft.day_number ? String(draft.day_number) : ""}
                       onValueChange={(v) =>
-                        setDraft({ ...draft, day_number: v === "none" ? null : Number(v) })
+                        setDraft({ ...draft, day_number: Number(v) })
                       }
                     >
-                      <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                      <SelectTrigger className={dayMissing ? "border-destructive" : ""}>
+                        <SelectValue placeholder="Select day" />
+                      </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Unassigned</SelectItem>
                         {[1, 2, 3, 4, 5, 6, 7].map((d) => (
                           <SelectItem key={d} value={String(d)}>Day {d}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    {dayMissing && (
+                      <p className="text-xs text-destructive">Day is required</p>
+                    )}
                   </div>
                 </div>
                 {(draft.lesson_type === "video" || draft.lesson_type === "pdf") && (
