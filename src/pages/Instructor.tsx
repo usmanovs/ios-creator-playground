@@ -25,7 +25,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, LogOut } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, LogOut, StickyNote, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -1163,101 +1163,4 @@ function NoteCard({
       )}
     </div>
   );
-}
-
-
-
-
-function SortableLesson({ lesson, chapterTitle, onPreview, onToggleCovered }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void; onToggleCovered?: (id: string) => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: lesson.id,
-  });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-  };
-  return (
-    <div ref={setNodeRef} style={style}>
-      <LessonCard
-        lesson={lesson}
-        chapterTitle={chapterTitle}
-        dragHandleProps={{ ...attributes, ...listeners }}
-        onPreview={() => onPreview(lesson.id)}
-        onToggleCovered={onToggleCovered ? () => onToggleCovered(lesson.id) : undefined}
-      />
-    </div>
-  );
-}
-
-function LessonCard({
-  lesson,
-  chapterTitle,
-  dragging,
-  dragHandleProps,
-  onPreview,
-  onToggleCovered,
-}: {
-  lesson: Lesson;
-  chapterTitle: string;
-  dragging?: boolean;
-  dragHandleProps?: any;
-  onPreview?: () => void;
-  onToggleCovered?: () => void;
-}) {
-  return (
-    <div
-      className={`rounded-lg bg-card/60 hover:bg-card border border-muted-foreground/30 p-2.5 flex items-start gap-2 ${
-        dragging ? "shadow-2xl ring-1 ring-primary/40" : ""
-      } ${lesson.covered ? "bg-emerald-500/5 border-emerald-500/20" : ""}`}
-    >
-      <button
-        type="button"
-        className="cursor-grab active:cursor-grabbing touch-none"
-        {...dragHandleProps}
-        aria-label="Drag"
-      >
-        <GripVertical className="w-3.5 h-3.5 mt-0.5 text-foreground/30 shrink-0" />
-      </button>
-      {onToggleCovered && (
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onToggleCovered(); }}
-          onPointerDown={(e) => e.stopPropagation()}
-          className={`mt-0.5 w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
-            lesson.covered
-              ? "bg-emerald-500 border-emerald-500 text-white"
-              : "border-foreground/30 hover:border-primary bg-background/40"
-          }`}
-          aria-label={lesson.covered ? "Mark not covered" : "Mark covered"}
-          title={lesson.covered ? "Covered — click to uncheck" : "Mark as covered"}
-        >
-          {lesson.covered && <Check className="w-3 h-3" strokeWidth={3} />}
-        </button>
-      )}
-      <div className="min-w-0 flex-1 flex items-center gap-2">
-        <div className={`text-sm font-medium truncate flex-1 ${lesson.covered ? "line-through text-foreground/60" : ""}`}>{lesson.title}</div>
-        <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5 shrink min-w-0">
-          <span className="truncate">{chapterTitle}</span>
-          {lesson.status === "draft" && (
-            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] shrink-0">draft</span>
-          )}
-        </div>
-      </div>
-
-      {onPreview && (
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onPreview(); }}
-          onPointerDown={(e) => e.stopPropagation()}
-          className="p-1 rounded hover:bg-primary/10 text-foreground/60 hover:text-primary shrink-0"
-          aria-label="Preview lesson"
-          title="Preview"
-        >
-          <Eye className="w-3.5 h-3.5" />
-        </button>
-      )}
-    </div>
-  );
-
 }
