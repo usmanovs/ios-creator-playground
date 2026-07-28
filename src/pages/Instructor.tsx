@@ -708,18 +708,6 @@ export default function InstructorPage() {
                 }
               />
             ))}
-            <DayColumn
-              id="unassigned"
-              label="Unassigned"
-              items={grouped.unassigned}
-              chapterTitle={chapterTitle}
-              onPreview={openPreview}
-              onToggleCovered={toggleCovered}
-              onAddNote={() => addNote(null)}
-              onRenameNote={updateNoteTitle}
-              onDeleteNote={deleteNote}
-              muted
-            />
           </div>
           <DragOverlay>
             {activeItem ? (
