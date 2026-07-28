@@ -1214,14 +1214,15 @@ function LessonCard({
         <CoveredCheckbox covered={item.covered} onToggle={onToggleCovered} tone="default" />
       )}
       <div className="min-w-0 flex-1 flex items-center gap-2">
-        <div className={`text-sm font-medium truncate flex-1 ${item.covered ? "line-through text-foreground/60" : ""}`}>{item.title}</div>
-        <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5 shrink min-w-0">
+        <div className={`text-sm font-medium truncate flex-1 min-w-[50%] ${item.covered ? "line-through text-foreground/60" : ""}`}>{item.title}</div>
+        <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5 shrink-0 max-w-[40%]">
           <span className="truncate">{chapterTitle}</span>
           {item.status === "draft" && (
             <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] shrink-0">draft</span>
           )}
         </div>
       </div>
+
 
       {onPreview && (
         <button
