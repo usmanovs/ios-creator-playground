@@ -1,0 +1,1 @@
+UPDATE public.lessons SET day_number = 6, schedule_order = 6021 WHERE id = 'a868cfd0-c40c-4b30-8f2a-1704eee3a896';
