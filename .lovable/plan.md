@@ -1,25 +1,28 @@
 ## Goal
-Add instructor-only notes (e.g. "Demo MVP #1 using a mirroring app, not Zoom screenshare") that sit in the day columns of the Instructor board exactly like lesson rows — same size, same drag handle, same checkbox — just color-coded so they're visually distinct. They never appear on the course page, sidebar, or student lesson view.
 
-## Approach
-New `instructor_notes` table, so notes can never leak into student-facing queries.
+Add to the Instructor board:
+1. A KPI strip at the top showing overall course progress.
+2. A Day 1 date picker; dates for Days 2–7 are computed automatically on a Monday/Wednesday/Friday cadence.
 
-### Database
-`public.instructor_notes`:
-- `title` (text) — the note text, shown like a lesson title
-- `day_number` (nullable smallint; null = Unassigned column)
-- `schedule_order` (int)
-- `covered` (boolean, default false) — so the checkbox works like lessons
-- id / created_at / updated_at with update trigger
-- Grants + RLS: anyone can read; only admins can create, edit, delete.
+## 1. KPI strip
 
-### Instructor page (`src/pages/Instructor.tsx`)
-- Fetch notes with lessons and merge them into each day column's item list, sorted together by `schedule_order`.
-- Render a note with the same row layout as a lesson: drag handle, covered checkbox, title text, and a "Note" tag where the chapter label sits.
-- Color coding: amber/warning accent — tinted background, amber left edge and border, amber "Note" tag — versus the current neutral lesson card. Colors added as semantic tokens in `index.css` / `tailwind.config.ts`, no hardcoded values.
-- Click the note title to edit it inline (click-to-edit / blur-to-save, matching the homework field pattern); trash icon to delete.
-- Notes participate in the existing drag-and-drop, including cross-day moves and the "drop at top" zones, so a note can sit between any two lessons.
-- "Add note" button in each day column header.
+A row of compact stat cards above the day columns:
 
-### Nothing else changes
-Course page, course sidebar, and the lesson page read from `lessons` only, so notes stay invisible to students by construction.
+- **Course completed %** — share of all schedule items (lessons + notes assigned to a day) marked "covered". Big number + progress bar.
+- **Items covered** — e.g. "24 / 61".
+- **Days completed** — e.g. "2 / 7" from the existing per-day "Done" toggle.
+- **Next class** — the date of the first not-completed day (once a start date is set).
+
+## 2. Day 1 date + MWF schedule
+
+- A "Day 1 date" picker sits in the KPI strip.
+- Given the Day 1 date, each following class day is the next date that falls on Monday, Wednesday, or Friday. Example: Day 1 = Fri Jul 24 → Mon Jul 27, Wed Jul 29, Fri Jul 31, Mon Aug 3, Wed Aug 5, Fri Aug 7.
+- If the chosen Day 1 date is not a Mon/Wed/Fri, it is still honored as-is for Day 1 and the following days snap to the MWF cadence (a small hint notes this).
+- Each day column header shows its computed date (e.g. "Day 3 · Wed, Jul 29"), and today's class day is highlighted.
+
+## Technical notes
+
+- Store the start date on the existing `courses` row as a new `start_date` column (date, nullable) via a migration, so it is shared across devices/admins rather than living in one browser's storage.
+- Date math is a small pure helper (`src/lib/schedule.ts`): `classDates(day1: Date, count: number)` walking forward and keeping only weekdays 1/3/5.
+- KPI values are derived from state already loaded in `src/pages/Instructor.tsx` (`lessons`, `notes`, `completed`) — no extra queries.
+- Styling reuses existing `glass-card` tokens; no new colors.
