@@ -25,7 +25,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, LogOut } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, LogOut, StickyNote, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -45,6 +45,23 @@ type Lesson = {
   status: string;
   covered: boolean;
 };
+type Note = {
+  id: string;
+  title: string;
+  day_number: number | null;
+  schedule_order: number;
+  covered: boolean;
+};
+type BoardItem = {
+  id: string;
+  kind: "lesson" | "note";
+  title: string;
+  day_number: number | null;
+  sort: number;
+  covered: boolean;
+  chapter_id: string | null;
+  status: string;
+};
 type Chapter = { id: string; title: string };
 
 const DAYS = [1, 2, 3, 4, 5, 6, 7] as const;
@@ -55,6 +72,7 @@ export default function InstructorPage() {
   const [ready, setReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [homework, setHomework] = useState<Record<number, string>>({});
   const [preClass, setPreClass] = useState<Record<number, string>>({});
@@ -103,12 +121,14 @@ export default function InstructorPage() {
   const load = useCallback(async () => {
     const { data: c } = await supabase.from("courses").select("id").limit(1).maybeSingle();
     if (!c) return;
-    const [{ data: ls }, { data: ch }, { data: hw }] = await Promise.all([
+    const [{ data: ls }, { data: ch }, { data: hw }, { data: nt }] = await Promise.all([
       supabase.from("lessons").select("id,title,chapter_id,day_number,order_index,schedule_order,status,covered").eq("course_id", c.id).order("order_index"),
       supabase.from("chapters").select("id,title").eq("course_id", c.id).order("order_index"),
       supabase.from("day_homework").select("day_number,content,pre_class_message,pre_class_message_2,completed"),
+      supabase.from("instructor_notes").select("id,title,day_number,schedule_order,covered").order("schedule_order"),
     ]);
     setLessons((ls as Lesson[]) || []);
+    setNotes((nt as Note[]) || []);
     setChapters((ch as Chapter[]) || []);
     const hwMap: Record<number, string> = {};
     const pcMap: Record<number, string> = {};
@@ -194,17 +214,62 @@ export default function InstructorPage() {
     }
   }, [completed]);
 
-  const toggleCovered = useCallback(async (lessonId: string) => {
-    const current = lessons.find((l) => l.id === lessonId);
+  const toggleCovered = useCallback(async (itemId: string, kind: "lesson" | "note") => {
+    if (kind === "note") {
+      const current = notes.find((n) => n.id === itemId);
+      if (!current) return;
+      const next = !current.covered;
+      setNotes((ns) => ns.map((n) => (n.id === itemId ? { ...n, covered: next } : n)));
+      const { error } = await supabase.from("instructor_notes").update({ covered: next }).eq("id", itemId);
+      if (error) {
+        toast.error(error.message);
+        setNotes((ns) => ns.map((n) => (n.id === itemId ? { ...n, covered: !next } : n)));
+      }
+      return;
+    }
+    const current = lessons.find((l) => l.id === itemId);
     if (!current) return;
     const next = !current.covered;
-    setLessons((ls) => ls.map((l) => (l.id === lessonId ? { ...l, covered: next } : l)));
-    const { error } = await supabase.from("lessons").update({ covered: next }).eq("id", lessonId);
+    setLessons((ls) => ls.map((l) => (l.id === itemId ? { ...l, covered: next } : l)));
+    const { error } = await supabase.from("lessons").update({ covered: next }).eq("id", itemId);
     if (error) {
       toast.error(error.message);
-      setLessons((ls) => ls.map((l) => (l.id === lessonId ? { ...l, covered: !next } : l)));
+      setLessons((ls) => ls.map((l) => (l.id === itemId ? { ...l, covered: !next } : l)));
     }
-  }, [lessons]);
+  }, [lessons, notes]);
+
+  const addNote = useCallback(async (day: number | null) => {
+    const maxOrder = notes
+      .filter((n) => n.day_number === day)
+      .reduce((m, n) => Math.max(m, n.schedule_order), 0);
+    const { data, error } = await supabase
+      .from("instructor_notes")
+      .insert({ title: "New note", day_number: day, schedule_order: maxOrder + 1 })
+      .select("id,title,day_number,schedule_order,covered")
+      .maybeSingle();
+    if (error || !data) {
+      toast.error(error?.message ?? "Could not add note");
+      return;
+    }
+    setNotes((ns) => [...ns, data as Note]);
+  }, [notes]);
+
+  const updateNoteTitle = useCallback(async (id: string, title: string) => {
+    setNotes((ns) => ns.map((n) => (n.id === id ? { ...n, title } : n)));
+    const { error } = await supabase.from("instructor_notes").update({ title }).eq("id", id);
+    if (error) toast.error(error.message);
+  }, []);
+
+  const deleteNote = useCallback(async (id: string) => {
+    const prev = notes;
+    setNotes((ns) => ns.filter((n) => n.id !== id));
+    const { error } = await supabase.from("instructor_notes").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      setNotes(prev);
+    }
+  }, [notes]);
+
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -261,48 +326,49 @@ export default function InstructorPage() {
   const chapterTitle = (id: string | null) =>
     chapters.find((c) => c.id === id)?.title ?? "—";
 
-  const columnOf = (l: Lesson): ColumnId =>
-    l.day_number ? (`d${l.day_number}` as ColumnId) : "unassigned";
+  const columnOfDay = (day: number | null): ColumnId =>
+    day ? (`d${day}` as ColumnId) : "unassigned";
+
+  const items = useMemo<BoardItem[]>(() => {
+    const lessonItems: BoardItem[] = lessons.map((l) => ({
+      id: l.id,
+      kind: "lesson",
+      title: l.title,
+      day_number: l.day_number,
+      sort: l.schedule_order ?? l.order_index,
+      covered: l.covered,
+      chapter_id: l.chapter_id,
+      status: l.status,
+    }));
+    const noteItems: BoardItem[] = notes.map((n) => ({
+      id: n.id,
+      kind: "note",
+      title: n.title,
+      day_number: n.day_number,
+      sort: n.schedule_order,
+      covered: n.covered,
+      chapter_id: null,
+      status: "note",
+    }));
+    return [...lessonItems, ...noteItems];
+  }, [lessons, notes]);
 
   const grouped = useMemo(() => {
-    const map: Record<ColumnId, Lesson[]> = { unassigned: [] } as any;
+    const map: Record<ColumnId, BoardItem[]> = { unassigned: [] } as any;
     DAYS.forEach((d) => (map[`d${d}` as ColumnId] = []));
-    for (const l of lessons) map[columnOf(l)].push(l);
-    // preserve schedule_order within each column (fallback to order_index)
-    (Object.keys(map) as ColumnId[]).forEach((k) =>
-      map[k].sort((a, b) => (a.schedule_order ?? a.order_index) - (b.schedule_order ?? b.order_index))
-    );
+    for (const it of items) map[columnOfDay(it.day_number)].push(it);
+    (Object.keys(map) as ColumnId[]).forEach((k) => map[k].sort((a, b) => a.sort - b.sort));
     return map;
-  }, [lessons]);
+  }, [items]);
 
-  const activeLesson = activeId ? lessons.find((l) => l.id === activeId) : null;
+  const activeItem = activeId ? items.find((i) => i.id === activeId) ?? null : null;
 
   const findColumn = (id: string): ColumnId | null => {
-    if (id.endsWith(":top")) {
-      const columnId = id.replace(":top", "");
-      return findColumn(columnId);
-    }
-    if (id === "unassigned" || id.startsWith("d")) {
-      // could be column id itself
-      if (id === "unassigned") return "unassigned";
-      if (/^d[1-7]$/.test(id)) return id as ColumnId;
-    }
-    const l = lessons.find((x) => x.id === id);
-    return l ? columnOf(l) : null;
-  };
-
-  const persist = async (updates: { id: string; day_number: number | null; schedule_order: number }[]) => {
-    // update each row; run in parallel
-    const results = await Promise.all(
-      updates.map((u) =>
-        supabase
-          .from("lessons")
-          .update({ day_number: u.day_number, schedule_order: u.schedule_order })
-          .eq("id", u.id)
-      )
-    );
-    const err = results.find((r) => r.error)?.error;
-    if (err) toast.error(err.message);
+    if (id.endsWith(":top")) return findColumn(id.replace(":top", ""));
+    if (id === "unassigned") return "unassigned";
+    if (/^d[1-7]$/.test(id)) return id as ColumnId;
+    const it = items.find((x) => x.id === id);
+    return it ? columnOfDay(it.day_number) : null;
   };
 
   const onDragEnd = async (e: DragEndEvent) => {
@@ -320,15 +386,16 @@ export default function InstructorPage() {
     const insertAtTop = overData.position === "start" || overIdStr.endsWith(":top");
     if (!fromCol || !toCol) return;
 
-    const prev = lessons;
+    const prevLessons = lessons;
+    const prevNotes = notes;
     const fromList = [...grouped[fromCol]];
     const toList = fromCol === toCol ? fromList : [...grouped[toCol]];
 
     const activeIdx = fromList.findIndex((l) => l.id === activeIdStr);
     if (activeIdx === -1) return;
 
-    let newToList: Lesson[];
-    let newFromList: Lesson[] = fromList;
+    let newToList: BoardItem[];
+    let newFromList: BoardItem[] = fromList;
 
     if (fromCol === toCol) {
       const overIdx =
@@ -363,13 +430,13 @@ export default function InstructorPage() {
       (k, i) => (colBase[k] = i * 1000)
     );
 
-    const updates: { id: string; day_number: number | null; schedule_order: number }[] = [];
-    const applyList = (col: ColumnId, list: Lesson[]) => {
+    const updates: { id: string; kind: "lesson" | "note"; day_number: number | null; schedule_order: number }[] = [];
+    const applyList = (col: ColumnId, list: BoardItem[]) => {
       list.forEach((l, i) => {
         const day = col === "unassigned" ? null : Number(col.replace("d", ""));
         const schedule_order = colBase[col] + i;
-        if (l.day_number !== day || l.schedule_order !== schedule_order) {
-          updates.push({ id: l.id, day_number: day, schedule_order });
+        if (l.day_number !== day || l.sort !== schedule_order) {
+          updates.push({ id: l.id, kind: l.kind, day_number: day, schedule_order });
         }
       });
     };
@@ -377,29 +444,43 @@ export default function InstructorPage() {
     if (fromCol !== toCol) applyList(fromCol, newFromList);
 
     // Optimistic update
-    const byId = new Map(lessons.map((l) => [l.id, l]));
-    updates.forEach((u) => {
-      const cur = byId.get(u.id);
-      if (cur) byId.set(u.id, { ...cur, day_number: u.day_number, schedule_order: u.schedule_order });
-    });
-    setLessons(Array.from(byId.values()));
-
-    const { error } = await (async () => {
-      const results = await Promise.all(
-        updates.map((u) =>
-          supabase
-            .from("lessons")
-            .update({ day_number: u.day_number, schedule_order: u.schedule_order })
-            .eq("id", u.id)
-        )
+    const lessonUpdates = updates.filter((u) => u.kind === "lesson");
+    const noteUpdates = updates.filter((u) => u.kind === "note");
+    if (lessonUpdates.length) {
+      const byId = new Map(lessonUpdates.map((u) => [u.id, u]));
+      setLessons((ls) =>
+        ls.map((l) => {
+          const u = byId.get(l.id);
+          return u ? { ...l, day_number: u.day_number, schedule_order: u.schedule_order } : l;
+        })
       );
-      return { error: results.find((r) => r.error)?.error };
-    })();
+    }
+    if (noteUpdates.length) {
+      const byId = new Map(noteUpdates.map((u) => [u.id, u]));
+      setNotes((ns) =>
+        ns.map((n) => {
+          const u = byId.get(n.id);
+          return u ? { ...n, day_number: u.day_number, schedule_order: u.schedule_order } : n;
+        })
+      );
+    }
+
+    const results = await Promise.all(
+      updates.map((u) =>
+        supabase
+          .from(u.kind === "note" ? "instructor_notes" : "lessons")
+          .update({ day_number: u.day_number, schedule_order: u.schedule_order })
+          .eq("id", u.id)
+      )
+    );
+    const error = results.find((r) => r.error)?.error;
     if (error) {
       toast.error(error.message);
-      setLessons(prev);
+      setLessons(prevLessons);
+      setNotes(prevNotes);
     }
   };
+
 
   if (!ready) return <div className="p-10 text-foreground/60">Loading…</div>;
   if (!isAdmin)
@@ -451,10 +532,13 @@ export default function InstructorPage() {
                 key={d}
                 id={`d${d}`}
                 label={`Day ${d}`}
-                lessons={grouped[`d${d}` as ColumnId]}
+                items={grouped[`d${d}` as ColumnId]}
                 chapterTitle={chapterTitle}
                 onPreview={openPreview}
                 onToggleCovered={toggleCovered}
+                onAddNote={() => addNote(d)}
+                onRenameNote={updateNoteTitle}
+                onDeleteNote={deleteNote}
                 homework={homework[d] ?? ""}
                 onHomeworkChange={(v) => onHomeworkChange(d, v)}
                 preClass={preClass[d] ?? ""}
@@ -473,16 +557,26 @@ export default function InstructorPage() {
             <DayColumn
               id="unassigned"
               label="Unassigned"
-              lessons={grouped.unassigned}
+              items={grouped.unassigned}
               chapterTitle={chapterTitle}
               onPreview={openPreview}
               onToggleCovered={toggleCovered}
+              onAddNote={() => addNote(null)}
+              onRenameNote={updateNoteTitle}
+              onDeleteNote={deleteNote}
               muted
             />
           </div>
           <DragOverlay>
-            {activeLesson ? <LessonCard lesson={activeLesson} chapterTitle={chapterTitle(activeLesson.chapter_id)} dragging /> : null}
+            {activeItem ? (
+              activeItem.kind === "note" ? (
+                <NoteCard item={activeItem} dragging />
+              ) : (
+                <LessonCard item={activeItem} chapterTitle={chapterTitle(activeItem.chapter_id)} dragging />
+              )
+            ) : null}
           </DragOverlay>
+
         </DndContext>
       </div>
 
@@ -696,10 +790,13 @@ function AutoTextarea({
 function DayColumn({
   id,
   label,
-  lessons,
+  items,
   chapterTitle,
   onPreview,
   onToggleCovered,
+  onAddNote,
+  onRenameNote,
+  onDeleteNote,
   muted,
   homework,
   onHomeworkChange,
@@ -717,10 +814,13 @@ function DayColumn({
 }: {
   id: string;
   label: string;
-  lessons: Lesson[];
+  items: BoardItem[];
   chapterTitle: (id: string | null) => string;
   onPreview: (id: string) => void;
-  onToggleCovered?: (lessonId: string) => void;
+  onToggleCovered?: (itemId: string, kind: "lesson" | "note") => void;
+  onAddNote?: () => void;
+  onRenameNote?: (id: string, title: string) => void;
+  onDeleteNote?: (id: string) => void;
   muted?: boolean;
   homework?: string;
   onHomeworkChange?: (v: string) => void;
@@ -743,6 +843,45 @@ function DayColumn({
   });
   const showHomework = typeof onHomeworkChange === "function";
   const showComplete = typeof onToggleCompleted === "function";
+
+  const list = (
+    <SortableContext id={id} items={items.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+      <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
+        <div
+          ref={setTopDropRef}
+          className={`h-3 rounded-md border border-dashed transition-colors ${
+            isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
+          }`}
+        />
+        {items.length === 0 && (
+          <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
+            Drop lessons here
+          </div>
+        )}
+        {items.map((it) => (
+          <SortableItem
+            key={it.id}
+            item={it}
+            chapterTitle={chapterTitle(it.chapter_id)}
+            onPreview={onPreview}
+            onToggleCovered={onToggleCovered}
+            onRenameNote={onRenameNote}
+            onDeleteNote={onDeleteNote}
+          />
+        ))}
+        {onAddNote && (
+          <button
+            type="button"
+            onClick={onAddNote}
+            className="w-full flex items-center justify-center gap-1.5 text-[11px] py-1.5 rounded-lg border border-dashed border-note/40 text-note hover:bg-note/10 transition-colors"
+          >
+            <StickyNote className="w-3.5 h-3.5" /> Add note
+          </button>
+        )}
+      </div>
+    </SortableContext>
+  );
+
   return (
     <div
       className={`glass-card rounded-2xl p-3 min-h-[300px] transition-colors ${
@@ -766,7 +905,7 @@ function DayColumn({
               {completed ? "Done" : "Complete"}
             </button>
           )}
-          <div className="text-xs text-foreground/50">{lessons.length}</div>
+          <div className="text-xs text-foreground/50">{items.length}</div>
         </div>
       </div>
       {typeof onPreClassChange === "function" && (
@@ -792,45 +931,9 @@ function DayColumn({
         />
       )}
       {typeof onPreClassChange === "function" ? (
-        <div className="mt-3 pt-3 border-t border-border/60">
-          <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-            <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
-              <div
-                ref={setTopDropRef}
-                className={`h-3 rounded-md border border-dashed transition-colors ${
-                  isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
-                }`}
-              />
-              {lessons.length === 0 && (
-                <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
-                  Drop lessons here
-                </div>
-              )}
-              {lessons.map((l) => (
-                <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} onToggleCovered={onToggleCovered} />
-              ))}
-            </div>
-          </SortableContext>
-        </div>
+        <div className="mt-3 pt-3 border-t border-border/60">{list}</div>
       ) : (
-        <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-          <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
-            <div
-              ref={setTopDropRef}
-              className={`h-3 rounded-md border border-dashed transition-colors ${
-                isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
-              }`}
-            />
-            {lessons.length === 0 && (
-              <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
-                Drop lessons here
-              </div>
-            )}
-            {lessons.map((l) => (
-              <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} onToggleCovered={onToggleCovered} />
-            ))}
-          </div>
-        </SortableContext>
+        list
       )}
       {showHomework && (
         <div className="mt-3 pt-3 border-t border-border/60">
@@ -846,11 +949,23 @@ function DayColumn({
   );
 }
 
-
-
-function SortableLesson({ lesson, chapterTitle, onPreview, onToggleCovered }: { lesson: Lesson; chapterTitle: string; onPreview: (id: string) => void; onToggleCovered?: (id: string) => void }) {
+function SortableItem({
+  item,
+  chapterTitle,
+  onPreview,
+  onToggleCovered,
+  onRenameNote,
+  onDeleteNote,
+}: {
+  item: BoardItem;
+  chapterTitle: string;
+  onPreview: (id: string) => void;
+  onToggleCovered?: (id: string, kind: "lesson" | "note") => void;
+  onRenameNote?: (id: string, title: string) => void;
+  onDeleteNote?: (id: string) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: lesson.id,
+    id: item.id,
   });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -859,26 +974,65 @@ function SortableLesson({ lesson, chapterTitle, onPreview, onToggleCovered }: { 
   };
   return (
     <div ref={setNodeRef} style={style}>
-      <LessonCard
-        lesson={lesson}
-        chapterTitle={chapterTitle}
-        dragHandleProps={{ ...attributes, ...listeners }}
-        onPreview={() => onPreview(lesson.id)}
-        onToggleCovered={onToggleCovered ? () => onToggleCovered(lesson.id) : undefined}
-      />
+      {item.kind === "note" ? (
+        <NoteCard
+          item={item}
+          dragHandleProps={{ ...attributes, ...listeners }}
+          onToggleCovered={onToggleCovered ? () => onToggleCovered(item.id, "note") : undefined}
+          onRename={onRenameNote ? (title) => onRenameNote(item.id, title) : undefined}
+          onDelete={onDeleteNote ? () => onDeleteNote(item.id) : undefined}
+        />
+      ) : (
+        <LessonCard
+          item={item}
+          chapterTitle={chapterTitle}
+          dragHandleProps={{ ...attributes, ...listeners }}
+          onPreview={() => onPreview(item.id)}
+          onToggleCovered={onToggleCovered ? () => onToggleCovered(item.id, "lesson") : undefined}
+        />
+      )}
     </div>
   );
 }
 
+function CoveredCheckbox({
+  covered,
+  onToggle,
+  tone,
+}: {
+  covered: boolean;
+  onToggle: () => void;
+  tone: "default" | "note";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); onToggle(); }}
+      onPointerDown={(e) => e.stopPropagation()}
+      className={`mt-0.5 w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
+        covered
+          ? "bg-emerald-500 border-emerald-500 text-white"
+          : tone === "note"
+          ? "border-note/50 hover:border-note bg-background/40"
+          : "border-foreground/30 hover:border-primary bg-background/40"
+      }`}
+      aria-label={covered ? "Mark not covered" : "Mark covered"}
+      title={covered ? "Covered — click to uncheck" : "Mark as covered"}
+    >
+      {covered && <Check className="w-3 h-3" strokeWidth={3} />}
+    </button>
+  );
+}
+
 function LessonCard({
-  lesson,
+  item,
   chapterTitle,
   dragging,
   dragHandleProps,
   onPreview,
   onToggleCovered,
 }: {
-  lesson: Lesson;
+  item: BoardItem;
   chapterTitle: string;
   dragging?: boolean;
   dragHandleProps?: any;
@@ -889,7 +1043,7 @@ function LessonCard({
     <div
       className={`rounded-lg bg-card/60 hover:bg-card border border-muted-foreground/30 p-2.5 flex items-start gap-2 ${
         dragging ? "shadow-2xl ring-1 ring-primary/40" : ""
-      } ${lesson.covered ? "bg-emerald-500/5 border-emerald-500/20" : ""}`}
+      } ${item.covered ? "bg-emerald-500/5 border-emerald-500/20" : ""}`}
     >
       <button
         type="button"
@@ -900,26 +1054,13 @@ function LessonCard({
         <GripVertical className="w-3.5 h-3.5 mt-0.5 text-foreground/30 shrink-0" />
       </button>
       {onToggleCovered && (
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onToggleCovered(); }}
-          onPointerDown={(e) => e.stopPropagation()}
-          className={`mt-0.5 w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
-            lesson.covered
-              ? "bg-emerald-500 border-emerald-500 text-white"
-              : "border-foreground/30 hover:border-primary bg-background/40"
-          }`}
-          aria-label={lesson.covered ? "Mark not covered" : "Mark covered"}
-          title={lesson.covered ? "Covered — click to uncheck" : "Mark as covered"}
-        >
-          {lesson.covered && <Check className="w-3 h-3" strokeWidth={3} />}
-        </button>
+        <CoveredCheckbox covered={item.covered} onToggle={onToggleCovered} tone="default" />
       )}
       <div className="min-w-0 flex-1 flex items-center gap-2">
-        <div className={`text-sm font-medium truncate flex-1 ${lesson.covered ? "line-through text-foreground/60" : ""}`}>{lesson.title}</div>
+        <div className={`text-sm font-medium truncate flex-1 ${item.covered ? "line-through text-foreground/60" : ""}`}>{item.title}</div>
         <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5 shrink min-w-0">
           <span className="truncate">{chapterTitle}</span>
-          {lesson.status === "draft" && (
+          {item.status === "draft" && (
             <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] shrink-0">draft</span>
           )}
         </div>
@@ -939,5 +1080,87 @@ function LessonCard({
       )}
     </div>
   );
+}
 
+function NoteCard({
+  item,
+  dragging,
+  dragHandleProps,
+  onToggleCovered,
+  onRename,
+  onDelete,
+}: {
+  item: BoardItem;
+  dragging?: boolean;
+  dragHandleProps?: any;
+  onToggleCovered?: () => void;
+  onRename?: (title: string) => void;
+  onDelete?: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(item.title);
+  useEffect(() => setValue(item.title), [item.title]);
+
+  return (
+    <div
+      className={`rounded-lg border-l-4 border border-note/40 border-l-note bg-note/10 hover:bg-note/15 p-2.5 flex items-start gap-2 ${
+        dragging ? "shadow-2xl ring-1 ring-note/50" : ""
+      } ${item.covered ? "opacity-80" : ""}`}
+    >
+      <button
+        type="button"
+        className="cursor-grab active:cursor-grabbing touch-none"
+        {...dragHandleProps}
+        aria-label="Drag"
+      >
+        <GripVertical className="w-3.5 h-3.5 mt-0.5 text-note/60 shrink-0" />
+      </button>
+      {onToggleCovered && (
+        <CoveredCheckbox covered={item.covered} onToggle={onToggleCovered} tone="note" />
+      )}
+      <div className="min-w-0 flex-1 flex items-center gap-2">
+        {editing && onRename ? (
+          <input
+            autoFocus
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onPointerDown={(e) => e.stopPropagation()}
+            onBlur={() => {
+              setEditing(false);
+              if (value.trim() !== item.title) onRename(value.trim());
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+              if (e.key === "Escape") { setValue(item.title); setEditing(false); }
+            }}
+            className="flex-1 min-w-0 bg-background/50 border border-note/40 rounded px-1.5 py-0.5 text-sm outline-none focus:border-note"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => onRename && setEditing(true)}
+            onPointerDown={(e) => e.stopPropagation()}
+            className={`text-sm font-medium truncate flex-1 text-left ${item.covered ? "line-through text-foreground/60" : ""}`}
+          >
+            {item.title || "Untitled note"}
+          </button>
+        )}
+        <span className="px-1.5 py-0.5 rounded bg-note/20 text-note text-[10px] shrink-0 flex items-center gap-1">
+          <StickyNote className="w-3 h-3" /> Note
+        </span>
+      </div>
+      {onDelete && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="p-1 rounded hover:bg-destructive/10 text-foreground/50 hover:text-destructive shrink-0"
+          aria-label="Delete note"
+          title="Delete note"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      )}
+    </div>
+  );
 }

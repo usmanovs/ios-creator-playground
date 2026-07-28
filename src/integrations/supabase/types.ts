@@ -178,6 +178,36 @@ export type Database = {
         }
         Relationships: []
       }
+      instructor_notes: {
+        Row: {
+          covered: boolean
+          created_at: string
+          day_number: number | null
+          id: string
+          schedule_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          covered?: boolean
+          created_at?: string
+          day_number?: number | null
+          id?: string
+          schedule_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          covered?: boolean
+          created_at?: string
+          day_number?: number | null
+          id?: string
+          schedule_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           chapter_id: string | null
