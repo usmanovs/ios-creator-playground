@@ -559,6 +559,76 @@ export default function InstructorPage() {
       </div>
 
       <div className="relative max-w-[1600px] mx-auto px-4 md:px-6 py-6">
+        {/* KPI strip */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-5">
+          <div className="glass-card rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
+              <TrendingUp className="w-3.5 h-3.5" /> Course completed
+            </div>
+            <div className="font-display text-3xl font-bold">{stats.pct}%</div>
+            <div className="mt-2 h-2 rounded-full bg-foreground/10 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${stats.pct}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="glass-card rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
+              <ListChecks className="w-3.5 h-3.5" /> Items covered
+            </div>
+            <div className="font-display text-3xl font-bold">
+              {stats.covered}
+              <span className="text-foreground/40 text-lg font-semibold"> / {stats.total}</span>
+            </div>
+            <div className="mt-2 text-xs text-foreground/50">Lessons + notes on the schedule</div>
+          </div>
+
+          <div className="glass-card rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
+              <Check className="w-3.5 h-3.5" /> Days completed
+            </div>
+            <div className="font-display text-3xl font-bold">
+              {stats.daysDone}
+              <span className="text-foreground/40 text-lg font-semibold"> / {DAYS.length}</span>
+            </div>
+            <div className="mt-2 text-xs text-foreground/50">
+              {stats.nextDate
+                ? `Next class: ${format(stats.nextDate, "EEE, MMM d")}`
+                : stats.nextDayIndex >= 0
+                ? `Next: Day ${DAYS[stats.nextDayIndex]}`
+                : "All days done 🎉"}
+            </div>
+          </div>
+
+          <div className="glass-card rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-1">
+              <CalendarIcon className="w-3.5 h-3.5" /> Day 1 date
+            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full justify-start text-left font-normal">
+                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  {day1 ? format(day1, "EEE, MMM d, yyyy") : <span className="text-muted-foreground">Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={day1 ?? undefined}
+                  onSelect={(d) => saveStartDate(d)}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+            <div className="mt-2 text-xs text-foreground/50">
+              Following days fall on Mon / Wed / Fri.
+            </div>
+          </div>
+        </div>
+
         <p className="text-sm text-foreground/60 mb-4">
           Drag lessons between days, or reorder within a day. Changes save automatically.
         </p>
@@ -570,12 +640,15 @@ export default function InstructorPage() {
           onDragCancel={() => setActiveId(null)}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-            {DAYS.map((d) => (
+            {DAYS.map((d, i) => (
               <DayColumn
                 key={d}
                 id={`d${d}`}
                 label={`Day ${d}`}
+                dateLabel={dayDates ? format(dayDates[i], "EEE, MMM d") : undefined}
+                isToday={dayDates ? isSameDay(dayDates[i], new Date()) : false}
                 items={grouped[`d${d}` as ColumnId]}
+
                 chapterTitle={chapterTitle}
                 onPreview={openPreview}
                 onToggleCovered={toggleCovered}
