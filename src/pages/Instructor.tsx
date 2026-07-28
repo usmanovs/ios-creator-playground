@@ -672,7 +672,9 @@ export default function InstructorPage() {
           onDragCancel={() => setActiveId(null)}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-            {DAYS.map((d, i) => (
+            {DAYS.map((d) => ({ d, i: DAYS.indexOf(d) }))
+              .sort((a, b) => Number(completed[a.d] ?? false) - Number(completed[b.d] ?? false))
+              .map(({ d, i }) => (
               <DayColumn
                 key={d}
                 id={`d${d}`}
@@ -700,6 +702,10 @@ export default function InstructorPage() {
                 homeworkSaving={savingDay === d}
                 completed={completed[d] ?? false}
                 onToggleCompleted={() => toggleCompleted(d)}
+                collapsed={(completed[d] ?? false) && !expandedOverride[d]}
+                onToggleCollapsed={() =>
+                  setExpandedOverride((prev) => ({ ...prev, [d]: !prev[d] }))
+                }
               />
             ))}
             <DayColumn
