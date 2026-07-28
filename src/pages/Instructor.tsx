@@ -790,10 +790,13 @@ function AutoTextarea({
 function DayColumn({
   id,
   label,
-  lessons,
+  items,
   chapterTitle,
   onPreview,
   onToggleCovered,
+  onAddNote,
+  onRenameNote,
+  onDeleteNote,
   muted,
   homework,
   onHomeworkChange,
@@ -811,10 +814,13 @@ function DayColumn({
 }: {
   id: string;
   label: string;
-  lessons: Lesson[];
+  items: BoardItem[];
   chapterTitle: (id: string | null) => string;
   onPreview: (id: string) => void;
-  onToggleCovered?: (lessonId: string) => void;
+  onToggleCovered?: (itemId: string, kind: "lesson" | "note") => void;
+  onAddNote?: () => void;
+  onRenameNote?: (id: string, title: string) => void;
+  onDeleteNote?: (id: string) => void;
   muted?: boolean;
   homework?: string;
   onHomeworkChange?: (v: string) => void;
@@ -837,6 +843,45 @@ function DayColumn({
   });
   const showHomework = typeof onHomeworkChange === "function";
   const showComplete = typeof onToggleCompleted === "function";
+
+  const list = (
+    <SortableContext id={id} items={items.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+      <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
+        <div
+          ref={setTopDropRef}
+          className={`h-3 rounded-md border border-dashed transition-colors ${
+            isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
+          }`}
+        />
+        {items.length === 0 && (
+          <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
+            Drop lessons here
+          </div>
+        )}
+        {items.map((it) => (
+          <SortableItem
+            key={it.id}
+            item={it}
+            chapterTitle={chapterTitle(it.chapter_id)}
+            onPreview={onPreview}
+            onToggleCovered={onToggleCovered}
+            onRenameNote={onRenameNote}
+            onDeleteNote={onDeleteNote}
+          />
+        ))}
+        {onAddNote && (
+          <button
+            type="button"
+            onClick={onAddNote}
+            className="w-full flex items-center justify-center gap-1.5 text-[11px] py-1.5 rounded-lg border border-dashed border-note/40 text-note hover:bg-note/10 transition-colors"
+          >
+            <StickyNote className="w-3.5 h-3.5" /> Add note
+          </button>
+        )}
+      </div>
+    </SortableContext>
+  );
+
   return (
     <div
       className={`glass-card rounded-2xl p-3 min-h-[300px] transition-colors ${
@@ -860,7 +905,7 @@ function DayColumn({
               {completed ? "Done" : "Complete"}
             </button>
           )}
-          <div className="text-xs text-foreground/50">{lessons.length}</div>
+          <div className="text-xs text-foreground/50">{items.length}</div>
         </div>
       </div>
       {typeof onPreClassChange === "function" && (
@@ -886,45 +931,9 @@ function DayColumn({
         />
       )}
       {typeof onPreClassChange === "function" ? (
-        <div className="mt-3 pt-3 border-t border-border/60">
-          <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-            <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
-              <div
-                ref={setTopDropRef}
-                className={`h-3 rounded-md border border-dashed transition-colors ${
-                  isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
-                }`}
-              />
-              {lessons.length === 0 && (
-                <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
-                  Drop lessons here
-                </div>
-              )}
-              {lessons.map((l) => (
-                <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} onToggleCovered={onToggleCovered} />
-              ))}
-            </div>
-          </SortableContext>
-        </div>
+        <div className="mt-3 pt-3 border-t border-border/60">{list}</div>
       ) : (
-        <SortableContext id={id} items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-          <div ref={setNodeRef} className="space-y-2 min-h-[72px]">
-            <div
-              ref={setTopDropRef}
-              className={`h-3 rounded-md border border-dashed transition-colors ${
-                isTopOver ? "border-primary/70 bg-primary/15" : "border-transparent"
-              }`}
-            />
-            {lessons.length === 0 && (
-              <div className="text-xs text-foreground/40 text-center py-6 border border-dashed border-border rounded-lg">
-                Drop lessons here
-              </div>
-            )}
-            {lessons.map((l) => (
-              <SortableLesson key={l.id} lesson={l} chapterTitle={chapterTitle(l.chapter_id)} onPreview={onPreview} onToggleCovered={onToggleCovered} />
-            ))}
-          </div>
-        </SortableContext>
+        list
       )}
       {showHomework && (
         <div className="mt-3 pt-3 border-t border-border/60">
@@ -939,6 +948,223 @@ function DayColumn({
     </div>
   );
 }
+
+function SortableItem({
+  item,
+  chapterTitle,
+  onPreview,
+  onToggleCovered,
+  onRenameNote,
+  onDeleteNote,
+}: {
+  item: BoardItem;
+  chapterTitle: string;
+  onPreview: (id: string) => void;
+  onToggleCovered?: (id: string, kind: "lesson" | "note") => void;
+  onRenameNote?: (id: string, title: string) => void;
+  onDeleteNote?: (id: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style}>
+      {item.kind === "note" ? (
+        <NoteCard
+          item={item}
+          dragHandleProps={{ ...attributes, ...listeners }}
+          onToggleCovered={onToggleCovered ? () => onToggleCovered(item.id, "note") : undefined}
+          onRename={onRenameNote ? (title) => onRenameNote(item.id, title) : undefined}
+          onDelete={onDeleteNote ? () => onDeleteNote(item.id) : undefined}
+        />
+      ) : (
+        <LessonCard
+          item={item}
+          chapterTitle={chapterTitle}
+          dragHandleProps={{ ...attributes, ...listeners }}
+          onPreview={() => onPreview(item.id)}
+          onToggleCovered={onToggleCovered ? () => onToggleCovered(item.id, "lesson") : undefined}
+        />
+      )}
+    </div>
+  );
+}
+
+function CoveredCheckbox({
+  covered,
+  onToggle,
+  tone,
+}: {
+  covered: boolean;
+  onToggle: () => void;
+  tone: "default" | "note";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); onToggle(); }}
+      onPointerDown={(e) => e.stopPropagation()}
+      className={`mt-0.5 w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
+        covered
+          ? "bg-emerald-500 border-emerald-500 text-white"
+          : tone === "note"
+          ? "border-note/50 hover:border-note bg-background/40"
+          : "border-foreground/30 hover:border-primary bg-background/40"
+      }`}
+      aria-label={covered ? "Mark not covered" : "Mark covered"}
+      title={covered ? "Covered — click to uncheck" : "Mark as covered"}
+    >
+      {covered && <Check className="w-3 h-3" strokeWidth={3} />}
+    </button>
+  );
+}
+
+function LessonCard({
+  item,
+  chapterTitle,
+  dragging,
+  dragHandleProps,
+  onPreview,
+  onToggleCovered,
+}: {
+  item: BoardItem;
+  chapterTitle: string;
+  dragging?: boolean;
+  dragHandleProps?: any;
+  onPreview?: () => void;
+  onToggleCovered?: () => void;
+}) {
+  return (
+    <div
+      className={`rounded-lg bg-card/60 hover:bg-card border border-muted-foreground/30 p-2.5 flex items-start gap-2 ${
+        dragging ? "shadow-2xl ring-1 ring-primary/40" : ""
+      } ${item.covered ? "bg-emerald-500/5 border-emerald-500/20" : ""}`}
+    >
+      <button
+        type="button"
+        className="cursor-grab active:cursor-grabbing touch-none"
+        {...dragHandleProps}
+        aria-label="Drag"
+      >
+        <GripVertical className="w-3.5 h-3.5 mt-0.5 text-foreground/30 shrink-0" />
+      </button>
+      {onToggleCovered && (
+        <CoveredCheckbox covered={item.covered} onToggle={onToggleCovered} tone="default" />
+      )}
+      <div className="min-w-0 flex-1 flex items-center gap-2">
+        <div className={`text-sm font-medium truncate flex-1 ${item.covered ? "line-through text-foreground/60" : ""}`}>{item.title}</div>
+        <div className="text-[11px] text-foreground/50 truncate flex items-center gap-1.5 shrink min-w-0">
+          <span className="truncate">{chapterTitle}</span>
+          {item.status === "draft" && (
+            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] shrink-0">draft</span>
+          )}
+        </div>
+      </div>
+
+      {onPreview && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onPreview(); }}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="p-1 rounded hover:bg-primary/10 text-foreground/60 hover:text-primary shrink-0"
+          aria-label="Preview lesson"
+          title="Preview"
+        >
+          <Eye className="w-3.5 h-3.5" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function NoteCard({
+  item,
+  dragging,
+  dragHandleProps,
+  onToggleCovered,
+  onRename,
+  onDelete,
+}: {
+  item: BoardItem;
+  dragging?: boolean;
+  dragHandleProps?: any;
+  onToggleCovered?: () => void;
+  onRename?: (title: string) => void;
+  onDelete?: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(item.title);
+  useEffect(() => setValue(item.title), [item.title]);
+
+  return (
+    <div
+      className={`rounded-lg border-l-4 border border-note/40 border-l-note bg-note/10 hover:bg-note/15 p-2.5 flex items-start gap-2 ${
+        dragging ? "shadow-2xl ring-1 ring-note/50" : ""
+      } ${item.covered ? "opacity-80" : ""}`}
+    >
+      <button
+        type="button"
+        className="cursor-grab active:cursor-grabbing touch-none"
+        {...dragHandleProps}
+        aria-label="Drag"
+      >
+        <GripVertical className="w-3.5 h-3.5 mt-0.5 text-note/60 shrink-0" />
+      </button>
+      {onToggleCovered && (
+        <CoveredCheckbox covered={item.covered} onToggle={onToggleCovered} tone="note" />
+      )}
+      <div className="min-w-0 flex-1 flex items-center gap-2">
+        {editing && onRename ? (
+          <input
+            autoFocus
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onPointerDown={(e) => e.stopPropagation()}
+            onBlur={() => {
+              setEditing(false);
+              if (value.trim() !== item.title) onRename(value.trim());
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+              if (e.key === "Escape") { setValue(item.title); setEditing(false); }
+            }}
+            className="flex-1 min-w-0 bg-background/50 border border-note/40 rounded px-1.5 py-0.5 text-sm outline-none focus:border-note"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => onRename && setEditing(true)}
+            onPointerDown={(e) => e.stopPropagation()}
+            className={`text-sm font-medium truncate flex-1 text-left ${item.covered ? "line-through text-foreground/60" : ""}`}
+          >
+            {item.title || "Untitled note"}
+          </button>
+        )}
+        <span className="px-1.5 py-0.5 rounded bg-note/20 text-note text-[10px] shrink-0 flex items-center gap-1">
+          <StickyNote className="w-3 h-3" /> Note
+        </span>
+      </div>
+      {onDelete && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="p-1 rounded hover:bg-destructive/10 text-foreground/50 hover:text-destructive shrink-0"
+          aria-label="Delete note"
+          title="Delete note"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 
 
 
