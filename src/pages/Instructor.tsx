@@ -536,13 +536,15 @@ export default function InstructorPage() {
     ];
     const total = scheduled.length;
     const covered = scheduled.filter((i) => i.covered).length;
-    const pct = total ? Math.round((covered / total) * 100) : 0;
     const daysDone = DAYS.filter((d) => completed[d]).length;
+    // Course progress is driven by completed class days, not individual items.
+    const pct = DAYS.length ? Math.round((daysDone / DAYS.length) * 100) : 0;
     const nextDayIndex = DAYS.findIndex((d) => !completed[d]);
     const nextDate =
       dayDates && nextDayIndex >= 0 ? dayDates[nextDayIndex] : null;
     return { total, covered, pct, daysDone, nextDayIndex, nextDate };
   }, [lessons, notes, completed, dayDates]);
+
 
 
   if (!ready) return <div className="p-10 text-foreground/60">Loading…</div>;
@@ -592,6 +594,10 @@ export default function InstructorPage() {
                 style={{ width: `${stats.pct}%` }}
               />
             </div>
+            <div className="mt-1.5 text-[11px] text-foreground/50">
+              {stats.daysDone} of {DAYS.length} class days completed
+            </div>
+
           </div>
 
           <div className="glass-card rounded-2xl p-4">
