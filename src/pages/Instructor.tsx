@@ -84,6 +84,8 @@ export default function InstructorPage() {
   const [preClassEditMode, setPreClassEditMode] = useState<Record<number, { 1: boolean; 2: boolean }>>({});
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
+  const [courseId, setCourseId] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<{ title: string; lesson_type: string; video_url: string | null; content_html: string | null } | null>(null);
