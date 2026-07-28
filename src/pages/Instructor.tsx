@@ -594,6 +594,10 @@ export default function InstructorPage() {
                 style={{ width: `${stats.pct}%` }}
               />
             </div>
+            <div className="mt-1.5 text-[11px] text-foreground/50">
+              {stats.daysDone} of {DAYS.length} class days completed
+            </div>
+
           </div>
 
           <div className="glass-card rounded-2xl p-4">
