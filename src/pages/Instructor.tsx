@@ -1006,10 +1006,22 @@ function DayColumn({
     <div
       className={`glass-card rounded-2xl p-3 min-h-[300px] transition-colors ${
         isOver ? "ring-2 ring-primary/60 bg-primary/5" : ""
-      } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""}`}
+      } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""} ${
+        isToday && !completed ? "ring-2 ring-primary/50" : ""
+      }`}
     >
       <div className="flex items-center justify-between mb-3 px-1">
-        <div className="font-display font-bold">{label}</div>
+        <div className="min-w-0">
+          <div className="font-display font-bold flex items-center gap-2">
+            {label}
+            {isToday && (
+              <span className="px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-semibold uppercase">
+                Today
+              </span>
+            )}
+          </div>
+          {dateLabel && <div className="text-[11px] text-foreground/50">{dateLabel}</div>}
+        </div>
         <div className="flex items-center gap-2">
           {showComplete && (
             <button
