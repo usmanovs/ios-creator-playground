@@ -906,6 +906,8 @@ function AutoTextarea({
 function DayColumn({
   id,
   label,
+  dateLabel,
+  isToday,
   items,
   chapterTitle,
   onPreview,
