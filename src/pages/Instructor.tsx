@@ -217,6 +217,8 @@ export default function InstructorPage() {
     const dayNoteIds = notes.filter((n) => n.day_number === day).map((n) => n.id);
 
     setCompleted((c) => ({ ...c, [day]: next }));
+    // Completing a day collapses it; re-opening a day clears any manual override.
+    setExpandedOverride((prev) => ({ ...prev, [day]: false }));
     // Marking a day complete implies every item scheduled that day was covered.
     setLessons((ls) => ls.map((l) => (l.day_number === day ? { ...l, covered: next } : l)));
     setNotes((ns) => ns.map((n) => (n.day_number === day ? { ...n, covered: next } : n)));
