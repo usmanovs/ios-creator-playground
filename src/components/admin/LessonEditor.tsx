@@ -106,7 +106,9 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
-        persist().then(() => toast.success("Saved"));
+        persist().then((ok) =>
+          ok ? toast.success("Saved") : dayMissing && toast.error("Please select a day before saving")
+        );
       }
     };
     window.addEventListener("keydown", handler);
