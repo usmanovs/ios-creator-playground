@@ -29,6 +29,10 @@
     --accent: 141 71% 58%;
     --accent-foreground: 240 28% 14%;
 
+    /* amber accent for instructor-only notes */
+    --note: 38 92% 58%;
+    --note-foreground: 240 28% 14%;
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
