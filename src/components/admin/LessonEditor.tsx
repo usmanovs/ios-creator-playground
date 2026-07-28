@@ -238,20 +238,20 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
             </Button>
             <Button
               onClick={async () => {
-                await persist();
-                toast.success("Saved");
+                if (await persist()) toast.success("Saved");
               }}
-              disabled={!dirty}
+              disabled={!dirty || dayMissing}
             >
               Save
             </Button>
             <Button
               onClick={async () => {
-                await persist();
-                toast.success("Saved");
-                onClose();
+                if (await persist()) {
+                  toast.success("Saved");
+                  onClose();
+                }
               }}
-              disabled={!dirty}
+              disabled={!dirty || dayMissing}
             >
               Save and Close
             </Button>
