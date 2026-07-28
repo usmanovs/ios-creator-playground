@@ -72,6 +72,7 @@ export default function InstructorPage() {
   const [ready, setReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [homework, setHomework] = useState<Record<number, string>>({});
   const [preClass, setPreClass] = useState<Record<number, string>>({});
