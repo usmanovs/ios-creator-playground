@@ -45,6 +45,23 @@ type Lesson = {
   status: string;
   covered: boolean;
 };
+type Note = {
+  id: string;
+  title: string;
+  day_number: number | null;
+  schedule_order: number;
+  covered: boolean;
+};
+type BoardItem = {
+  id: string;
+  kind: "lesson" | "note";
+  title: string;
+  day_number: number | null;
+  sort: number;
+  covered: boolean;
+  chapter_id: string | null;
+  status: string;
+};
 type Chapter = { id: string; title: string };
 
 const DAYS = [1, 2, 3, 4, 5, 6, 7] as const;
