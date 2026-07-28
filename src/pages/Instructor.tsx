@@ -326,48 +326,49 @@ export default function InstructorPage() {
   const chapterTitle = (id: string | null) =>
     chapters.find((c) => c.id === id)?.title ?? "—";
 
-  const columnOf = (l: Lesson): ColumnId =>
-    l.day_number ? (`d${l.day_number}` as ColumnId) : "unassigned";
+  const columnOfDay = (day: number | null): ColumnId =>
+    day ? (`d${day}` as ColumnId) : "unassigned";
+
+  const items = useMemo<BoardItem[]>(() => {
+    const lessonItems: BoardItem[] = lessons.map((l) => ({
+      id: l.id,
+      kind: "lesson",
+      title: l.title,
+      day_number: l.day_number,
+      sort: l.schedule_order ?? l.order_index,
+      covered: l.covered,
+      chapter_id: l.chapter_id,
+      status: l.status,
+    }));
+    const noteItems: BoardItem[] = notes.map((n) => ({
+      id: n.id,
+      kind: "note",
+      title: n.title,
+      day_number: n.day_number,
+      sort: n.schedule_order,
+      covered: n.covered,
+      chapter_id: null,
+      status: "note",
+    }));
+    return [...lessonItems, ...noteItems];
+  }, [lessons, notes]);
 
   const grouped = useMemo(() => {
-    const map: Record<ColumnId, Lesson[]> = { unassigned: [] } as any;
+    const map: Record<ColumnId, BoardItem[]> = { unassigned: [] } as any;
     DAYS.forEach((d) => (map[`d${d}` as ColumnId] = []));
-    for (const l of lessons) map[columnOf(l)].push(l);
-    // preserve schedule_order within each column (fallback to order_index)
-    (Object.keys(map) as ColumnId[]).forEach((k) =>
-      map[k].sort((a, b) => (a.schedule_order ?? a.order_index) - (b.schedule_order ?? b.order_index))
-    );
+    for (const it of items) map[columnOfDay(it.day_number)].push(it);
+    (Object.keys(map) as ColumnId[]).forEach((k) => map[k].sort((a, b) => a.sort - b.sort));
     return map;
-  }, [lessons]);
+  }, [items]);
 
-  const activeLesson = activeId ? lessons.find((l) => l.id === activeId) : null;
+  const activeItem = activeId ? items.find((i) => i.id === activeId) ?? null : null;
 
   const findColumn = (id: string): ColumnId | null => {
-    if (id.endsWith(":top")) {
-      const columnId = id.replace(":top", "");
-      return findColumn(columnId);
-    }
-    if (id === "unassigned" || id.startsWith("d")) {
-      // could be column id itself
-      if (id === "unassigned") return "unassigned";
-      if (/^d[1-7]$/.test(id)) return id as ColumnId;
-    }
-    const l = lessons.find((x) => x.id === id);
-    return l ? columnOf(l) : null;
-  };
-
-  const persist = async (updates: { id: string; day_number: number | null; schedule_order: number }[]) => {
-    // update each row; run in parallel
-    const results = await Promise.all(
-      updates.map((u) =>
-        supabase
-          .from("lessons")
-          .update({ day_number: u.day_number, schedule_order: u.schedule_order })
-          .eq("id", u.id)
-      )
-    );
-    const err = results.find((r) => r.error)?.error;
-    if (err) toast.error(err.message);
+    if (id.endsWith(":top")) return findColumn(id.replace(":top", ""));
+    if (id === "unassigned") return "unassigned";
+    if (/^d[1-7]$/.test(id)) return id as ColumnId;
+    const it = items.find((x) => x.id === id);
+    return it ? columnOfDay(it.day_number) : null;
   };
 
   const onDragEnd = async (e: DragEndEvent) => {
@@ -385,15 +386,16 @@ export default function InstructorPage() {
     const insertAtTop = overData.position === "start" || overIdStr.endsWith(":top");
     if (!fromCol || !toCol) return;
 
-    const prev = lessons;
+    const prevLessons = lessons;
+    const prevNotes = notes;
     const fromList = [...grouped[fromCol]];
     const toList = fromCol === toCol ? fromList : [...grouped[toCol]];
 
     const activeIdx = fromList.findIndex((l) => l.id === activeIdStr);
     if (activeIdx === -1) return;
 
-    let newToList: Lesson[];
-    let newFromList: Lesson[] = fromList;
+    let newToList: BoardItem[];
+    let newFromList: BoardItem[] = fromList;
 
     if (fromCol === toCol) {
       const overIdx =
@@ -428,13 +430,13 @@ export default function InstructorPage() {
       (k, i) => (colBase[k] = i * 1000)
     );
 
-    const updates: { id: string; day_number: number | null; schedule_order: number }[] = [];
-    const applyList = (col: ColumnId, list: Lesson[]) => {
+    const updates: { id: string; kind: "lesson" | "note"; day_number: number | null; schedule_order: number }[] = [];
+    const applyList = (col: ColumnId, list: BoardItem[]) => {
       list.forEach((l, i) => {
         const day = col === "unassigned" ? null : Number(col.replace("d", ""));
         const schedule_order = colBase[col] + i;
-        if (l.day_number !== day || l.schedule_order !== schedule_order) {
-          updates.push({ id: l.id, day_number: day, schedule_order });
+        if (l.day_number !== day || l.sort !== schedule_order) {
+          updates.push({ id: l.id, kind: l.kind, day_number: day, schedule_order });
         }
       });
     };
@@ -442,29 +444,43 @@ export default function InstructorPage() {
     if (fromCol !== toCol) applyList(fromCol, newFromList);
 
     // Optimistic update
-    const byId = new Map(lessons.map((l) => [l.id, l]));
-    updates.forEach((u) => {
-      const cur = byId.get(u.id);
-      if (cur) byId.set(u.id, { ...cur, day_number: u.day_number, schedule_order: u.schedule_order });
-    });
-    setLessons(Array.from(byId.values()));
-
-    const { error } = await (async () => {
-      const results = await Promise.all(
-        updates.map((u) =>
-          supabase
-            .from("lessons")
-            .update({ day_number: u.day_number, schedule_order: u.schedule_order })
-            .eq("id", u.id)
-        )
+    const lessonUpdates = updates.filter((u) => u.kind === "lesson");
+    const noteUpdates = updates.filter((u) => u.kind === "note");
+    if (lessonUpdates.length) {
+      const byId = new Map(lessonUpdates.map((u) => [u.id, u]));
+      setLessons((ls) =>
+        ls.map((l) => {
+          const u = byId.get(l.id);
+          return u ? { ...l, day_number: u.day_number, schedule_order: u.schedule_order } : l;
+        })
       );
-      return { error: results.find((r) => r.error)?.error };
-    })();
+    }
+    if (noteUpdates.length) {
+      const byId = new Map(noteUpdates.map((u) => [u.id, u]));
+      setNotes((ns) =>
+        ns.map((n) => {
+          const u = byId.get(n.id);
+          return u ? { ...n, day_number: u.day_number, schedule_order: u.schedule_order } : n;
+        })
+      );
+    }
+
+    const results = await Promise.all(
+      updates.map((u) =>
+        supabase
+          .from(u.kind === "note" ? "instructor_notes" : "lessons")
+          .update({ day_number: u.day_number, schedule_order: u.schedule_order })
+          .eq("id", u.id)
+      )
+    );
+    const error = results.find((r) => r.error)?.error;
     if (error) {
       toast.error(error.message);
-      setLessons(prev);
+      setLessons(prevLessons);
+      setNotes(prevNotes);
     }
   };
+
 
   if (!ready) return <div className="p-10 text-foreground/60">Loading…</div>;
   if (!isAdmin)
