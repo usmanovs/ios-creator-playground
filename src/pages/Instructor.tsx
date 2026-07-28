@@ -214,17 +214,62 @@ export default function InstructorPage() {
     }
   }, [completed]);
 
-  const toggleCovered = useCallback(async (lessonId: string) => {
-    const current = lessons.find((l) => l.id === lessonId);
+  const toggleCovered = useCallback(async (itemId: string, kind: "lesson" | "note") => {
+    if (kind === "note") {
+      const current = notes.find((n) => n.id === itemId);
+      if (!current) return;
+      const next = !current.covered;
+      setNotes((ns) => ns.map((n) => (n.id === itemId ? { ...n, covered: next } : n)));
+      const { error } = await supabase.from("instructor_notes").update({ covered: next }).eq("id", itemId);
+      if (error) {
+        toast.error(error.message);
+        setNotes((ns) => ns.map((n) => (n.id === itemId ? { ...n, covered: !next } : n)));
+      }
+      return;
+    }
+    const current = lessons.find((l) => l.id === itemId);
     if (!current) return;
     const next = !current.covered;
-    setLessons((ls) => ls.map((l) => (l.id === lessonId ? { ...l, covered: next } : l)));
-    const { error } = await supabase.from("lessons").update({ covered: next }).eq("id", lessonId);
+    setLessons((ls) => ls.map((l) => (l.id === itemId ? { ...l, covered: next } : l)));
+    const { error } = await supabase.from("lessons").update({ covered: next }).eq("id", itemId);
     if (error) {
       toast.error(error.message);
-      setLessons((ls) => ls.map((l) => (l.id === lessonId ? { ...l, covered: !next } : l)));
+      setLessons((ls) => ls.map((l) => (l.id === itemId ? { ...l, covered: !next } : l)));
     }
-  }, [lessons]);
+  }, [lessons, notes]);
+
+  const addNote = useCallback(async (day: number | null) => {
+    const maxOrder = notes
+      .filter((n) => n.day_number === day)
+      .reduce((m, n) => Math.max(m, n.schedule_order), 0);
+    const { data, error } = await supabase
+      .from("instructor_notes")
+      .insert({ title: "New note", day_number: day, schedule_order: maxOrder + 1 })
+      .select("id,title,day_number,schedule_order,covered")
+      .maybeSingle();
+    if (error || !data) {
+      toast.error(error?.message ?? "Could not add note");
+      return;
+    }
+    setNotes((ns) => [...ns, data as Note]);
+  }, [notes]);
+
+  const updateNoteTitle = useCallback(async (id: string, title: string) => {
+    setNotes((ns) => ns.map((n) => (n.id === id ? { ...n, title } : n)));
+    const { error } = await supabase.from("instructor_notes").update({ title }).eq("id", id);
+    if (error) toast.error(error.message);
+  }, []);
+
+  const deleteNote = useCallback(async (id: string) => {
+    const prev = notes;
+    setNotes((ns) => ns.filter((n) => n.id !== id));
+    const { error } = await supabase.from("instructor_notes").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      setNotes(prev);
+    }
+  }, [notes]);
+
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
