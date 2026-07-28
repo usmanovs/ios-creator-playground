@@ -489,6 +489,41 @@ export default function InstructorPage() {
     }
   };
 
+  const saveStartDate = useCallback(async (d: Date | undefined) => {
+    if (!courseId || !d) return;
+    const value = toDateOnly(d);
+    const prev = startDate;
+    setStartDate(value);
+    const { error } = await supabase.from("courses").update({ start_date: value } as any).eq("id", courseId);
+    if (error) {
+      toast.error(error.message);
+      setStartDate(prev);
+    } else {
+      toast.success("Day 1 date saved");
+    }
+  }, [courseId, startDate]);
+
+  const day1 = parseDateOnly(startDate);
+  const dayDates = useMemo(
+    () => (day1 ? classDates(day1, DAYS.length) : null),
+    [startDate],
+  );
+
+  const stats = useMemo(() => {
+    const scheduled = [
+      ...lessons.filter((l) => l.day_number != null),
+      ...notes.filter((n) => n.day_number != null),
+    ];
+    const total = scheduled.length;
+    const covered = scheduled.filter((i) => i.covered).length;
+    const pct = total ? Math.round((covered / total) * 100) : 0;
+    const daysDone = DAYS.filter((d) => completed[d]).length;
+    const nextDayIndex = DAYS.findIndex((d) => !completed[d]);
+    const nextDate =
+      dayDates && nextDayIndex >= 0 ? dayDates[nextDayIndex] : null;
+    return { total, covered, pct, daysDone, nextDayIndex, nextDate };
+  }, [lessons, notes, completed, dayDates]);
+
 
   if (!ready) return <div className="p-10 text-foreground/60">Loading…</div>;
   if (!isAdmin)
