@@ -83,6 +83,7 @@ export default function InstructorPage() {
   const [preClass2, setPreClass2] = useState<Record<number, string>>({});
   const [preClassEditMode, setPreClassEditMode] = useState<Record<number, { 1: boolean; 2: boolean }>>({});
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
+  const [expandedOverride, setExpandedOverride] = useState<Record<number, boolean>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
   const [courseId, setCourseId] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string | null>(null);
@@ -216,6 +217,8 @@ export default function InstructorPage() {
     const dayNoteIds = notes.filter((n) => n.day_number === day).map((n) => n.id);
 
     setCompleted((c) => ({ ...c, [day]: next }));
+    // Completing a day collapses it; re-opening a day clears any manual override.
+    setExpandedOverride((prev) => ({ ...prev, [day]: false }));
     // Marking a day complete implies every item scheduled that day was covered.
     setLessons((ls) => ls.map((l) => (l.day_number === day ? { ...l, covered: next } : l)));
     setNotes((ns) => ns.map((n) => (n.day_number === day ? { ...n, covered: next } : n)));
@@ -413,6 +416,10 @@ export default function InstructorPage() {
     const toCol = overContainer ?? explicitColumn ?? findColumn(overIdStr);
     const insertAtTop = overData.position === "start" || overIdStr.endsWith(":top");
     if (!fromCol || !toCol) return;
+    if (toCol !== "unassigned") {
+      const targetDay = Number(toCol.replace("d", ""));
+      setExpandedOverride((prev) => (prev[targetDay] ? prev : { ...prev, [targetDay]: true }));
+    }
 
     const prevLessons = lessons;
     const prevNotes = notes;
@@ -665,7 +672,9 @@ export default function InstructorPage() {
           onDragCancel={() => setActiveId(null)}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-            {DAYS.map((d, i) => (
+            {DAYS.map((d) => ({ d, i: DAYS.indexOf(d) }))
+              .sort((a, b) => Number(completed[a.d] ?? false) - Number(completed[b.d] ?? false))
+              .map(({ d, i }) => (
               <DayColumn
                 key={d}
                 id={`d${d}`}
@@ -693,6 +702,10 @@ export default function InstructorPage() {
                 homeworkSaving={savingDay === d}
                 completed={completed[d] ?? false}
                 onToggleCompleted={() => toggleCompleted(d)}
+                collapsed={(completed[d] ?? false) && !expandedOverride[d]}
+                onToggleCollapsed={() =>
+                  setExpandedOverride((prev) => ({ ...prev, [d]: !prev[d] }))
+                }
               />
             ))}
             <DayColumn
@@ -954,6 +967,8 @@ function DayColumn({
   homeworkSaving,
   completed,
   onToggleCompleted,
+  collapsed,
+  onToggleCollapsed,
 }: {
   id: string;
   label: string;
@@ -980,6 +995,8 @@ function DayColumn({
   homeworkSaving?: boolean;
   completed?: boolean;
   onToggleCompleted?: () => void;
+  collapsed?: boolean;
+  onToggleCollapsed?: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id, data: { columnId: id } });
   const { setNodeRef: setTopDropRef, isOver: isTopOver } = useDroppable({
@@ -1029,23 +1046,34 @@ function DayColumn({
 
   return (
     <div
-      className={`glass-card rounded-2xl p-3 min-h-[300px] transition-colors ${
+      ref={collapsed ? setNodeRef : undefined}
+      className={`glass-card rounded-2xl p-3 transition-colors ${collapsed ? "min-h-0 self-start" : "min-h-[300px]"} ${
         isOver ? "ring-2 ring-primary/60 bg-primary/5" : ""
       } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""} ${
         isToday && !completed ? "ring-2 ring-primary/50" : ""
       }`}
     >
-      <div className="flex items-center justify-between mb-3 px-1">
-        <div className="min-w-0">
-          <div className="font-display font-bold flex items-center gap-2">
-            {label}
-            {isToday && (
-              <span className="px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-semibold uppercase">
-                Today
-              </span>
-            )}
+      <div className={`flex items-center justify-between px-1 ${collapsed ? "" : "mb-3"}`}>
+        <div
+          className={`min-w-0 flex items-center gap-2 ${onToggleCollapsed ? "cursor-pointer" : ""}`}
+          onClick={onToggleCollapsed}
+        >
+          {onToggleCollapsed && (
+            <span className="text-foreground/50">
+              {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            </span>
+          )}
+          <div className="min-w-0">
+            <div className="font-display font-bold flex items-center gap-2">
+              {label}
+              {isToday && (
+                <span className="px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-semibold uppercase">
+                  Today
+                </span>
+              )}
+            </div>
+            {dateLabel && <div className="text-[11px] text-foreground/50">{dateLabel}</div>}
           </div>
-          {dateLabel && <div className="text-[11px] text-foreground/50">{dateLabel}</div>}
         </div>
         <div className="flex items-center gap-2">
           {showComplete && (
@@ -1065,42 +1093,46 @@ function DayColumn({
           <div className="text-xs text-foreground/50">{items.length}</div>
         </div>
       </div>
-      {typeof onPreClassChange === "function" && (
-        <PreClassField
-          label="Pre-class message 1"
-          value={preClass ?? ""}
-          isEditing={preClassEditMode ?? false}
-          onToggleEdit={onTogglePreClassEditMode!}
-          onChange={onPreClassChange!}
-          saving={homeworkSaving ?? false}
-          placeholder="Message to send to students before class…"
-        />
-      )}
-      {typeof onPreClass2Change === "function" && (
-        <PreClassField
-          label="Pre-class message 2"
-          value={preClass2 ?? ""}
-          isEditing={preClass2EditMode ?? false}
-          onToggleEdit={onTogglePreClass2EditMode!}
-          onChange={onPreClass2Change!}
-          saving={homeworkSaving ?? false}
-          placeholder="Second message to send to students before class…"
-        />
-      )}
-      {typeof onPreClassChange === "function" ? (
-        <div className="mt-3 pt-3 border-t border-border/60">{list}</div>
-      ) : (
-        list
-      )}
-      {showHomework && (
-        <div className="mt-3 pt-3 border-t border-border/60">
-          <HomeworkField
-            value={homework ?? ""}
-            onChange={onHomeworkChange!}
-            saving={homeworkSaving ?? false}
-            placeholder="Add homework for this day…"
-          />
-        </div>
+      {!collapsed && (
+        <>
+          {typeof onPreClassChange === "function" && (
+            <PreClassField
+              label="Pre-class message 1"
+              value={preClass ?? ""}
+              isEditing={preClassEditMode ?? false}
+              onToggleEdit={onTogglePreClassEditMode!}
+              onChange={onPreClassChange!}
+              saving={homeworkSaving ?? false}
+              placeholder="Message to send to students before class…"
+            />
+          )}
+          {typeof onPreClass2Change === "function" && (
+            <PreClassField
+              label="Pre-class message 2"
+              value={preClass2 ?? ""}
+              isEditing={preClass2EditMode ?? false}
+              onToggleEdit={onTogglePreClass2EditMode!}
+              onChange={onPreClass2Change!}
+              saving={homeworkSaving ?? false}
+              placeholder="Second message to send to students before class…"
+            />
+          )}
+          {typeof onPreClassChange === "function" ? (
+            <div className="mt-3 pt-3 border-t border-border/60">{list}</div>
+          ) : (
+            list
+          )}
+          {showHomework && (
+            <div className="mt-3 pt-3 border-t border-border/60">
+              <HomeworkField
+                value={homework ?? ""}
+                onChange={onHomeworkChange!}
+                saving={homeworkSaving ?? false}
+                placeholder="Add homework for this day…"
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
