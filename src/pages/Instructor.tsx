@@ -967,6 +967,8 @@ function DayColumn({
   homeworkSaving,
   completed,
   onToggleCompleted,
+  collapsed,
+  onToggleCollapsed,
 }: {
   id: string;
   label: string;
