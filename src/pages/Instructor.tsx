@@ -932,6 +932,8 @@ function DayColumn({
 }: {
   id: string;
   label: string;
+  dateLabel?: string;
+  isToday?: boolean;
   items: BoardItem[];
   chapterTitle: (id: string | null) => string;
   onPreview: (id: string) => void;
