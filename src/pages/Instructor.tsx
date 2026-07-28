@@ -413,6 +413,10 @@ export default function InstructorPage() {
     const toCol = overContainer ?? explicitColumn ?? findColumn(overIdStr);
     const insertAtTop = overData.position === "start" || overIdStr.endsWith(":top");
     if (!fromCol || !toCol) return;
+    if (toCol !== "unassigned") {
+      const targetDay = Number(toCol.replace("d", ""));
+      setExpandedOverride((prev) => (prev[targetDay] ? prev : { ...prev, [targetDay]: true }));
+    }
 
     const prevLessons = lessons;
     const prevNotes = notes;
