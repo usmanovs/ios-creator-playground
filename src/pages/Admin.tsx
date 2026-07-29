@@ -191,6 +191,20 @@ export default function AdminPage() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  // Drag state (overlay + rollback snapshot)
+  const dragSnapshot = useRef<Lesson[] | null>(null);
+  const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
+  const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
+
+  const dropAnimation: DropAnimation = {
+    duration: 200,
+    easing: "cubic-bezier(0.2, 0, 0, 1)",
+    sideEffects: defaultDropAnimationSideEffects({
+      styles: { active: { opacity: "0.4" } },
+    }),
+  };
+
+
   if (!ready) return <div className="p-10 text-foreground/60">Loading…</div>;
   if (!isAdmin)
     return (
