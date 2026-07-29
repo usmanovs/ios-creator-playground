@@ -437,9 +437,80 @@ export default function AdminPage() {
     return prioritize(closestCenter(args));
   };
 
-  const onDndEnd = (e: DragEndEvent) => {
+  // Resolves the drop target (chapter + index) from the current `over` element.
+  const resolveTarget = (
+    over: { id: string | number; data: { current?: any } },
+    all: Lesson[],
+    activeId: string
+  ): { toChapterId: string; toIndex: number } | null => {
+    const overData = over.data.current as any;
+    const listLen = (chapterId: string) =>
+      all.filter((l) => l.chapter_id === chapterId && l.id !== activeId).length;
+
+    if (overData?.type === "chapter-droppable") {
+      return { toChapterId: overData.chapterId, toIndex: listLen(overData.chapterId) };
+    }
+    if (overData?.type === "chapter") {
+      return { toChapterId: String(over.id), toIndex: listLen(String(over.id)) };
+    }
+    if (overData?.type === "lesson" && overData?.sortable?.containerId) {
+      const toChapterId = String(overData.sortable.containerId);
+      const peers = all
+        .filter((l) => l.chapter_id === toChapterId)
+        .sort((a, b) => a.order_index - b.order_index);
+      const idx = peers.findIndex((l) => l.id === over.id);
+      return { toChapterId, toIndex: idx === -1 ? peers.length : idx };
+    }
+    const overChapter = chapters.find((c) => c.id === over.id);
+    if (overChapter) {
+      return { toChapterId: overChapter.id, toIndex: listLen(overChapter.id) };
+    }
+    return null;
+  };
+
+  const onDndStart = (e: DragStartEvent) => {
+    const type = (e.active.data.current as any)?.type;
+    dragSnapshot.current = lessons;
+    if (type === "lesson") {
+      setActiveLesson(lessons.find((l) => l.id === e.active.id) ?? null);
+    } else {
+      setActiveChapter(chapters.find((c) => c.id === e.active.id) ?? null);
+    }
+  };
+
+  // Live preview: move the lesson in local state as it hovers over targets.
+  const onDndOver = (e: DragOverEvent) => {
     const { active, over } = e;
     if (!over) return;
+    if ((active.data.current as any)?.type !== "lesson") return;
+    if (String(active.id) === String(over.id)) return;
+    setLessons((all) => {
+      const target = resolveTarget(over as any, all, String(active.id));
+      if (!target) return all;
+      return computeMove(all, String(active.id), target.toChapterId, target.toIndex);
+    });
+  };
+
+  const clearDrag = () => {
+    setActiveLesson(null);
+    setActiveChapter(null);
+  };
+
+  const onDndCancel = () => {
+    if (dragSnapshot.current) setLessons(dragSnapshot.current);
+    dragSnapshot.current = null;
+    clearDrag();
+  };
+
+  const onDndEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    clearDrag();
+    const snapshot = dragSnapshot.current;
+    dragSnapshot.current = null;
+    if (!over) {
+      if (snapshot) setLessons(snapshot);
+      return;
+    }
     const activeType = (active.data.current as any)?.type;
 
     // Chapter reorder
@@ -456,43 +527,18 @@ export default function AdminPage() {
       return;
     }
 
-    // Lesson move / reorder
-    const activeLesson = lessons.find((l) => l.id === active.id);
-    if (!activeLesson) return;
-
-    let toChapterId: string | null = null;
-    let toIndex = 0;
-
-    const overData = over.data.current as any;
-    if (overData?.type === "chapter-droppable") {
-      toChapterId = overData.chapterId;
-      toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
-    } else if (overData?.type === "chapter") {
-      toChapterId = String(over.id);
-      toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
-    } else if (overData?.type === "lesson" && overData?.sortable?.containerId) {
-      toChapterId = String(overData.sortable.containerId);
-      const peers = lessons
-        .filter((l) => l.chapter_id === toChapterId)
-        .sort((a, b) => a.order_index - b.order_index);
-      const idx = peers.findIndex((l) => l.id === over.id);
-      toIndex = idx === -1 ? peers.length : idx;
-    } else {
-      // over a chapter card itself
-      const overChapter = chapters.find((c) => c.id === over.id);
-      if (overChapter) {
-        toChapterId = overChapter.id;
-        toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
-      }
-    }
-    if (!toChapterId) return;
-    if (
-      toChapterId === activeLesson.chapter_id &&
-      String(active.id) === String(over.id)
-    )
-      return;
-    moveLesson(String(active.id), toChapterId, toIndex);
+    // Lesson: state already reflects the preview from onDragOver — just settle & persist.
+    if (!snapshot) return;
+    setLessons((all) => {
+      const target = resolveTarget(over as any, all, String(active.id));
+      const next = target
+        ? computeMove(all, String(active.id), target.toChapterId, target.toIndex)
+        : all;
+      persistMove(snapshot, next, String(active.id));
+      return next;
+    });
   };
+
 
   const totalLessons = lessons.length;
   const publishedLessons = lessons.filter((l) => l.status === "published").length;
