@@ -673,7 +673,16 @@ export default function AdminPage() {
               onCta={addChapter}
             />
           ) : (
-            <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={onDndEnd}>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={collisionDetection}
+              autoScroll={{ threshold: { x: 0, y: 0.2 }, acceleration: 8 }}
+              onDragStart={onDndStart}
+              onDragOver={onDndOver}
+              onDragCancel={onDndCancel}
+              onDragEnd={onDndEnd}
+            >
+
               <SortableContext items={chapters.map((c) => c.id)} strategy={verticalListSortingStrategy}>
                 <div className="space-y-4">
                   {chapters.map((ch) => {
