@@ -1,28 +1,24 @@
 ## Goal
 
-On the instructor board (`/instructor`), when a day is marked **Done**, it should shrink to a slim collapsed card and move out of the way so the remaining (upcoming) days shift up into view.
+Make dragging a lesson from one chapter to another on `/admin` feel smooth and predictable: you see exactly where the lesson will land while dragging, instead of only finding out after you drop.
 
-## Behavior
+## What changes
 
-1. **Auto-collapse on complete** — clicking "Complete" collapses that day's card immediately; un-marking it expands it again.
-2. **Collapsed card shows a compact summary only**: `Day N`, its date, a green "Done" badge, item count, and a chevron. Pre-class messages, lesson list, and homework are hidden.
-3. **Manual override** — clicking the collapsed card's header (or chevron) expands it back for review without changing its Done status. Expanding a completed day is remembered per day for the session.
-4. **Completed days move to the end** — the grid renders incomplete days first (in Day order), then completed days (in Day order), then Unassigned. So the next class day is always top-left.
-5. **Drag-and-drop stays intact** — a collapsed day still accepts drops; dropping onto it auto-expands it so you can see where the item landed.
+1. **Live preview while dragging.** Today items only move on drop, so cross-chapter drags feel like a guess. Add an `onDragOver` handler that moves the dragged lesson into the hovered chapter's list in local state as you hover, so the target list opens a gap and the source list closes up in real time.
 
-```text
-Before                          After Day 1 & 2 completed
-[Day1 full][Day2 full][Day3]    [Day3 full][Day4 full][Day5 full]
-[Day4    ][Day5    ][Day6]      [Day6 full][Day7 full][Unassigned]
-[Day7    ][Unassigned  ]        [Day1 ✓ collapsed][Day2 ✓ collapsed]
-```
+2. **Floating drag preview.** Add a `DragOverlay` that renders the lesson row (and chapter card) following the cursor, instead of the current "ghost at 50% opacity stuck in place". Original row renders as a faint placeholder gap.
+
+3. **Save once, on drop.** With the live preview handling visuals, `onDragEnd` only persists the final result. Replace the current sequential per-row `await supabase.update(...)` loop with a single batched `upsert` of the touched rows, so the board doesn't stutter after drop. Keep the existing rollback-on-error behavior.
+
+4. **Collapsed chapters.** Hovering a collapsed chapter for a moment auto-expands it so you can drop at a precise position rather than only appending to the end.
+
+5. **Motion polish.** Enable dnd-kit's auto-scroll with a gentler threshold for long chapter lists, add a `dropAnimation` so the card settles into place, and keep sortable transitions on so neighbors slide rather than jump.
 
 ## Technical notes
 
-All changes are in `src/pages/Instructor.tsx` (presentation only — no schema or data changes):
+All changes are in `src/pages/Admin.tsx`, `src/components/admin/SortableChapter.tsx`, and `src/components/admin/SortableLesson.tsx` (presentation/interaction only, no schema change):
 
-- Add `collapsedOverride: Record<number, boolean>` state; effective collapsed = `completed[d] && !collapsedOverride[d]`.
-- Pass `collapsed` + `onToggleCollapsed` into `DayColumn`; when `collapsed`, render only the header row (plus the droppable ref so drops still register) and skip `PreClassField`, the sortable list, and `HomeworkField`.
-- Reduce `min-h-[300px]` to `min-h-0` for collapsed cards so the grid reflows tightly.
-- Sort the `DAYS.map` render order by `completed` flag before mapping, keeping the same `DayColumn` props.
-- In `onDragEnd` (and on `isOver`), clear the override for the target day so a collapsed completed day opens when something is dropped into it.
+- `Admin.tsx`: add `activeDrag` state, `onDragStart`/`onDragOver`/`onDragCancel` to `DndContext`; `onDragOver` computes target chapter + index using the existing `collisionDetection` output and updates `lessons` optimistically (chapter_id + order_index) without touching the DB. Keep a snapshot of `lessons` at drag start for cancel/rollback.
+- `moveLesson` is split: a pure `computeMove(lessons, lessonId, toChapterId, toIndex)` used by both `onDragOver` and `onDragEnd`, plus a `persistMove` that diffs against the drag-start snapshot and does one `supabase.from("lessons").upsert(rows)`.
+- `SortableLesson.tsx`: extract the row markup so the same visual can render inside `DragOverlay`; use `isDragging ? opacity-30 border-dashed` for the placeholder.
+- `SortableChapter.tsx`: on `isOver` while collapsed, start a ~500ms timer that calls `setOpen(true)`; clear on leave.

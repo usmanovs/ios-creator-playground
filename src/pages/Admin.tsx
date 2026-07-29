@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DndContext,
+  DragOverlay,
   closestCenter,
   pointerWithin,
   rectIntersection,
@@ -11,7 +12,12 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+  defaultDropAnimationSideEffects,
+  type DropAnimation,
 } from "@dnd-kit/core";
+
 import {
   SortableContext,
   sortableKeyboardCoordinates,
@@ -26,6 +32,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { ExternalLink, LogOut, Plus, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 import SortableChapter from "@/components/admin/SortableChapter";
+import { LessonRow } from "@/components/admin/SortableLesson";
+
 import LessonEditor, { EditableLesson } from "@/components/admin/LessonEditor";
 import AdminsPanel from "@/components/admin/AdminsPanel";
 
@@ -185,6 +193,20 @@ export default function AdminPage() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  // Drag state (overlay + rollback snapshot)
+  const dragSnapshot = useRef<Lesson[] | null>(null);
+  const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
+  const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
+
+  const dropAnimation: DropAnimation = {
+    duration: 200,
+    easing: "cubic-bezier(0.2, 0, 0, 1)",
+    sideEffects: defaultDropAnimationSideEffects({
+      styles: { active: { opacity: "0.4" } },
+    }),
+  };
+
+
   if (!ready) return <div className="p-10 text-foreground/60">Loading…</div>;
   if (!isAdmin)
     return (
@@ -316,45 +338,47 @@ export default function AdminPage() {
     toast.success("Lesson deleted");
   };
 
-  const moveLesson = async (
+  // Pure: returns the next lessons array after moving a lesson. No side effects.
+  const computeMove = (
+    all: Lesson[],
     lessonId: string,
     toChapterId: string,
     toIndex: number
-  ) => {
-    const src = lessons.find((l) => l.id === lessonId);
-    if (!src) return;
-    const fromChapterId = src.chapter_id;
-    const prev = lessons;
+  ): Lesson[] => {
+    const src = all.find((l) => l.id === lessonId);
+    if (!src) return all;
 
-    let nextLessons: Lesson[];
-    if (fromChapterId === toChapterId) {
-      const peers = lessons
+    if (src.chapter_id === toChapterId) {
+      const peers = all
         .filter((l) => l.chapter_id === toChapterId)
         .sort((a, b) => a.order_index - b.order_index);
       const oldIdx = peers.findIndex((l) => l.id === lessonId);
-      if (oldIdx === -1) return;
-      const reordered = arrayMove(peers, oldIdx, toIndex).map((l, i) => ({
+      if (oldIdx === -1) return all;
+      const clamped = Math.max(0, Math.min(toIndex, peers.length - 1));
+      if (clamped === oldIdx) return all;
+      const reordered = arrayMove(peers, oldIdx, clamped).map((l, i) => ({
         ...l,
         order_index: i * 10,
       }));
-      const others = lessons.filter((l) => l.chapter_id !== toChapterId);
-      nextLessons = [...others, ...reordered];
-    } else {
-      const target = lessons
-        .filter((l) => l.chapter_id === toChapterId && l.id !== lessonId)
-        .sort((a, b) => a.order_index - b.order_index);
-      const moved = { ...src, chapter_id: toChapterId };
-      target.splice(Math.max(0, Math.min(toIndex, target.length)), 0, moved);
-      const reorderedTarget = target.map((l, i) => ({ ...l, order_index: i * 10 }));
-      const others = lessons.filter(
-        (l) => l.chapter_id !== toChapterId && l.id !== lessonId
-      );
-      nextLessons = [...others, ...reorderedTarget];
+      const others = all.filter((l) => l.chapter_id !== toChapterId);
+      return [...others, ...reordered];
     }
 
-    setLessons(nextLessons);
+    const target = all
+      .filter((l) => l.chapter_id === toChapterId && l.id !== lessonId)
+      .sort((a, b) => a.order_index - b.order_index);
+    const moved = { ...src, chapter_id: toChapterId };
+    target.splice(Math.max(0, Math.min(toIndex, target.length)), 0, moved);
+    const reorderedTarget = target.map((l, i) => ({ ...l, order_index: i * 10 }));
+    const others = all.filter(
+      (l) => l.chapter_id !== toChapterId && l.id !== lessonId
+    );
+    return [...others, ...reorderedTarget];
+  };
 
-    const touched = nextLessons.filter((l) => {
+  // Persists whatever differs between the drag-start snapshot and the current state.
+  const persistMove = async (prev: Lesson[], next: Lesson[], lessonId: string) => {
+    const touched = next.filter((l) => {
       const before = prev.find((x) => x.id === l.id);
       return (
         !before ||
@@ -362,32 +386,35 @@ export default function AdminPage() {
         before.chapter_id !== l.chapter_id
       );
     });
-    const { error } = await (async () => {
-      for (const l of touched) {
-        const { error } = await supabase
+    if (touched.length === 0) return;
+
+    const results = await Promise.all(
+      touched.map((l) =>
+        supabase
           .from("lessons")
           .update({ order_index: l.order_index, chapter_id: l.chapter_id })
-          .eq("id", l.id);
-        if (error) return { error };
-      }
-      return { error: null as any };
-    })();
-    if (error) {
-      toast.error(error.message);
+          .eq("id", l.id)
+      )
+    );
+    const failed = results.find((r) => r.error);
+    if (failed?.error) {
+      toast.error(failed.error.message);
       setLessons(prev);
       return;
     }
-    if (fromChapterId !== toChapterId) {
+
+    const src = next.find((l) => l.id === lessonId);
+    const before = prev.find((l) => l.id === lessonId);
+    if (src && before && before.chapter_id !== src.chapter_id) {
       log("update", "lesson", lessonId, src.title, {
-        moved_to_chapter: toChapterId,
-        from_chapter: fromChapterId,
+        moved_to_chapter: src.chapter_id,
+        from_chapter: before.chapter_id,
       });
-    } else {
-      log("reorder", "lesson", null, "lessons", {
-        chapter_id: toChapterId,
-      });
+    } else if (src) {
+      log("reorder", "lesson", null, "lessons", { chapter_id: src.chapter_id });
     }
   };
+
 
   const saveLessonPatch = async (patch: Partial<Lesson>): Promise<void> => {
     if (!editingLesson) return;
@@ -432,9 +459,80 @@ export default function AdminPage() {
     return prioritize(closestCenter(args));
   };
 
-  const onDndEnd = (e: DragEndEvent) => {
+  // Resolves the drop target (chapter + index) from the current `over` element.
+  const resolveTarget = (
+    over: { id: string | number; data: { current?: any } },
+    all: Lesson[],
+    activeId: string
+  ): { toChapterId: string; toIndex: number } | null => {
+    const overData = over.data.current as any;
+    const listLen = (chapterId: string) =>
+      all.filter((l) => l.chapter_id === chapterId && l.id !== activeId).length;
+
+    if (overData?.type === "chapter-droppable") {
+      return { toChapterId: overData.chapterId, toIndex: listLen(overData.chapterId) };
+    }
+    if (overData?.type === "chapter") {
+      return { toChapterId: String(over.id), toIndex: listLen(String(over.id)) };
+    }
+    if (overData?.type === "lesson" && overData?.sortable?.containerId) {
+      const toChapterId = String(overData.sortable.containerId);
+      const peers = all
+        .filter((l) => l.chapter_id === toChapterId)
+        .sort((a, b) => a.order_index - b.order_index);
+      const idx = peers.findIndex((l) => l.id === over.id);
+      return { toChapterId, toIndex: idx === -1 ? peers.length : idx };
+    }
+    const overChapter = chapters.find((c) => c.id === over.id);
+    if (overChapter) {
+      return { toChapterId: overChapter.id, toIndex: listLen(overChapter.id) };
+    }
+    return null;
+  };
+
+  const onDndStart = (e: DragStartEvent) => {
+    const type = (e.active.data.current as any)?.type;
+    dragSnapshot.current = lessons;
+    if (type === "lesson") {
+      setActiveLesson(lessons.find((l) => l.id === e.active.id) ?? null);
+    } else {
+      setActiveChapter(chapters.find((c) => c.id === e.active.id) ?? null);
+    }
+  };
+
+  // Live preview: move the lesson in local state as it hovers over targets.
+  const onDndOver = (e: DragOverEvent) => {
     const { active, over } = e;
     if (!over) return;
+    if ((active.data.current as any)?.type !== "lesson") return;
+    if (String(active.id) === String(over.id)) return;
+    setLessons((all) => {
+      const target = resolveTarget(over as any, all, String(active.id));
+      if (!target) return all;
+      return computeMove(all, String(active.id), target.toChapterId, target.toIndex);
+    });
+  };
+
+  const clearDrag = () => {
+    setActiveLesson(null);
+    setActiveChapter(null);
+  };
+
+  const onDndCancel = () => {
+    if (dragSnapshot.current) setLessons(dragSnapshot.current);
+    dragSnapshot.current = null;
+    clearDrag();
+  };
+
+  const onDndEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    clearDrag();
+    const snapshot = dragSnapshot.current;
+    dragSnapshot.current = null;
+    if (!over) {
+      if (snapshot) setLessons(snapshot);
+      return;
+    }
     const activeType = (active.data.current as any)?.type;
 
     // Chapter reorder
@@ -451,43 +549,18 @@ export default function AdminPage() {
       return;
     }
 
-    // Lesson move / reorder
-    const activeLesson = lessons.find((l) => l.id === active.id);
-    if (!activeLesson) return;
-
-    let toChapterId: string | null = null;
-    let toIndex = 0;
-
-    const overData = over.data.current as any;
-    if (overData?.type === "chapter-droppable") {
-      toChapterId = overData.chapterId;
-      toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
-    } else if (overData?.type === "chapter") {
-      toChapterId = String(over.id);
-      toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
-    } else if (overData?.type === "lesson" && overData?.sortable?.containerId) {
-      toChapterId = String(overData.sortable.containerId);
-      const peers = lessons
-        .filter((l) => l.chapter_id === toChapterId)
-        .sort((a, b) => a.order_index - b.order_index);
-      const idx = peers.findIndex((l) => l.id === over.id);
-      toIndex = idx === -1 ? peers.length : idx;
-    } else {
-      // over a chapter card itself
-      const overChapter = chapters.find((c) => c.id === over.id);
-      if (overChapter) {
-        toChapterId = overChapter.id;
-        toIndex = lessons.filter((l) => l.chapter_id === toChapterId).length;
-      }
-    }
-    if (!toChapterId) return;
-    if (
-      toChapterId === activeLesson.chapter_id &&
-      String(active.id) === String(over.id)
-    )
-      return;
-    moveLesson(String(active.id), toChapterId, toIndex);
+    // Lesson: state already reflects the preview from onDragOver — just settle & persist.
+    if (!snapshot) return;
+    setLessons((all) => {
+      const target = resolveTarget(over as any, all, String(active.id));
+      const next = target
+        ? computeMove(all, String(active.id), target.toChapterId, target.toIndex)
+        : all;
+      persistMove(snapshot, next, String(active.id));
+      return next;
+    });
   };
+
 
   const totalLessons = lessons.length;
   const publishedLessons = lessons.filter((l) => l.status === "published").length;
@@ -602,7 +675,16 @@ export default function AdminPage() {
               onCta={addChapter}
             />
           ) : (
-            <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={onDndEnd}>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={collisionDetection}
+              autoScroll={{ threshold: { x: 0, y: 0.2 }, acceleration: 8 }}
+              onDragStart={onDndStart}
+              onDragOver={onDndOver}
+              onDragCancel={onDndCancel}
+              onDragEnd={onDndEnd}
+            >
+
               <SortableContext items={chapters.map((c) => c.id)} strategy={verticalListSortingStrategy}>
                 <div className="space-y-4">
                   {chapters.map((ch) => {
@@ -643,7 +725,17 @@ export default function AdminPage() {
                   })}
                 </div>
               </SortableContext>
+              <DragOverlay dropAnimation={dropAnimation}>
+                {activeLesson ? (
+                  <LessonRow lesson={activeLesson as any} overlay />
+                ) : activeChapter ? (
+                  <div className="glass-card rounded-2xl px-4 py-3 shadow-2xl ring-1 ring-primary/40">
+                    <span className="font-display text-lg font-bold">{activeChapter.title}</span>
+                  </div>
+                ) : null}
+              </DragOverlay>
             </DndContext>
+
           )}
         </section>
 
