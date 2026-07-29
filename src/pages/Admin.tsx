@@ -723,7 +723,17 @@ export default function AdminPage() {
                   })}
                 </div>
               </SortableContext>
+              <DragOverlay dropAnimation={dropAnimation}>
+                {activeLesson ? (
+                  <LessonRow lesson={activeLesson as any} overlay />
+                ) : activeChapter ? (
+                  <div className="glass-card rounded-2xl px-4 py-3 shadow-2xl ring-1 ring-primary/40">
+                    <span className="font-display text-lg font-bold">{activeChapter.title}</span>
+                  </div>
+                ) : null}
+              </DragOverlay>
             </DndContext>
+
           )}
         </section>
 
