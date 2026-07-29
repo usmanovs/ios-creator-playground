@@ -17,28 +17,28 @@ type Props = {
   onDelete: () => void;
 };
 
-export default function SortableLesson({ lesson, onEdit, onDelete }: Props) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: lesson.id,
-    data: { type: "lesson" },
-  });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
+/** Presentational row — also used inside <DragOverlay>. */
+export function LessonRow({
+  lesson,
+  onEdit,
+  onDelete,
+  dragHandleProps,
+  overlay = false,
+}: {
+  lesson: SortableLessonItem;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  dragHandleProps?: Record<string, unknown>;
+  overlay?: boolean;
+}) {
   return (
     <div
-      ref={setNodeRef}
-      style={style}
       className={`relative flex items-center gap-2 p-3 rounded-xl bg-card/40 border border-border ${
-        isDragging ? "z-50 ring-1 ring-primary/40 bg-card" : ""
+        overlay ? "bg-card shadow-2xl ring-1 ring-primary/40 cursor-grabbing" : ""
       }`}
     >
       <button
-        {...attributes}
-        {...listeners}
+        {...dragHandleProps}
         className="cursor-grab active:cursor-grabbing text-foreground/40 hover:text-foreground touch-none"
         aria-label="Drag"
       >
@@ -62,17 +62,47 @@ export default function SortableLesson({ lesson, onEdit, onDelete }: Props) {
       >
         {lesson.status}
       </span>
-      <Button variant="ghost" size="icon" asChild title="Preview">
-        <Link to={`/lesson/${lesson.id}`} target="_blank" rel="noreferrer">
-          <ExternalLink className="w-4 h-4" />
-        </Link>
-      </Button>
-      <Button variant="ghost" size="icon" onClick={onEdit} title="Edit">
-        <Pencil className="w-4 h-4" />
-      </Button>
-      <Button variant="ghost" size="icon" onClick={onDelete} title="Delete">
-        <Trash2 className="w-4 h-4 text-destructive" />
-      </Button>
+      {!overlay && (
+        <>
+          <Button variant="ghost" size="icon" asChild title="Preview">
+            <Link to={`/lesson/${lesson.id}`} target="_blank" rel="noreferrer">
+              <ExternalLink className="w-4 h-4" />
+            </Link>
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onEdit} title="Edit">
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onDelete} title="Delete">
+            <Trash2 className="w-4 h-4 text-destructive" />
+          </Button>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function SortableLesson({ lesson, onEdit, onDelete }: Props) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: lesson.id,
+    data: { type: "lesson" },
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={isDragging ? "opacity-30" : ""}
+    >
+      <LessonRow
+        lesson={lesson}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
     </div>
   );
 }
