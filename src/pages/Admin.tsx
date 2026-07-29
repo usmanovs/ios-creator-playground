@@ -316,45 +316,47 @@ export default function AdminPage() {
     toast.success("Lesson deleted");
   };
 
-  const moveLesson = async (
+  // Pure: returns the next lessons array after moving a lesson. No side effects.
+  const computeMove = (
+    all: Lesson[],
     lessonId: string,
     toChapterId: string,
     toIndex: number
-  ) => {
-    const src = lessons.find((l) => l.id === lessonId);
-    if (!src) return;
-    const fromChapterId = src.chapter_id;
-    const prev = lessons;
+  ): Lesson[] => {
+    const src = all.find((l) => l.id === lessonId);
+    if (!src) return all;
 
-    let nextLessons: Lesson[];
-    if (fromChapterId === toChapterId) {
-      const peers = lessons
+    if (src.chapter_id === toChapterId) {
+      const peers = all
         .filter((l) => l.chapter_id === toChapterId)
         .sort((a, b) => a.order_index - b.order_index);
       const oldIdx = peers.findIndex((l) => l.id === lessonId);
-      if (oldIdx === -1) return;
-      const reordered = arrayMove(peers, oldIdx, toIndex).map((l, i) => ({
+      if (oldIdx === -1) return all;
+      const clamped = Math.max(0, Math.min(toIndex, peers.length - 1));
+      if (clamped === oldIdx) return all;
+      const reordered = arrayMove(peers, oldIdx, clamped).map((l, i) => ({
         ...l,
         order_index: i * 10,
       }));
-      const others = lessons.filter((l) => l.chapter_id !== toChapterId);
-      nextLessons = [...others, ...reordered];
-    } else {
-      const target = lessons
-        .filter((l) => l.chapter_id === toChapterId && l.id !== lessonId)
-        .sort((a, b) => a.order_index - b.order_index);
-      const moved = { ...src, chapter_id: toChapterId };
-      target.splice(Math.max(0, Math.min(toIndex, target.length)), 0, moved);
-      const reorderedTarget = target.map((l, i) => ({ ...l, order_index: i * 10 }));
-      const others = lessons.filter(
-        (l) => l.chapter_id !== toChapterId && l.id !== lessonId
-      );
-      nextLessons = [...others, ...reorderedTarget];
+      const others = all.filter((l) => l.chapter_id !== toChapterId);
+      return [...others, ...reordered];
     }
 
-    setLessons(nextLessons);
+    const target = all
+      .filter((l) => l.chapter_id === toChapterId && l.id !== lessonId)
+      .sort((a, b) => a.order_index - b.order_index);
+    const moved = { ...src, chapter_id: toChapterId };
+    target.splice(Math.max(0, Math.min(toIndex, target.length)), 0, moved);
+    const reorderedTarget = target.map((l, i) => ({ ...l, order_index: i * 10 }));
+    const others = all.filter(
+      (l) => l.chapter_id !== toChapterId && l.id !== lessonId
+    );
+    return [...others, ...reorderedTarget];
+  };
 
-    const touched = nextLessons.filter((l) => {
+  // Persists whatever differs between the drag-start snapshot and the current state.
+  const persistMove = async (prev: Lesson[], next: Lesson[], lessonId: string) => {
+    const touched = next.filter((l) => {
       const before = prev.find((x) => x.id === l.id);
       return (
         !before ||
@@ -362,32 +364,35 @@ export default function AdminPage() {
         before.chapter_id !== l.chapter_id
       );
     });
-    const { error } = await (async () => {
-      for (const l of touched) {
-        const { error } = await supabase
+    if (touched.length === 0) return;
+
+    const results = await Promise.all(
+      touched.map((l) =>
+        supabase
           .from("lessons")
           .update({ order_index: l.order_index, chapter_id: l.chapter_id })
-          .eq("id", l.id);
-        if (error) return { error };
-      }
-      return { error: null as any };
-    })();
-    if (error) {
-      toast.error(error.message);
+          .eq("id", l.id)
+      )
+    );
+    const failed = results.find((r) => r.error);
+    if (failed?.error) {
+      toast.error(failed.error.message);
       setLessons(prev);
       return;
     }
-    if (fromChapterId !== toChapterId) {
+
+    const src = next.find((l) => l.id === lessonId);
+    const before = prev.find((l) => l.id === lessonId);
+    if (src && before && before.chapter_id !== src.chapter_id) {
       log("update", "lesson", lessonId, src.title, {
-        moved_to_chapter: toChapterId,
-        from_chapter: fromChapterId,
+        moved_to_chapter: src.chapter_id,
+        from_chapter: before.chapter_id,
       });
-    } else {
-      log("reorder", "lesson", null, "lessons", {
-        chapter_id: toChapterId,
-      });
+    } else if (src) {
+      log("reorder", "lesson", null, "lessons", { chapter_id: src.chapter_id });
     }
   };
+
 
   const saveLessonPatch = async (patch: Partial<Lesson>): Promise<void> => {
     if (!editingLesson) return;
