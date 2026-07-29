@@ -826,19 +826,34 @@ function PreClassField({
             autoFocus
           />
         ) : (
-          <div className="text-sm bg-background/40 rounded-md border border-border p-3 min-h-[56px] text-foreground/80 whitespace-pre-wrap">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={onToggleEdit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onToggleEdit();
+              }
+            }}
+            className="text-sm bg-background/40 rounded-md border border-border p-3 min-h-[56px] text-foreground/80 whitespace-pre-wrap cursor-text hover:bg-background/50 transition-colors"
+          >
             {value ? value : <span className="text-foreground/40 italic">{placeholder}</span>}
           </div>
         )
       ) : (
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setOpen(true);
+            if (!value) onToggleEdit();
+          }}
           className="w-full text-left text-sm bg-background/40 rounded-md border border-border p-3 text-foreground/80 whitespace-pre-wrap relative overflow-hidden max-h-[84px] hover:bg-background/50 transition-colors"
         >
           {value ? value : <span className="text-foreground/40 italic">{placeholder}</span>}
           <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         </button>
       )}
+
     </div>
   );
 }
