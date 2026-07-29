@@ -69,10 +69,19 @@ export default function SortableChapter({
     data: { type: "chapter-droppable", chapterId: chapter.id },
   });
 
+  // Hovering a collapsed chapter while dragging auto-expands it.
+  useEffect(() => {
+    if (!isOver || open) return;
+    const t = window.setTimeout(() => setOpen(true), 500);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOver, open]);
+
   const setChapterRefs = (node: HTMLDivElement | null) => {
     setNodeRef(node);
     setDropRef(node);
   };
+
 
   return (
     <div
