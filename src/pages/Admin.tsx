@@ -32,6 +32,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { ExternalLink, LogOut, Plus, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 import SortableChapter from "@/components/admin/SortableChapter";
+import { LessonRow } from "@/components/admin/SortableLesson";
+
 import LessonEditor, { EditableLesson } from "@/components/admin/LessonEditor";
 import AdminsPanel from "@/components/admin/AdminsPanel";
 
