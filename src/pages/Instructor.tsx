@@ -684,7 +684,7 @@ export default function InstructorPage() {
             />
             )}
             {DAYS.map((d) => ({ d, i: DAYS.indexOf(d) }))
-              .sort((a, b) => Number(completed[a.d] ?? false) - Number(completed[b.d] ?? false))
+              .sort((a, b) => Number(sortCompleted[a.d] ?? false) - Number(sortCompleted[b.d] ?? false))
               .map(({ d, i }) => (
               <DayColumn
                 key={d}
