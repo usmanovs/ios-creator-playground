@@ -1185,10 +1185,12 @@ function SortableItem({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   });
+  const collapsed = item.covered && !revealed;
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
+    marginTop: collapsed ? 0 : undefined,
   };
   return (
     <div ref={setNodeRef} style={style}>
