@@ -95,6 +95,14 @@ export default function InstructorPage() {
   const [previewData, setPreviewData] = useState<{ title: string; lesson_type: string; video_url: string | null; content_html: string | null } | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
 
+  // Let the collapse animation finish before the day column changes position.
+  useEffect(() => {
+    const t = setTimeout(() => setSortCompleted(completed), 650);
+    return () => clearTimeout(t);
+  }, [completed]);
+
+
+
   const openPreview = useCallback(async (id: string) => {
     setPreviewId(id);
     setPreviewData(null);
