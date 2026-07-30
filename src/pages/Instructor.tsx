@@ -1019,6 +1019,8 @@ function DayColumn({
   });
   const showHomework = typeof onHomeworkChange === "function";
   const showComplete = typeof onToggleCompleted === "function";
+  const [showCovered, setShowCovered] = useState(false);
+  const coveredCount = items.filter((i) => i.covered).length;
 
   const list = (
     <SortableContext id={id} items={items.map((l) => l.id)} strategy={verticalListSortingStrategy}>
@@ -1043,6 +1045,7 @@ function DayColumn({
             onToggleCovered={onToggleCovered}
             onRenameNote={onRenameNote}
             onDeleteNote={onDeleteNote}
+            revealed={showCovered}
           />
         ))}
         {onAddNote && (
@@ -1052,6 +1055,16 @@ function DayColumn({
             className="w-full flex items-center justify-center gap-1.5 text-[11px] py-1.5 rounded-lg border border-dashed border-note/40 text-note hover:bg-note/10 transition-colors"
           >
             <StickyNote className="w-3.5 h-3.5" /> Add note
+          </button>
+        )}
+        {coveredCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowCovered((s) => !s)}
+            className="w-full flex items-center justify-center gap-1.5 text-[11px] py-1.5 rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+          >
+            <Check className="w-3.5 h-3.5" />
+            {showCovered ? "Hide covered" : `${coveredCount} covered`}
           </button>
         )}
       </div>
