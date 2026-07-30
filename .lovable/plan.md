@@ -1,24 +1,45 @@
+# Smoothly collapse completed lesson cards (Instructor board)
+
 ## Goal
+On the Instructor class-schedule board, when a lesson/note checkbox is clicked to mark it **covered**, the card should **smoothly animate closed** (~450ms) and then **disappear from the day column**. A second click can't accidentally toggle it back off because the card is animating away. Covered items can still be un-checked later via a small "covered" reveal toggle at the bottom of each day.
 
-Make dragging a lesson from one chapter to another on `/admin` feel smooth and predictable: you see exactly where the lesson will land while dragging, instead of only finding out after you drop.
+## Current state (verified)
+- `src/pages/Instructor.tsx` `CoveredCheckbox` toggles `covered` via `onToggleCovered(id, kind)` → `toggleCovered` (lines 248–270) optimistically flips state and persists to Supabase.
+- `DayColumn` renders every item in a single sortable list (`items.map` → `SortableItem`, lines 1037–1047); covered items stay in the list, just styled `line-through` / emerald tint.
+- There is no exit animation and no "covered" reveal section.
 
-## What changes
+## Changes (all in `src/pages/Instructor.tsx`)
 
-1. **Live preview while dragging.** Today items only move on drop, so cross-chapter drags feel like a guess. Add an `onDragOver` handler that moves the dragged lesson into the hovered chapter's list in local state as you hover, so the target list opens a gap and the source list closes up in real time.
+### 1. Split day items into active / covered in `DayColumn`
+- Derive `activeItems = items.filter(i => !i.covered)` and `coveredItems = items.filter(i => i.covered)`.
+- The `SortableContext` keeps using the **full** `items` list (so drag IDs stay stable), but render active items in the main list and covered items only inside the reveal section.
 
-2. **Floating drag preview.** Add a `DragOverlay` that renders the lesson row (and chapter card) following the cursor, instead of the current "ghost at 50% opacity stuck in place". Original row renders as a faint placeholder gap.
+### 2. Exit animation for cards being checked
+- Add `exitingIds` state (a `Set<string>`) in `DayColumn`.
+- Wrap each active card in a new `AnimatedCard` component that detects `covered` going `false → true` (compare to a ref). On that transition it adds an `exiting` class and calls back `onExitStart(id)` to add the id to `exitingIds` (so the card stays mounted and animating instead of vanishing instantly).
+- The `exiting` state animates with the `grid-template-rows: 1fr → 0fr` technique (no height measuring needed) plus `opacity → 0`, over `duration-500 ease-in-out`. Inner element `overflow-hidden`.
+- On `onTransitionEnd`, call `onExitDone(id)` to remove the id from `exitingIds`. The card is now excluded from `activeItems` (it's covered) and so disappears from the main list — it now lives only in the hidden `coveredItems` reveal section.
+- Active-list render filter: `activeItems = items.filter(i => !i.covered || exitingIds.has(i.id))`. A covered-but-exiting card keeps rendering (with exit animation) until its animation finishes.
 
-3. **Save once, on drop.** With the live preview handling visuals, `onDragEnd` only persists the final result. Replace the current sequential per-row `await supabase.update(...)` loop with a single batched `upsert` of the touched rows, so the board doesn't stutter after drop. Keep the existing rollback-on-error behavior.
+### 3. "Covered" reveal toggle at the bottom of each day column
+- When `coveredItems.length > 0`, render a small footer button: `✓ {n} covered` (emerald, subtle). Clicking toggles local `showCovered` state.
+- When expanded, render `coveredItems` in a bordered, dimmed list (opacity-60, line-through). Each still has its `CoveredCheckbox` so the instructor can uncheck to restore the item.
+- Unchecking a covered item: it animates back into the active list (a brief fade/slide-in on mount via the same `AnimatedCard` enter animation, ~250ms) — opposite direction, no double-click risk.
 
-4. **Collapsed chapters.** Hovering a collapsed chapter for a moment auto-expands it so you can drop at a precise position rather than only appending to the end.
+### 4. Re-enter animation
+- `AnimatedCard` also plays a short enter animation on mount (opacity 0 → 1, slight translateY) `duration-300`, so items returning from the covered section slide back in smoothly.
 
-5. **Motion polish.** Enable dnd-kit's auto-scroll with a gentler threshold for long chapter lists, add a `dropAnimation` so the card settles into place, and keep sortable transitions on so neighbors slide rather than jump.
+### 5. Keep counts accurate
+- The day header count badge (line 1107) currently shows `items.length`. Keep it as total items (active + covered) so it doesn't jump confusingly during the exit animation; the new "✓ n covered" footer conveys the split.
 
-## Technical notes
+## Edge cases
+- Drag-and-drop: `SortableContext` items list stays the full `items`, so dragging IDs/positions remain valid. Covered items are not draggable in the reveal section (wrap them plainly, no `useSortable`), avoiding sort conflicts.
+- Completed-day auto-collapse (lines 716–719) is unaffected; when a day is completed and collapses, covered items are already hidden inside it.
+- `toggleCompleted` bulk-sets `covered` on all day items (lines 222–224) — those cards animate out together; the `exitingIds` approach handles many simultaneous exits fine.
 
-All changes are in `src/pages/Admin.tsx`, `src/components/admin/SortableChapter.tsx`, and `src/components/admin/SortableLesson.tsx` (presentation/interaction only, no schema change):
+## Non-goals
+- No database/schema changes (covered already persists).
+- No changes to the student-facing course page or Admin page.
 
-- `Admin.tsx`: add `activeDrag` state, `onDragStart`/`onDragOver`/`onDragCancel` to `DndContext`; `onDragOver` computes target chapter + index using the existing `collisionDetection` output and updates `lessons` optimistically (chapter_id + order_index) without touching the DB. Keep a snapshot of `lessons` at drag start for cancel/rollback.
-- `moveLesson` is split: a pure `computeMove(lessons, lessonId, toChapterId, toIndex)` used by both `onDragOver` and `onDragEnd`, plus a `persistMove` that diffs against the drag-start snapshot and does one `supabase.from("lessons").upsert(rows)`.
-- `SortableLesson.tsx`: extract the row markup so the same visual can render inside `DragOverlay`; use `isDragging ? opacity-30 border-dashed` for the placeholder.
-- `SortableChapter.tsx`: on `isOver` while collapsed, start a ~500ms timer that calls `setOpen(true)`; clear on leave.
+## Files changed
+- `src/pages/Instructor.tsx` only.
