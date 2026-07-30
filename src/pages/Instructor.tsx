@@ -84,6 +84,9 @@ export default function InstructorPage() {
   const [preClassEditMode, setPreClassEditMode] = useState<Record<number, { 1: boolean; 2: boolean }>>({});
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [expandedOverride, setExpandedOverride] = useState<Record<number, boolean>>({});
+  // Mirrors `completed` but lags behind so a day can visibly collapse before
+  // the board re-sorts it to the end.
+  const [sortCompleted, setSortCompleted] = useState<Record<number, boolean>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
   const [courseId, setCourseId] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string | null>(null);
@@ -91,6 +94,14 @@ export default function InstructorPage() {
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<{ title: string; lesson_type: string; video_url: string | null; content_html: string | null } | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+
+  // Let the collapse animation finish before the day column changes position.
+  useEffect(() => {
+    const t = setTimeout(() => setSortCompleted(completed), 650);
+    return () => clearTimeout(t);
+  }, [completed]);
+
+
 
   const openPreview = useCallback(async (id: string) => {
     setPreviewId(id);
@@ -684,7 +695,7 @@ export default function InstructorPage() {
             />
             )}
             {DAYS.map((d) => ({ d, i: DAYS.indexOf(d) }))
-              .sort((a, b) => Number(completed[a.d] ?? false) - Number(completed[b.d] ?? false))
+              .sort((a, b) => Number(sortCompleted[a.d] ?? false) - Number(sortCompleted[b.d] ?? false))
               .map(({ d, i }) => (
               <DayColumn
                 key={d}
@@ -1074,7 +1085,7 @@ function DayColumn({
   return (
     <div
       ref={collapsed ? setNodeRef : undefined}
-      className={`glass-card rounded-2xl p-3 transition-colors ${collapsed ? "min-h-0 self-start" : "min-h-[300px]"} ${
+      className={`glass-card rounded-2xl p-3 transition-all duration-500 ease-in-out ${collapsed ? "min-h-0 self-start" : "min-h-[300px]"} ${
         isOver ? "ring-2 ring-primary/60 bg-primary/5" : ""
       } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""} ${
         isToday && !completed ? "ring-2 ring-primary/50" : ""
@@ -1120,8 +1131,15 @@ function DayColumn({
           <div className="text-xs text-foreground/50">{items.length}</div>
         </div>
       </div>
-      {!collapsed && (
-        <>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: collapsed ? "0fr" : "1fr",
+          opacity: collapsed ? 0 : 1,
+          transition: "grid-template-rows 0.55s ease-in-out, opacity 0.4s ease-in-out",
+        }}
+      >
+        <div style={{ overflow: "hidden", minHeight: 0 }}>
           {typeof onPreClassChange === "function" && (
             <PreClassField
               label="Pre-class message 1"
@@ -1159,8 +1177,9 @@ function DayColumn({
               />
             </div>
           )}
-        </>
-      )}
+        </div>
+      </div>
+
     </div>
   );
 }
