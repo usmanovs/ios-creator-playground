@@ -1120,8 +1120,15 @@ function DayColumn({
           <div className="text-xs text-foreground/50">{items.length}</div>
         </div>
       </div>
-      {!collapsed && (
-        <>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: collapsed ? "0fr" : "1fr",
+          opacity: collapsed ? 0 : 1,
+          transition: "grid-template-rows 0.55s ease-in-out, opacity 0.4s ease-in-out",
+        }}
+      >
+        <div style={{ overflow: "hidden", minHeight: 0 }}>
           {typeof onPreClassChange === "function" && (
             <PreClassField
               label="Pre-class message 1"
@@ -1159,8 +1166,9 @@ function DayColumn({
               />
             </div>
           )}
-        </>
-      )}
+        </div>
+      </div>
+
     </div>
   );
 }
