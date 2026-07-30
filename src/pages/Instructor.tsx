@@ -1228,7 +1228,7 @@ function AnimatedCard({
 }: {
   covered: boolean;
   revealed?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const collapsed = covered && !revealed;
   return (
