@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DndContext,
@@ -1019,6 +1019,8 @@ function DayColumn({
   });
   const showHomework = typeof onHomeworkChange === "function";
   const showComplete = typeof onToggleCompleted === "function";
+  const [showCovered, setShowCovered] = useState(false);
+  const coveredCount = items.filter((i) => i.covered).length;
 
   const list = (
     <SortableContext id={id} items={items.map((l) => l.id)} strategy={verticalListSortingStrategy}>
@@ -1043,6 +1045,7 @@ function DayColumn({
             onToggleCovered={onToggleCovered}
             onRenameNote={onRenameNote}
             onDeleteNote={onDeleteNote}
+            revealed={showCovered}
           />
         ))}
         {onAddNote && (
@@ -1052,6 +1055,16 @@ function DayColumn({
             className="w-full flex items-center justify-center gap-1.5 text-[11px] py-1.5 rounded-lg border border-dashed border-note/40 text-note hover:bg-note/10 transition-colors"
           >
             <StickyNote className="w-3.5 h-3.5" /> Add note
+          </button>
+        )}
+        {coveredCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowCovered((s) => !s)}
+            className="w-full flex items-center justify-center gap-1.5 text-[11px] py-1.5 rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+          >
+            <Check className="w-3.5 h-3.5" />
+            {showCovered ? "Hide covered" : `${coveredCount} covered`}
           </button>
         )}
       </div>
@@ -1159,6 +1172,7 @@ function SortableItem({
   onToggleCovered,
   onRenameNote,
   onDeleteNote,
+  revealed,
 }: {
   item: BoardItem;
   chapterTitle: string;
@@ -1166,34 +1180,73 @@ function SortableItem({
   onToggleCovered?: (id: string, kind: "lesson" | "note") => void;
   onRenameNote?: (id: string, title: string) => void;
   onDeleteNote?: (id: string) => void;
+  revealed?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   });
+  const collapsed = item.covered && !revealed;
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
+    marginTop: collapsed ? 0 : undefined,
   };
   return (
     <div ref={setNodeRef} style={style}>
-      {item.kind === "note" ? (
-        <NoteCard
-          item={item}
-          dragHandleProps={{ ...attributes, ...listeners }}
-          onToggleCovered={onToggleCovered ? () => onToggleCovered(item.id, "note") : undefined}
-          onRename={onRenameNote ? (title) => onRenameNote(item.id, title) : undefined}
-          onDelete={onDeleteNote ? () => onDeleteNote(item.id) : undefined}
-        />
-      ) : (
-        <LessonCard
-          item={item}
-          chapterTitle={chapterTitle}
-          dragHandleProps={{ ...attributes, ...listeners }}
-          onPreview={() => onPreview(item.id)}
-          onToggleCovered={onToggleCovered ? () => onToggleCovered(item.id, "lesson") : undefined}
-        />
-      )}
+      <AnimatedCard covered={item.covered} revealed={revealed}>
+        {item.kind === "note" ? (
+          <NoteCard
+            item={item}
+            dragHandleProps={{ ...attributes, ...listeners }}
+            onToggleCovered={onToggleCovered ? () => onToggleCovered(item.id, "note") : undefined}
+            onRename={onRenameNote ? (title) => onRenameNote(item.id, title) : undefined}
+            onDelete={onDeleteNote ? () => onDeleteNote(item.id) : undefined}
+          />
+        ) : (
+          <LessonCard
+            item={item}
+            chapterTitle={chapterTitle}
+            dragHandleProps={{ ...attributes, ...listeners }}
+            onPreview={() => onPreview(item.id)}
+            onToggleCovered={onToggleCovered ? () => onToggleCovered(item.id, "lesson") : undefined}
+          />
+        )}
+      </AnimatedCard>
+    </div>
+  );
+}
+
+/**
+ * Smoothly collapses a card to zero height when it's marked covered (and not
+ * revealed), so the instructor can't accidentally double-toggle it. Expands
+ * back when revealed or un-checked. Uses the grid-template-rows 1fr/0fr trick
+ * so no height measuring is required.
+ */
+function AnimatedCard({
+  covered,
+  revealed,
+  children,
+}: {
+  covered: boolean;
+  revealed?: boolean;
+  children: ReactNode;
+}) {
+  const collapsed = covered && !revealed;
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateRows: collapsed ? "0fr" : "1fr",
+        opacity: collapsed ? 0 : 1,
+        pointerEvents: collapsed ? "none" : "auto",
+        transition:
+          "grid-template-rows 0.45s ease-in-out, opacity 0.35s ease-in-out",
+      }}
+    >
+      <div style={{ overflow: "hidden", minHeight: collapsed ? 0 : undefined }}>
+        {children}
+      </div>
     </div>
   );
 }
