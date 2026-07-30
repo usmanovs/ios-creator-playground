@@ -1074,7 +1074,7 @@ function DayColumn({
   return (
     <div
       ref={collapsed ? setNodeRef : undefined}
-      className={`glass-card rounded-2xl p-3 transition-colors ${collapsed ? "min-h-0 self-start" : "min-h-[300px]"} ${
+      className={`glass-card rounded-2xl p-3 transition-all duration-500 ease-in-out ${collapsed ? "min-h-0 self-start" : "min-h-[300px]"} ${
         isOver ? "ring-2 ring-primary/60 bg-primary/5" : ""
       } ${muted ? "opacity-90" : ""} ${completed ? "ring-2 ring-emerald-500/50 bg-emerald-500/5" : ""} ${
         isToday && !completed ? "ring-2 ring-primary/50" : ""
