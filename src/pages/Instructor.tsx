@@ -84,6 +84,9 @@ export default function InstructorPage() {
   const [preClassEditMode, setPreClassEditMode] = useState<Record<number, { 1: boolean; 2: boolean }>>({});
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [expandedOverride, setExpandedOverride] = useState<Record<number, boolean>>({});
+  // Mirrors `completed` but lags behind so a day can visibly collapse before
+  // the board re-sorts it to the end.
+  const [sortCompleted, setSortCompleted] = useState<Record<number, boolean>>({});
   const [savingDay, setSavingDay] = useState<number | null>(null);
   const [courseId, setCourseId] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string | null>(null);
