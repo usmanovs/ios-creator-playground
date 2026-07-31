@@ -836,6 +836,10 @@ function PreClassField({
             placeholder={placeholder}
             className="min-h-[140px] text-sm bg-background/40"
             autoFocus
+            onBlur={() => {
+              if (isEditing) onToggleEdit();
+              setOpen(false);
+            }}
           />
         ) : (
           <div
