@@ -820,6 +820,7 @@ function PreClassField({
             <Copy className="w-3 h-3" />
           </button>
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={onToggleEdit}
             className="text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-primary hover:bg-background/70 transition-colors"
           >
@@ -902,6 +903,7 @@ function HomeworkField({
             <Copy className="w-3 h-3" />
           </button>
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => setIsEditing((e) => !e)}
             className="text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-primary hover:bg-background/70 transition-colors"
           >
