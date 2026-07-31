@@ -820,6 +820,7 @@ function PreClassField({
         <div className="flex items-center gap-2">
           {saving && <div className="text-[10px] text-foreground/40">Saving…</div>}
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(value ?? "");
@@ -833,6 +834,7 @@ function PreClassField({
           >
             <Copy className="w-3 h-3" />
           </button>
+
           <button
             onMouseDown={(e) => e.preventDefault()}
             onClick={async () => {
