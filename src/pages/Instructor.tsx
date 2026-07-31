@@ -785,6 +785,7 @@ function PreClassField({
 }) {
   const [open, setOpen] = useState(false);
   const prevIsEditing = useRef(isEditing);
+  const wrapRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (isEditing && !prevIsEditing.current) {
       setOpen(true);
@@ -793,9 +794,22 @@ function PreClassField({
     }
     prevIsEditing.current = isEditing;
   }, [isEditing]);
+  useEffect(() => {
+    if (!isEditing) return;
+    const handler = (e: PointerEvent) => {
+      const el = wrapRef.current;
+      if (el && !el.contains(e.target as Node)) {
+        onToggleEdit();
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", handler, true);
+    return () => document.removeEventListener("pointerdown", handler, true);
+  }, [isEditing, onToggleEdit]);
   return (
-    <div className="mb-3">
+    <div className="mb-3" ref={wrapRef}>
       <div className="flex items-center justify-between mb-1.5 px-1">
+
         <button
           onClick={() => setOpen((o) => !o)}
           className="flex items-center gap-1 text-[11px] uppercase tracking-wide text-foreground/50 font-semibold hover:text-foreground transition-colors"
@@ -805,20 +819,6 @@ function PreClassField({
         </button>
         <div className="flex items-center gap-2">
           {saving && <div className="text-[10px] text-foreground/40">Saving…</div>}
-          <button
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(value ?? "");
-                toast.success("Copied to clipboard");
-              } catch {
-                toast.error("Failed to copy");
-              }
-            }}
-            className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-background/50 text-foreground/70 hover:bg-background/70 hover:text-foreground transition-colors"
-            title="Copy message"
-          >
-            <Copy className="w-3 h-3" />
-          </button>
           <button
             onMouseDown={(e) => e.preventDefault()}
             onClick={async () => {
