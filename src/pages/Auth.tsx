@@ -14,6 +14,8 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showLink, setShowLink] = useState(false);
+  const shareUrl = window.location.href;
 
   const redirectAfterAuth = useCallback(async (userId: string) => {
     const { data } = await supabase
