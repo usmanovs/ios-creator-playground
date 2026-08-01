@@ -40,6 +40,8 @@ const StudentWorkSection = () => {
       role: t('work.nurgul.role'),
       location: t('work.nurgul.location'),
       flag: '🇰🇬',
+      photo: nurgulPhoto.url,
+
       before: t('work.nurgul.before'),
       app: t('work.nurgul.app'),
       desc: t('work.nurgul.desc'),
