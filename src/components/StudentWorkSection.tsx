@@ -82,15 +82,31 @@ const StudentWorkSection = () => {
               <p className="mt-1 text-sm text-muted-foreground">{w.desc}</p>
               <div className="mt-5 w-full rounded-xl border border-primary/25 bg-primary/10 px-4 py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/60 text-lg font-bold text-primary-foreground">
+                  <span className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/60 text-lg font-bold text-primary-foreground">
                     {w.name.charAt(0)}
+                    <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-border/60 bg-background text-xs leading-none">
+                      {w.flag}
+                    </span>
                   </span>
                   <div className="min-w-0">
                     <p className="text-base font-bold text-foreground leading-tight">{w.name}</p>
                     <p className="text-sm text-foreground/70 leading-snug">{w.role}</p>
                   </div>
                 </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/50 px-2.5 py-1 text-xs text-foreground/80">
+                    <MapPin className="h-3 w-3 text-primary" />
+                    {w.location}
+                  </span>
+                  {w.before && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/50 px-2.5 py-1 text-xs text-foreground/80">
+                      <GraduationCap className="h-3 w-3 text-primary" />
+                      {w.before}
+                    </span>
+                  )}
+                </div>
               </div>
+
 
             </motion.div>
           ))}
