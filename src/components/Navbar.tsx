@@ -36,12 +36,12 @@ const Navbar = () => {
           >
             {lang === 'en' ? 'RU' : 'EN'}
           </button>
-          <a
-            href="#pricing"
+          <Link
+            to="/auth"
             className="hidden sm:inline-flex px-4 py-2 text-sm font-bold rounded-xl bg-primary text-primary-foreground hover:brightness-110 transition-all"
           >
-            {t('nav.enroll')}
-          </a>
+            {t('nav.startLearning')}
+          </Link>
         </div>
       </div>
     </nav>
