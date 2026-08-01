@@ -120,15 +120,37 @@ export default function AuthPage() {
           onClick={async () => {
             const url = window.location.href;
             const text = "Join the iOS Vibe Coding course — enroll here:";
+            const fullText = `${text} ${url}`;
+            let done = false;
             try {
               if (navigator.share) {
                 await navigator.share({ title: "iOS Vibe Coding", text, url });
-              } else {
-                await navigator.clipboard.writeText(`${text} ${url}`);
+                done = true;
+              } else if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(fullText);
                 toast.success("Link copied to clipboard");
+                done = true;
               }
-            } catch {
-              /* user cancelled share dialog */
+            } catch (e: any) {
+              if (e?.name !== "AbortError") done = false;
+              else done = true;
+            }
+            if (!done) {
+              // legacy fallback: select-and-copy via a hidden input
+              const ta = document.createElement("textarea");
+              ta.value = fullText;
+              ta.style.position = "fixed";
+              ta.style.opacity = "0";
+              document.body.appendChild(ta);
+              ta.focus();
+              ta.select();
+              try {
+                document.execCommand("copy");
+                toast.success("Link copied to clipboard");
+              } catch {
+                toast.error("Copy failed — select and copy manually: " + url);
+              }
+              document.body.removeChild(ta);
             }
           }}
           className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-foreground/10 text-sm font-semibold text-foreground/70 hover:bg-card/60 transition-colors"
