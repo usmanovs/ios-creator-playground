@@ -38,10 +38,12 @@ const Navbar = () => {
           </button>
           <Link
             to="/auth"
-            className="hidden sm:inline-flex px-4 py-2 text-sm font-bold rounded-xl bg-primary text-primary-foreground hover:brightness-110 transition-all"
+            aria-label={t('nav.startLearning')}
+            className="hidden sm:inline-flex px-4 py-2 text-sm font-bold rounded-xl bg-transparent text-foreground/5 hover:text-foreground/40 transition-all"
           >
             {t('nav.startLearning')}
           </Link>
+
         </div>
       </div>
     </nav>
