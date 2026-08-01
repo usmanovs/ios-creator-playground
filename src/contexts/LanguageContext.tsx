@@ -21,17 +21,22 @@ const translations: Record<string, Record<Language, string>> = {
   'work.title': { en: 'Real apps built by our students', ru: 'Реальные приложения, созданные нашими студентами' },
   'work.subtitle': { en: 'No coding background. Just the course, AI and a few weeks of work.', ru: 'Без опыта в программировании. Только курс, AI и пара недель работы.' },
   'work.aman.name': { en: 'Aman', ru: 'Аман' },
-  'work.aman.role': { en: 'Entrepreneur, South Korea', ru: 'Предприниматель, Южная Корея' },
+  'work.aman.role': { en: 'Entrepreneur', ru: 'Предприниматель' },
+  'work.aman.location': { en: 'Seoul, South Korea', ru: 'Сеул, Южная Корея' },
   'work.aman.app': { en: 'Shazam clone', ru: 'Клон Shazam' },
   'work.aman.desc': { en: 'A music recognition app that identifies songs from a few seconds of audio.', ru: 'Приложение распознаёт песню за несколько секунд звука.' },
   'work.elnura.name': { en: 'Elnura', ru: 'Эльнура' },
-  'work.elnura.role': { en: 'Housewife, Chicago', ru: 'Домохозяйка, Чикаго' },
+  'work.elnura.role': { en: 'Housewife', ru: 'Домохозяйка' },
+  'work.elnura.location': { en: 'Chicago, USA', ru: 'Чикаго, США' },
   'work.elnura.app': { en: 'English phrases app', ru: 'Приложение для изучения английского' },
   'work.elnura.desc': { en: 'Learn English through simple phrases with transcription and translation.', ru: 'Учите английский по простым фразам с произношением и переводом.' },
   'work.nurgul.name': { en: 'Nurgul', ru: 'Нургуль' },
-  'work.nurgul.role': { en: 'Analyst at MBank, Bishkek — 18 years a public school teacher', ru: 'Аналитик в MBank, Бишкек — 18 лет работала учителем в школе' },
+  'work.nurgul.role': { en: 'Analyst at MBank', ru: 'Аналитик в MBank' },
+  'work.nurgul.location': { en: 'Bishkek, Kyrgyzstan', ru: 'Бишкек, Кыргызстан' },
+  'work.nurgul.before': { en: '18 years a public school teacher', ru: '18 лет работала учителем в школе' },
   'work.nurgul.app': { en: 'Calm clone', ru: 'Клон Calm' },
   'work.nurgul.desc': { en: 'A meditation app with personalized goals, guided sessions and sleep stories.', ru: 'Приложение для медитации с персональными целями, сессиями и историями для сна.' },
+
 
 
 
