@@ -71,10 +71,18 @@ const StudentWorkSection = () => {
               </div>
               <h3 className="mt-5 text-lg font-semibold text-foreground">{w.app}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{w.desc}</p>
-              <div className="mt-4 pt-4 border-t border-border/60 w-full">
-                <p className="font-medium text-foreground">{w.name}</p>
-                <p className="text-sm text-muted-foreground">{w.role}</p>
+              <div className="mt-5 w-full rounded-xl border border-primary/25 bg-primary/10 px-4 py-4">
+                <div className="flex items-center gap-3 text-left">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/60 text-lg font-bold text-primary-foreground">
+                    {w.name.charAt(0)}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-base font-bold text-foreground leading-tight">{w.name}</p>
+                    <p className="text-sm text-foreground/70 leading-snug">{w.role}</p>
+                  </div>
+                </div>
               </div>
+
             </motion.div>
           ))}
         </div>
