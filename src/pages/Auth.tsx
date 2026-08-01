@@ -15,7 +15,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showLink, setShowLink] = useState(false);
-  const shareUrl = window.location.href;
+  const shareUrl = `https://ios.getforce.org${window.location.pathname}`;
 
   const redirectAfterAuth = useCallback(async (userId: string) => {
     const { data } = await supabase
