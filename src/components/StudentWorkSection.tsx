@@ -21,8 +21,16 @@ const StudentWorkSection = () => {
       role: t('work.elnura.role'),
       app: t('work.elnura.app'),
       desc: t('work.elnura.desc'),
+    {
+      video: '/student/nurgul-demo.mp4',
+      poster: '/student/nurgul-poster.jpg',
+      name: t('work.nurgul.name'),
+      role: t('work.nurgul.role'),
+      app: t('work.nurgul.app'),
+      desc: t('work.nurgul.desc'),
     },
   ];
+
 
 
   return (
