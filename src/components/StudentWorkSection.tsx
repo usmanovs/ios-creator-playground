@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, MapPin, GraduationCap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const StudentWorkSection = () => {
