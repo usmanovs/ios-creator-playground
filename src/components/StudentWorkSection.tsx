@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { Sparkles, MapPin, GraduationCap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import amanPhoto from '@/assets/aman.png.asset.json';
+import nurgulPhoto from '@/assets/nurgul.png.asset.json';
+
 
 const StudentWorkSection = () => {
   const { t } = useLanguage();
@@ -38,6 +40,8 @@ const StudentWorkSection = () => {
       role: t('work.nurgul.role'),
       location: t('work.nurgul.location'),
       flag: '🇰🇬',
+      photo: nurgulPhoto.url,
+
       before: t('work.nurgul.before'),
       app: t('work.nurgul.app'),
       desc: t('work.nurgul.desc'),
