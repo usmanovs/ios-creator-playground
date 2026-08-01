@@ -52,7 +52,7 @@ const StudentWorkSection = () => {
             >
               <div className="relative rounded-[2rem] border border-border/60 bg-black/40 p-2 shadow-2xl">
                 <video
-                  className="w-[240px] rounded-[1.6rem]"
+                  className="w-[240px] aspect-[9/19] object-cover bg-black rounded-[1.6rem]"
                   src={w.video}
                   poster={w.poster}
                   controls
