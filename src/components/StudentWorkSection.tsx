@@ -1,32 +1,29 @@
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import amanVideo from '@/assets/aman-demo.mp4.asset.json';
-import amanPoster from '@/assets/aman-poster.jpg.asset.json';
-import elnuraVideo from '@/assets/elnura-demo.mp4.asset.json';
-import elnuraPoster from '@/assets/elnura-poster.jpg.asset.json';
 
 const StudentWorkSection = () => {
   const { t } = useLanguage();
 
   const works = [
     {
-      video: amanVideo.url,
-      poster: amanPoster.url,
+      video: '/student/aman-demo.mp4',
+      poster: '/student/aman-poster.jpg',
       name: t('work.aman.name'),
       role: t('work.aman.role'),
       app: t('work.aman.app'),
       desc: t('work.aman.desc'),
     },
     {
-      video: elnuraVideo.url,
-      poster: elnuraPoster.url,
+      video: '/student/elnura-demo.mp4',
+      poster: '/student/elnura-poster.jpg',
       name: t('work.elnura.name'),
       role: t('work.elnura.role'),
       app: t('work.elnura.app'),
       desc: t('work.elnura.desc'),
     },
   ];
+
 
   return (
     <section id="student-work" className="relative py-16 md:py-24">
