@@ -74,9 +74,15 @@ export default function AuthPage() {
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-6">
       <div className="aurora-bg" />
       <div className="relative glass-card rounded-2xl p-8 w-full max-w-md space-y-5">
-        <h1 className="font-display text-2xl font-bold">
-          {mode === "signin" ? "Sign in to your account" : "Create your account"}
-        </h1>
+        <div className="text-center space-y-2 pb-1">
+          <h1 className="font-display text-2xl font-bold">
+            {mode === "signin" ? "Sign in to your account" : "Create your account"}
+          </h1>
+          <p className="text-sm text-foreground/60 leading-relaxed">
+            Master AI to build the future. Learn to ship real apps, automate your work, and
+            become the developer the 21st century demands — starting today.
+          </p>
+        </div>
 
         <Button type="button" variant="outline" className="w-full" onClick={signInWithGoogle}>
           <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
