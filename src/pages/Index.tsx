@@ -27,6 +27,8 @@ const Index = () => {
           <Navbar />
           <HeroSection />
           <AppStoreSection />
+          <StudentWorkSection />
+
 
           <InstructorSection />
           <RequirementsSection />
