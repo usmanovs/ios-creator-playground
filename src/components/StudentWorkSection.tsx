@@ -11,6 +11,9 @@ const StudentWorkSection = () => {
       poster: '/student/aman-poster.jpg',
       name: t('work.aman.name'),
       role: t('work.aman.role'),
+      location: t('work.aman.location'),
+      flag: '🇰🇷',
+      before: '',
       app: t('work.aman.app'),
       desc: t('work.aman.desc'),
     },
@@ -19,19 +22,25 @@ const StudentWorkSection = () => {
       poster: '/student/elnura-poster.jpg',
       name: t('work.elnura.name'),
       role: t('work.elnura.role'),
+      location: t('work.elnura.location'),
+      flag: '🇺🇸',
+      before: '',
       app: t('work.elnura.app'),
       desc: t('work.elnura.desc'),
     },
     {
-
       video: '/student/nurgul-demo.mp4',
       poster: '/student/nurgul-poster.jpg',
       name: t('work.nurgul.name'),
       role: t('work.nurgul.role'),
+      location: t('work.nurgul.location'),
+      flag: '🇰🇬',
+      before: t('work.nurgul.before'),
       app: t('work.nurgul.app'),
       desc: t('work.nurgul.desc'),
     },
   ];
+
 
 
 
