@@ -16,6 +16,20 @@ const translations: Record<string, Record<Language, string>> = {
   'nav.course': { en: 'Course', ru: 'Курс' },
   'nav.enroll': { en: 'Enroll Now', ru: 'Записаться' },
 
+  // Student work
+  'work.badge': { en: 'Student projects', ru: 'Работы студентов' },
+  'work.title': { en: 'Real apps built by our students', ru: 'Реальные приложения, созданные нашими студентами' },
+  'work.subtitle': { en: 'No coding background. Just the course, AI and a few weeks of work.', ru: 'Без опыта в программировании. Только курс, AI и пара недель работы.' },
+  'work.aman.name': { en: 'Aman', ru: 'Аман' },
+  'work.aman.role': { en: 'Entrepreneur, South Korea', ru: 'Предприниматель, Южная Корея' },
+  'work.aman.app': { en: 'Shazam clone', ru: 'Клон Shazam' },
+  'work.aman.desc': { en: 'A music recognition app that identifies songs from a few seconds of audio.', ru: 'Приложение распознаёт песню за несколько секунд звука.' },
+  'work.elnura.name': { en: 'Elnura', ru: 'Эльнура' },
+  'work.elnura.role': { en: 'Housewife, Chicago', ru: 'Домохозяйка, Чикаго' },
+  'work.elnura.app': { en: 'English phrases app', ru: 'Приложение для изучения английского' },
+  'work.elnura.desc': { en: 'Learn English through simple phrases with transcription and translation.', ru: 'Учите английский по простым фразам с произношением и переводом.' },
+
+
   // Hero
   'hero.badge': { en: 'Save $150 — Live Sessions', ru: 'Экономия $150 — Живые Занятия' },
   'hero.title1': { en: 'Build an iOS app', ru: 'Создай iOS приложение' },
