@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Sparkles, MapPin, GraduationCap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import amanPhoto from '@/assets/aman.png.asset.json';
 
 const StudentWorkSection = () => {
   const { t } = useLanguage();
@@ -13,10 +14,12 @@ const StudentWorkSection = () => {
       role: t('work.aman.role'),
       location: t('work.aman.location'),
       flag: '🇰🇷',
+      photo: amanPhoto.url,
       before: '',
       app: t('work.aman.app'),
       desc: t('work.aman.desc'),
     },
+
     {
       video: '/student/elnura-demo.mp4',
       poster: '/student/elnura-poster.jpg',
