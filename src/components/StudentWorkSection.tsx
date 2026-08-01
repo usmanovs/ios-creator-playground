@@ -22,7 +22,17 @@ const StudentWorkSection = () => {
       app: t('work.elnura.app'),
       desc: t('work.elnura.desc'),
     },
+    {
+
+      video: '/student/nurgul-demo.mp4',
+      poster: '/student/nurgul-poster.jpg',
+      name: t('work.nurgul.name'),
+      role: t('work.nurgul.role'),
+      app: t('work.nurgul.app'),
+      desc: t('work.nurgul.desc'),
+    },
   ];
+
 
 
   return (
@@ -37,7 +47,7 @@ const StudentWorkSection = () => {
           <p className="mt-3 text-muted-foreground">{t('work.subtitle')}</p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
           {works.map((w, i) => (
             <motion.div
               key={w.name}
