@@ -85,12 +85,17 @@ const StudentWorkSection = () => {
               <p className="mt-1 text-sm text-muted-foreground">{w.desc}</p>
               <div className="mt-5 w-full rounded-xl border border-primary/25 bg-primary/10 px-4 py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <span className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/60 text-lg font-bold text-primary-foreground">
-                    {w.name.charAt(0)}
+                  <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-primary/60 text-lg font-bold text-primary-foreground">
+                    {w.photo ? (
+                      <img src={w.photo} alt={w.name} className="h-full w-full object-cover" loading="lazy" />
+                    ) : (
+                      w.name.charAt(0)
+                    )}
                     <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-border/60 bg-background text-xs leading-none">
                       {w.flag}
                     </span>
                   </span>
+
                   <div className="min-w-0">
                     <p className="text-base font-bold text-foreground leading-tight">{w.name}</p>
                     <p className="text-sm text-foreground/70 leading-snug">{w.role}</p>
