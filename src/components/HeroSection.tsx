@@ -183,10 +183,19 @@ const HeroSection = () => {
           </span>
         </a>
 
+        {/* Start Learning — routes to /auth */}
+        <Link
+          to="/auth"
+          className="relative inline-flex items-center justify-center px-10 py-4 md:py-5 rounded-2xl border-2 border-accent/40 bg-accent/10 text-accent-foreground backdrop-blur-2xl font-bold text-base md:text-lg tracking-tight transition-all hover:bg-accent/20 hover:border-accent/60 active:scale-95 mb-4 animate-slide-up"
+          style={{ animationDelay: '0.5s', animationFillMode: 'backwards' }}
+        >
+          {t('hero.startLearning')}
+        </Link>
+
         {/* CTA subtext */}
         <p
           className="text-sm md:text-base font-bold text-accent mb-14 animate-slide-up"
-          style={{ animationDelay: '0.5s', animationFillMode: 'backwards' }}
+          style={{ animationDelay: '0.55s', animationFillMode: 'backwards' }}
         >
           {t('hero.ctaSubtext')}
         </p>

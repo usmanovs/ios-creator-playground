@@ -26,6 +26,8 @@ const translations: Record<string, Record<Language, string>> = {
   'hero.discountBanner': { en: 'enroll now and save $150 on Live Sessions', ru: 'запишись сейчас и сэкономь $150 на Живых Занятиях' },
   'hero.cta': { en: 'Enroll Now — $349', ru: 'Записаться — $349' },
   'hero.ctaSubtext': { en: 'Save $150 · Limited spots', ru: 'Экономия $150 · Ограниченные места' },
+  'hero.startLearning': { en: 'Start Learning', ru: 'Начать обучение' },
+  'nav.startLearning': { en: 'Start Learning', ru: 'Начать' },
   'hero.students': { en: 'students already enrolled', ru: 'студентов уже записались' },
   'hero.revenue': { en: 'Graduates ship real App Store apps and target their first $600+ before the course ends', ru: 'Выпускники публикуют реальные приложения в App Store и стремятся к первым $600+ до конца курса' },
   'hero.stat1.val': { en: '300+', ru: '300+' },
