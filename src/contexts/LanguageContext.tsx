@@ -28,6 +28,11 @@ const translations: Record<string, Record<Language, string>> = {
   'work.elnura.role': { en: 'Housewife, Chicago', ru: 'Домохозяйка, Чикаго' },
   'work.elnura.app': { en: 'English phrases app', ru: 'Приложение для изучения английского' },
   'work.elnura.desc': { en: 'Learn English through simple phrases with transcription and translation.', ru: 'Учите английский по простым фразам с произношением и переводом.' },
+  'work.nurgul.name': { en: 'Nurgul', ru: 'Нургуль' },
+  'work.nurgul.role': { en: 'Analyst at MBank, Bishkek — 18 years a public school teacher', ru: 'Аналитик в MBank, Бишкек — 18 лет работала учителем в школе' },
+  'work.nurgul.app': { en: 'Calm clone', ru: 'Клон Calm' },
+  'work.nurgul.desc': { en: 'A meditation app with personalized goals, guided sessions and sleep stories.', ru: 'Приложение для медитации с персональными целями, сессиями и историями для сна.' },
+
 
 
   // Hero
