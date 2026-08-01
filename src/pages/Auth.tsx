@@ -14,7 +14,6 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showLink, setShowLink] = useState(false);
   const shareUrl = `https://ios.getforce.org${window.location.pathname}`;
 
   const redirectAfterAuth = useCallback(async (userId: string) => {
