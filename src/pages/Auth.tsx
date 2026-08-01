@@ -117,43 +117,32 @@ export default function AuthPage() {
           {mode === "signin" ? "Need an account? Sign up" : "Have an account? Sign in"}
         </button>
 
-        {showLink ? (
-          <div className="flex items-center gap-2">
-            <Input
-              readOnly
-              value={shareUrl}
-              onFocus={(e) => e.currentTarget.select()}
-              className="flex-1 text-xs"
-            />
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard?.writeText(shareUrl);
-                  toast.success("Link copied");
-                } catch {
-                  toast.error("Copy failed — select manually");
-                }
-              }}
-            >
-              Copy
-            </Button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setShowLink(true)}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-foreground/10 text-sm font-semibold text-foreground/70 hover:bg-card/60 transition-colors"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-            </svg>
-            Share this page
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              await navigator.clipboard?.writeText(shareUrl);
+              toast.success("Link copied: " + shareUrl);
+            } catch {
+              const ta = document.createElement("textarea");
+              ta.value = shareUrl;
+              ta.style.position = "fixed";
+              ta.style.opacity = "0";
+              document.body.appendChild(ta);
+              ta.select();
+              try { document.execCommand("copy"); toast.success("Link copied: " + shareUrl); }
+              catch { toast.error("Copy failed — " + shareUrl); }
+              document.body.removeChild(ta);
+            }
+          }}
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-foreground/10 text-sm font-semibold text-foreground/70 hover:bg-card/60 transition-colors"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+          Share this page
+        </button>
       </div>
     </div>
   );
