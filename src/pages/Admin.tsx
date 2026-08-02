@@ -324,6 +324,35 @@ export default function AdminPage() {
     setEditingLesson(data as Lesson);
   };
 
+  const openLesson = async (id: string) => {
+    const l = lessons.find((x) => x.id === id);
+    if (!l) return;
+    // Open immediately with what we have, then hydrate heavy fields.
+    setEditingLesson(l);
+    if (l.content_html == null && l.content == null && l.video_url == null) {
+      const { data: full } = await supabase
+        .from("lessons")
+        .select("video_url,content,content_html")
+        .eq("id", id)
+        .maybeSingle();
+      if (full) {
+        const hydrated: Lesson = { ...l, ...(full as any) };
+        setLessons((p) => p.map((x) => (x.id === id ? hydrated : x)));
+        setEditingLesson((cur) => (cur && cur.id === id ? hydrated : cur));
+      }
+    }
+  };
+
+  // Flat ordered list of lessons (chapter order, then lesson order)
+  const orderedLessons = chapters.flatMap((ch) =>
+    lessons
+      .filter((l) => l.chapter_id === ch.id)
+      .sort((a, b) => a.order_index - b.order_index)
+  );
+  const nextLesson = editingLesson
+    ? orderedLessons[orderedLessons.findIndex((l) => l.id === editingLesson.id) + 1] ?? null
+    : null;
+
 
   const deleteLesson = async (l: Lesson) => {
     const prev = lessons;
