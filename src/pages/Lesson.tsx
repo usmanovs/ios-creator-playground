@@ -105,7 +105,10 @@ const LessonPage = () => {
   useEffect(() => {
     if (!courseId || !lessonId) return;
     const nav = queryClient.getQueryData<CourseNav>(["course-nav", courseId]);
-    if (!nav) return;
+    if (!nav) {
+      setNextLesson(null);
+      return;
+    }
 
     const ordered = [...nav.lessons].sort((a, b) => {
       const ai = nav.chapters.find((c) => c.id === a.chapter_id)?.order_index ?? 0;
@@ -113,7 +116,13 @@ const LessonPage = () => {
       return ai - bi || a.order_index - b.order_index;
     });
     const idx = ordered.findIndex((l) => l.id === lessonId);
-    if (idx === -1) return;
+    if (idx === -1) {
+      setNextLesson(null);
+      return;
+    }
+
+    const next = ordered[idx + 1];
+    setNextLesson(next ? { id: next.id, title: next.title } : null);
 
     const neighbors = [ordered[idx - 1], ordered[idx + 1]].filter(Boolean);
     for (const n of neighbors) {
