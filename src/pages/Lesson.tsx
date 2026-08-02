@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, ArrowRight } from "lucide-react";
-import DOMPurify from "dompurify";
+import { sanitizeLessonHtml } from "@/lib/sanitizeLessonHtml";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -60,7 +60,7 @@ const LessonPage = () => {
   });
 
   const safeHtml = useMemo(
-    () => (lesson?.content_html ? DOMPurify.sanitize(lesson.content_html) : ""),
+    () => sanitizeLessonHtml(lesson?.content_html),
     [lesson?.content_html]
   );
 
