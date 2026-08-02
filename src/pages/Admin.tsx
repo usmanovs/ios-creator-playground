@@ -761,7 +761,10 @@ export default function AdminPage() {
         lesson={editingLesson}
         onClose={() => setEditingLesson(null)}
         onSave={saveLessonPatch}
+        nextLessonTitle={nextLesson?.title ?? null}
+        onNextLesson={nextLesson ? () => openLesson(nextLesson.id) : undefined}
       />
+
 
       <ConfirmDialog
         open={!!confirmDeleteChapter}
