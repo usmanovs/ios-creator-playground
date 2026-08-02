@@ -57,10 +57,12 @@ export default function LessonEditor({ lesson, onClose, onSave, prevLessonTitle,
   const [confirmClose, setConfirmClose] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const autosaveTimer = useRef<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setDraft(lesson);
     setOriginal(lesson);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [lesson?.id]);
 
   const dirty =
