@@ -129,7 +129,7 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
   return (
     <>
       <Dialog open={!!lesson} onOpenChange={(o) => !o && tryClose()}>
-        <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden flex flex-col relative">
           <DialogHeader>
             <div className="flex items-center justify-between gap-3">
               <DialogTitle className="flex items-center gap-3">
