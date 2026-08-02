@@ -727,24 +727,8 @@ export default function AdminPage() {
                         onRename={(t) => renameChapter(ch, t)}
                         onDelete={() => setConfirmDeleteChapter(ch)}
                         onAddLesson={() => addLesson(ch.id)}
-                        onEditLesson={async (id) => {
-                          const l = lessons.find((x) => x.id === id);
-                          if (!l) return;
-                          // Open immediately with what we have, then hydrate heavy fields.
-                          setEditingLesson(l);
-                          if (l.content_html == null && l.content == null && l.video_url == null) {
-                            const { data: full } = await supabase
-                              .from("lessons")
-                              .select("video_url,content,content_html")
-                              .eq("id", id)
-                              .maybeSingle();
-                            if (full) {
-                              const hydrated: Lesson = { ...l, ...(full as any) };
-                              setLessons((p) => p.map((x) => (x.id === id ? hydrated : x)));
-                              setEditingLesson((cur) => (cur && cur.id === id ? hydrated : cur));
-                            }
-                          }
-                        }}
+                        onEditLesson={(id) => openLesson(id)}
+
                         onDeleteLesson={(id) => {
                           const l = lessons.find((x) => x.id === id);
                           if (l) setConfirmDeleteLesson(l);
