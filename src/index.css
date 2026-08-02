@@ -225,3 +225,22 @@ html {
   margin-top: 0;
   margin-bottom: 0;
 }
+
+/* Tighter spacing under headings in lesson content & editor */
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.prose h1,
+.prose h2,
+.prose h3 {
+  margin-bottom: 0.3em;
+}
+.ProseMirror h1 + *,
+.ProseMirror h2 + *,
+.ProseMirror h3 + *,
+.prose h1 + *,
+.prose h2 + *,
+.prose h3 + * {
+  margin-top: 0.2em;
+}
+
