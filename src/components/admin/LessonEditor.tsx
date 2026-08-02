@@ -128,13 +128,29 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
       <Dialog open={!!lesson} onOpenChange={(o) => !o && tryClose()}>
         <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-3">
-              Edit lesson
-              <span className={`text-xs px-2 py-0.5 rounded-full ${dirty ? "bg-amber-500/20 text-amber-400" : "bg-emerald-500/20 text-emerald-400"}`}>
-                {dirty ? "Unsaved" : "Saved"}
-              </span>
-              <span className="text-xs text-foreground/40 hidden md:inline">⌘S to save · Esc to close</span>
-            </DialogTitle>
+            <div className="flex items-center justify-between gap-3">
+              <DialogTitle className="flex items-center gap-3">
+                Edit lesson
+                <span className={`text-xs px-2 py-0.5 rounded-full ${dirty ? "bg-amber-500/20 text-amber-400" : "bg-emerald-500/20 text-emerald-400"}`}>
+                  {dirty ? "Unsaved" : "Saved"}
+                </span>
+                <span className="text-xs text-foreground/40 hidden md:inline">⌘S to save · Esc to close</span>
+              </DialogTitle>
+              {onNextLesson && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="shrink-0"
+                  onClick={async () => {
+                    if (dirty && !dayMissing) await persist();
+                    onNextLesson();
+                  }}
+                  title={nextLessonTitle ? `Next: ${nextLessonTitle}` : "Next lesson"}
+                >
+                  Next lesson →
+                </Button>
+              )}
+            </div>
           </DialogHeader>
 
           {draft && (
@@ -234,46 +250,29 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
             </div>
           )}
 
-          <DialogFooter className="sm:justify-between">
-            {onNextLesson ? (
-              <Button
-                variant="secondary"
-                className="sm:mr-auto"
-                onClick={async () => {
-                  if (dirty && !dayMissing) await persist();
-                  onNextLesson();
-                }}
-                title={nextLessonTitle ?? undefined}
-              >
-                Next lesson →
-              </Button>
-            ) : (
-              <span />
-            )}
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={tryClose}>
-                Close
-              </Button>
-              <Button
-                onClick={async () => {
-                  if (await persist()) toast.success("Saved");
-                }}
-                disabled={!dirty || dayMissing}
-              >
-                Save
-              </Button>
-              <Button
-                onClick={async () => {
-                  if (await persist()) {
-                    toast.success("Saved");
-                    onClose();
-                  }
-                }}
-                disabled={!dirty || dayMissing}
-              >
-                Save and Close
-              </Button>
-            </div>
+          <DialogFooter className="sm:justify-end gap-2">
+            <Button variant="outline" onClick={tryClose}>
+              Close
+            </Button>
+            <Button
+              onClick={async () => {
+                if (await persist()) toast.success("Saved");
+              }}
+              disabled={!dirty || dayMissing}
+            >
+              Save
+            </Button>
+            <Button
+              onClick={async () => {
+                if (await persist()) {
+                  toast.success("Saved");
+                  onClose();
+                }
+              }}
+              disabled={!dirty || dayMissing}
+            >
+              Save and Close
+            </Button>
           </DialogFooter>
 
         </DialogContent>
