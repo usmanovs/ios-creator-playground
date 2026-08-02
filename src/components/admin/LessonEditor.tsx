@@ -140,7 +140,7 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="shrink-0"
+                  className="shrink-0 mr-8"
                   onClick={async () => {
                     if (dirty && !dayMissing) await persist();
                     onNextLesson();
