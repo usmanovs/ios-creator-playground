@@ -43,13 +43,15 @@ type Props = {
   lesson: EditableLesson | null;
   onClose: () => void;
   onSave: (patch: Partial<EditableLesson>) => Promise<void>;
+  prevLessonTitle?: string | null;
+  onPrevLesson?: () => void;
   nextLessonTitle?: string | null;
   onNextLesson?: () => void;
 };
 
 const eq = (a: any, b: any) => (a ?? "") === (b ?? "");
 
-export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle, onNextLesson }: Props) {
+export default function LessonEditor({ lesson, onClose, onSave, prevLessonTitle, onPrevLesson, nextLessonTitle, onNextLesson }: Props) {
   const [draft, setDraft] = useState<EditableLesson | null>(lesson);
   const [original, setOriginal] = useState<EditableLesson | null>(lesson);
   const [confirmClose, setConfirmClose] = useState(false);
