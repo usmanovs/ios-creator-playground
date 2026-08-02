@@ -53,6 +53,7 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
   const [draft, setDraft] = useState<EditableLesson | null>(lesson);
   const [original, setOriginal] = useState<EditableLesson | null>(lesson);
   const [confirmClose, setConfirmClose] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const autosaveTimer = useRef<number | null>(null);
 
   useEffect(() => {
