@@ -250,30 +250,29 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
             </div>
           )}
 
-          <DialogFooter className="sm:justify-end">
-              <Button variant="outline" onClick={tryClose}>
-                Close
-              </Button>
-              <Button
-                onClick={async () => {
-                  if (await persist()) toast.success("Saved");
-                }}
-                disabled={!dirty || dayMissing}
-              >
-                Save
-              </Button>
-              <Button
-                onClick={async () => {
-                  if (await persist()) {
-                    toast.success("Saved");
-                    onClose();
-                  }
-                }}
-                disabled={!dirty || dayMissing}
-              >
-                Save and Close
-              </Button>
-            </div>
+          <DialogFooter className="sm:justify-end gap-2">
+            <Button variant="outline" onClick={tryClose}>
+              Close
+            </Button>
+            <Button
+              onClick={async () => {
+                if (await persist()) toast.success("Saved");
+              }}
+              disabled={!dirty || dayMissing}
+            >
+              Save
+            </Button>
+            <Button
+              onClick={async () => {
+                if (await persist()) {
+                  toast.success("Saved");
+                  onClose();
+                }
+              }}
+              disabled={!dirty || dayMissing}
+            >
+              Save and Close
+            </Button>
           </DialogFooter>
 
         </DialogContent>
