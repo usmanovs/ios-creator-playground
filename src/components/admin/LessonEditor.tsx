@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import RichTextEditor from "./RichTextEditor";
 import LessonPreview from "./LessonPreview";
 import YouTubeUrlField from "./YouTubeUrlField";
@@ -164,7 +165,7 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                     onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                   />
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Type</Label>
                     <Select
@@ -176,19 +177,6 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                         <SelectItem value="video">Video</SelectItem>
                         <SelectItem value="text">Text</SelectItem>
                         <SelectItem value="pdf">PDF</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Status</Label>
-                    <Select
-                      value={draft.status}
-                      onValueChange={(v) => setDraft({ ...draft, status: v })}
-                    >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="published">Published</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -213,6 +201,23 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                       <p className="text-xs text-destructive">Day is required</p>
                     )}
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <RadioGroup
+                    value={draft.status}
+                    onValueChange={(v) => setDraft({ ...draft, status: v })}
+                    className="flex gap-6"
+                  >
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="draft" id="status-draft" />
+                      <Label htmlFor="status-draft" className="cursor-pointer font-normal">Draft</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="published" id="status-published" />
+                      <Label htmlFor="status-published" className="cursor-pointer font-normal">Published</Label>
+                    </div>
+                  </RadioGroup>
                 </div>
                 {(draft.lesson_type === "video" || draft.lesson_type === "pdf") && (
                   <YouTubeUrlField
