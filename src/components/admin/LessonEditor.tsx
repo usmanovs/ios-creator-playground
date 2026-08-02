@@ -168,7 +168,7 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
           </DialogHeader>
 
           {draft && (
-            <div className="grid md:grid-cols-2 gap-4 overflow-y-auto flex-1 pr-1">
+            <div className="overflow-y-auto flex-1 pr-1">
               {/* Form */}
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -257,14 +257,32 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                   />
                 </div>
               </div>
+            </div>
+          )}
 
-              {/* Preview */}
-              <LessonPreview
-                lessonType={draft.lesson_type}
-                videoUrl={draft.video_url}
-                contentHtml={draft.content_html}
-                title={draft.title}
-              />
+          {/* On-demand preview overlay */}
+          {draft && showPreview && (
+            <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col rounded-lg">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <span className="text-sm font-semibold text-foreground/70">Lesson Preview</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setShowPreview(false)}
+                  title="Close preview"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                <LessonPreview
+                  lessonType={draft.lesson_type}
+                  videoUrl={draft.video_url}
+                  contentHtml={draft.content_html}
+                  title={draft.title}
+                />
+              </div>
             </div>
           )}
 
