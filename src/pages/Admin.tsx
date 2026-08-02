@@ -349,9 +349,11 @@ export default function AdminPage() {
       .filter((l) => l.chapter_id === ch.id)
       .sort((a, b) => a.order_index - b.order_index)
   );
-  const nextLesson = editingLesson
-    ? orderedLessons[orderedLessons.findIndex((l) => l.id === editingLesson.id) + 1] ?? null
-    : null;
+  const editingIndex = editingLesson
+    ? orderedLessons.findIndex((l) => l.id === editingLesson.id)
+    : -1;
+  const nextLesson = editingIndex >= 0 ? orderedLessons[editingIndex + 1] ?? null : null;
+  const prevLesson = editingIndex > 0 ? orderedLessons[editingIndex - 1] ?? null : null;
 
 
   const deleteLesson = async (l: Lesson) => {
@@ -761,6 +763,8 @@ export default function AdminPage() {
         lesson={editingLesson}
         onClose={() => setEditingLesson(null)}
         onSave={saveLessonPatch}
+        prevLessonTitle={prevLesson?.title ?? null}
+        onPrevLesson={prevLesson ? () => openLesson(prevLesson.id) : undefined}
         nextLessonTitle={nextLesson?.title ?? null}
         onNextLesson={nextLesson ? () => openLesson(nextLesson.id) : undefined}
       />
