@@ -251,29 +251,31 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
               <span />
             )}
             <div className="flex gap-2">
-
-              Close
-            </Button>
-            <Button
-              onClick={async () => {
-                if (await persist()) toast.success("Saved");
-              }}
-              disabled={!dirty || dayMissing}
-            >
-              Save
-            </Button>
-            <Button
-              onClick={async () => {
-                if (await persist()) {
-                  toast.success("Saved");
-                  onClose();
-                }
-              }}
-              disabled={!dirty || dayMissing}
-            >
-              Save and Close
-            </Button>
+              <Button variant="outline" onClick={tryClose}>
+                Close
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (await persist()) toast.success("Saved");
+                }}
+                disabled={!dirty || dayMissing}
+              >
+                Save
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (await persist()) {
+                    toast.success("Saved");
+                    onClose();
+                  }
+                }}
+                disabled={!dirty || dayMissing}
+              >
+                Save and Close
+              </Button>
+            </div>
           </DialogFooter>
+
         </DialogContent>
       </Dialog>
 
