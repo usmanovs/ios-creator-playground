@@ -139,20 +139,31 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                 </span>
                 <span className="text-xs text-foreground/40 hidden md:inline">⌘S to save · Esc to close</span>
               </DialogTitle>
-              {onNextLesson && (
+              <div className="flex items-center gap-2 mr-8">
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="shrink-0 mr-8"
-                  onClick={async () => {
-                    if (dirty && !dayMissing) await persist();
-                    onNextLesson();
-                  }}
-                  title={nextLessonTitle ? `Next: ${nextLessonTitle}` : "Next lesson"}
+                  className="shrink-0"
+                  onClick={() => setShowPreview(true)}
+                  title="Preview lesson"
                 >
-                  Next lesson →
+                  <Eye className="h-4 w-4 mr-1" /> Preview
                 </Button>
-              )}
+                {onNextLesson && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={async () => {
+                      if (dirty && !dayMissing) await persist();
+                      onNextLesson();
+                    }}
+                    title={nextLessonTitle ? `Next: ${nextLessonTitle}` : "Next lesson"}
+                  >
+                    Next lesson →
+                  </Button>
+                )}
+              </div>
             </div>
           </DialogHeader>
 
