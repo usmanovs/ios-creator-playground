@@ -228,7 +228,23 @@ const LessonPage = () => {
                         <Link to="/auth">Sign in to track progress</Link>
                       </Button>
                     )}
+
+                    {nextLesson && (
+                      <Button
+                        variant="default"
+                        className="ml-auto gap-2"
+                        onClick={() => navigate(`/lesson/${nextLesson.id}`)}
+                      >
+                        Next lesson
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
+                  {nextLesson && (
+                    <p className="mt-2 text-right text-xs text-foreground/40 ml-auto">
+                      {nextLesson.title}
+                    </p>
+                  )}
                 </>
               )}
             </div>
