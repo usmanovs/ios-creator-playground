@@ -6,6 +6,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Eye, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,6 +53,7 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
   const [draft, setDraft] = useState<EditableLesson | null>(lesson);
   const [original, setOriginal] = useState<EditableLesson | null>(lesson);
   const [confirmClose, setConfirmClose] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const autosaveTimer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -127,7 +129,7 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
   return (
     <>
       <Dialog open={!!lesson} onOpenChange={(o) => !o && tryClose()}>
-        <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden flex flex-col relative">
           <DialogHeader>
             <div className="flex items-center justify-between gap-3">
               <DialogTitle className="flex items-center gap-3">
@@ -137,25 +139,36 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                 </span>
                 <span className="text-xs text-foreground/40 hidden md:inline">⌘S to save · Esc to close</span>
               </DialogTitle>
-              {onNextLesson && (
+              <div className="flex items-center gap-2 mr-8">
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="shrink-0 mr-8"
-                  onClick={async () => {
-                    if (dirty && !dayMissing) await persist();
-                    onNextLesson();
-                  }}
-                  title={nextLessonTitle ? `Next: ${nextLessonTitle}` : "Next lesson"}
+                  className="shrink-0"
+                  onClick={() => setShowPreview(true)}
+                  title="Preview lesson"
                 >
-                  Next lesson →
+                  <Eye className="h-4 w-4 mr-1" /> Preview
                 </Button>
-              )}
+                {onNextLesson && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={async () => {
+                      if (dirty && !dayMissing) await persist();
+                      onNextLesson();
+                    }}
+                    title={nextLessonTitle ? `Next: ${nextLessonTitle}` : "Next lesson"}
+                  >
+                    Next lesson →
+                  </Button>
+                )}
+              </div>
             </div>
           </DialogHeader>
 
           {draft && (
-            <div className="grid md:grid-cols-2 gap-4 overflow-y-auto flex-1 pr-1">
+            <div className="overflow-y-auto flex-1 pr-1">
               {/* Form */}
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -244,14 +257,32 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                   />
                 </div>
               </div>
+            </div>
+          )}
 
-              {/* Preview */}
-              <LessonPreview
-                lessonType={draft.lesson_type}
-                videoUrl={draft.video_url}
-                contentHtml={draft.content_html}
-                title={draft.title}
-              />
+          {/* On-demand preview overlay */}
+          {draft && showPreview && (
+            <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col rounded-lg">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <span className="text-sm font-semibold text-foreground/70">Lesson Preview</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setShowPreview(false)}
+                  title="Close preview"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                <LessonPreview
+                  lessonType={draft.lesson_type}
+                  videoUrl={draft.video_url}
+                  contentHtml={draft.content_html}
+                  title={draft.title}
+                />
+              </div>
             </div>
           )}
 
