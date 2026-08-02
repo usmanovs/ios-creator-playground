@@ -142,6 +142,20 @@ export default function LessonEditor({ lesson, onClose, onSave, prevLessonTitle,
                 <span className="text-xs text-foreground/40 hidden md:inline">⌘S to save · Esc to close</span>
               </DialogTitle>
               <div className="flex items-center gap-2 mr-8">
+                {onPrevLesson && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={async () => {
+                      if (dirty && !dayMissing) await persist();
+                      onPrevLesson();
+                    }}
+                    title={prevLessonTitle ? `Previous: ${prevLessonTitle}` : "Previous lesson"}
+                  >
+                    ← Previous
+                  </Button>
+                )}
                 <Button
                   variant="secondary"
                   size="sm"
