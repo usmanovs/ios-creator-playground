@@ -234,8 +234,24 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
             </div>
           )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={tryClose}>
+          <DialogFooter className="sm:justify-between">
+            {onNextLesson ? (
+              <Button
+                variant="secondary"
+                className="sm:mr-auto"
+                onClick={async () => {
+                  if (dirty && !dayMissing) await persist();
+                  onNextLesson();
+                }}
+                title={nextLessonTitle ?? undefined}
+              >
+                Next lesson →
+              </Button>
+            ) : (
+              <span />
+            )}
+            <div className="flex gap-2">
+
               Close
             </Button>
             <Button
