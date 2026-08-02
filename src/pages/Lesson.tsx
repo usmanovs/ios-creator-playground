@@ -102,17 +102,45 @@ const LessonPage = () => {
     toast.success("Progress updated");
   };
 
+  // Fetch the full course nav so "Next lesson" always works, even on direct nav.
+  const { data: navData } = useQuery({
+    queryKey: ["course-nav", courseId],
+    queryFn: async (): Promise<CourseNav | null> => {
+      if (!courseId) return null;
+      const { data } = await supabase
+        .from("courses")
+        .select("title")
+        .eq("id", courseId)
+        .maybeSingle();
+      const { data: chapters } = await supabase
+        .from("chapters")
+        .select("id,title,order_index")
+        .eq("course_id", courseId)
+        .order("order_index", { ascending: true });
+      const { data: lessons } = await supabase
+        .from("lessons")
+        .select("id,chapter_id,title,order_index,lesson_type")
+        .eq("course_id", courseId)
+        .order("order_index", { ascending: true });
+      return {
+        course: data ? { title: (data as { title: string }).title } : null,
+        chapters: (chapters as CourseNav["chapters"]) ?? [],
+        lessons: (lessons as CourseNav["lessons"]) ?? [],
+      };
+    },
+    enabled: !!courseId,
+    staleTime: 5 * 60 * 1000,
+  });
+
   useEffect(() => {
-    if (!courseId || !lessonId) return;
-    const nav = queryClient.getQueryData<CourseNav>(["course-nav", courseId]);
-    if (!nav) {
+    if (!courseId || !lessonId || !navData) {
       setNextLesson(null);
       return;
     }
 
-    const ordered = [...nav.lessons].sort((a, b) => {
-      const ai = nav.chapters.find((c) => c.id === a.chapter_id)?.order_index ?? 0;
-      const bi = nav.chapters.find((c) => c.id === b.chapter_id)?.order_index ?? 0;
+    const ordered = [...navData.lessons].sort((a, b) => {
+      const ai = navData.chapters.find((c) => c.id === a.chapter_id)?.order_index ?? 0;
+      const bi = navData.chapters.find((c) => c.id === b.chapter_id)?.order_index ?? 0;
       return ai - bi || a.order_index - b.order_index;
     });
     const idx = ordered.findIndex((l) => l.id === lessonId);
@@ -132,7 +160,7 @@ const LessonPage = () => {
         staleTime: 5 * 60 * 1000,
       });
     }
-  }, [courseId, lessonId, queryClient]);
+  }, [courseId, lessonId, navData, queryClient]);
 
   return (
     <SidebarProvider>
