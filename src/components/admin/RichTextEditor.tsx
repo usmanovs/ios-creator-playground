@@ -92,6 +92,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
       TableHeader,
       TableCell,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
+      ListKeymap,
     ],
     content: value || "",
     editorProps: {
