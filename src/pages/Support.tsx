@@ -1,14 +1,44 @@
-import { Smartphone, MessageCircle, Send, Instagram, Mail, ArrowLeft } from 'lucide-react';
+import { Smartphone, MessageCircle, Send, Instagram, Mail, ArrowLeft, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Support = () => {
+  const shareUrl = `https://ios.getforce.org/support`;
+
+  const sharePage = async () => {
+    try {
+      await navigator.clipboard?.writeText(shareUrl);
+      toast.success('Link copied: ' + shareUrl);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = shareUrl;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); toast.success('Link copied: ' + shareUrl); }
+      catch { toast.error('Copy failed — ' + shareUrl); }
+      document.body.removeChild(ta);
+    }
+  };
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-2xl mx-auto px-4 py-16">
+      <div className="flex items-center justify-between gap-4">
         <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-12">
           <ArrowLeft className="w-4 h-4" />
           Back to Home
         </Link>
+        <button
+          onClick={sharePage}
+          className="group inline-flex items-center gap-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all mb-12"
+        >
+          <div className="w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center group-hover:bg-foreground/10 transition-colors">
+            <Share2 className="w-4 h-4" />
+          </div>
+          Share this page
+        </button>
+      </div>
 
         <div className="flex items-center gap-3 mb-6">
           <Smartphone className="w-8 h-8 text-primary" />
