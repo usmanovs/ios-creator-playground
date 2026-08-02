@@ -128,13 +128,29 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
       <Dialog open={!!lesson} onOpenChange={(o) => !o && tryClose()}>
         <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-3">
-              Edit lesson
-              <span className={`text-xs px-2 py-0.5 rounded-full ${dirty ? "bg-amber-500/20 text-amber-400" : "bg-emerald-500/20 text-emerald-400"}`}>
-                {dirty ? "Unsaved" : "Saved"}
-              </span>
-              <span className="text-xs text-foreground/40 hidden md:inline">⌘S to save · Esc to close</span>
-            </DialogTitle>
+            <div className="flex items-center justify-between gap-3">
+              <DialogTitle className="flex items-center gap-3">
+                Edit lesson
+                <span className={`text-xs px-2 py-0.5 rounded-full ${dirty ? "bg-amber-500/20 text-amber-400" : "bg-emerald-500/20 text-emerald-400"}`}>
+                  {dirty ? "Unsaved" : "Saved"}
+                </span>
+                <span className="text-xs text-foreground/40 hidden md:inline">⌘S to save · Esc to close</span>
+              </DialogTitle>
+              {onNextLesson && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="shrink-0"
+                  onClick={async () => {
+                    if (dirty && !dayMissing) await persist();
+                    onNextLesson();
+                  }}
+                  title={nextLessonTitle ? `Next: ${nextLessonTitle}` : "Next lesson"}
+                >
+                  Next lesson →
+                </Button>
+              )}
+            </div>
           </DialogHeader>
 
           {draft && (
