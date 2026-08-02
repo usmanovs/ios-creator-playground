@@ -46,9 +46,11 @@ const fetchLesson = async (lessonId: string): Promise<Lesson | null> => {
 
 const LessonPage = () => {
   const { lessonId } = useParams();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, completedIds } = useUserProgress();
   const [toggling, setToggling] = useState(false);
+  const [nextLesson, setNextLesson] = useState<{ id: string; title: string } | null>(null);
 
   const { data: lesson, isLoading, isFetching } = useQuery({
     queryKey: ["lesson", lessonId],
