@@ -1,7 +1,26 @@
-import { Smartphone, MessageCircle, Send, Instagram, Mail, ArrowLeft } from 'lucide-react';
+import { Smartphone, MessageCircle, Send, Instagram, Mail, ArrowLeft, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Support = () => {
+  const shareUrl = `https://ios.getforce.org/support`;
+
+  const sharePage = async () => {
+    try {
+      await navigator.clipboard?.writeText(shareUrl);
+      toast.success('Link copied: ' + shareUrl);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = shareUrl;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); toast.success('Link copied: ' + shareUrl); }
+      catch { toast.error('Copy failed — ' + shareUrl); }
+      document.body.removeChild(ta);
+    }
+  };
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-2xl mx-auto px-4 py-16">
