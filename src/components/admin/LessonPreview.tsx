@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import DOMPurify from "dompurify";
+import { sanitizeLessonHtml } from "@/lib/sanitizeLessonHtml";
 import { isYouTube, toYouTubeEmbed } from "@/lib/youtube";
 
 type Props = {
@@ -11,9 +11,10 @@ type Props = {
 
 export default function LessonPreview({ lessonType, videoUrl, contentHtml, title }: Props) {
   const safeHtml = useMemo(
-    () => (contentHtml ? DOMPurify.sanitize(contentHtml) : ""),
+    () => sanitizeLessonHtml(contentHtml),
     [contentHtml]
   );
+
 
   return (
     <div className="rounded-xl border border-border bg-card/40 p-4 space-y-3 h-full overflow-y-auto">
