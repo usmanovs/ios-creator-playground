@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -46,9 +46,11 @@ const fetchLesson = async (lessonId: string): Promise<Lesson | null> => {
 
 const LessonPage = () => {
   const { lessonId } = useParams();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, completedIds } = useUserProgress();
   const [toggling, setToggling] = useState(false);
+  const [nextLesson, setNextLesson] = useState<{ id: string; title: string } | null>(null);
 
   const { data: lesson, isLoading, isFetching } = useQuery({
     queryKey: ["lesson", lessonId],
@@ -103,7 +105,10 @@ const LessonPage = () => {
   useEffect(() => {
     if (!courseId || !lessonId) return;
     const nav = queryClient.getQueryData<CourseNav>(["course-nav", courseId]);
-    if (!nav) return;
+    if (!nav) {
+      setNextLesson(null);
+      return;
+    }
 
     const ordered = [...nav.lessons].sort((a, b) => {
       const ai = nav.chapters.find((c) => c.id === a.chapter_id)?.order_index ?? 0;
@@ -111,7 +116,13 @@ const LessonPage = () => {
       return ai - bi || a.order_index - b.order_index;
     });
     const idx = ordered.findIndex((l) => l.id === lessonId);
-    if (idx === -1) return;
+    if (idx === -1) {
+      setNextLesson(null);
+      return;
+    }
+
+    const next = ordered[idx + 1];
+    setNextLesson(next ? { id: next.id, title: next.title } : null);
 
     const neighbors = [ordered[idx - 1], ordered[idx + 1]].filter(Boolean);
     for (const n of neighbors) {
@@ -217,7 +228,23 @@ const LessonPage = () => {
                         <Link to="/auth">Sign in to track progress</Link>
                       </Button>
                     )}
+
+                    {nextLesson && (
+                      <Button
+                        variant="default"
+                        className="ml-auto gap-2"
+                        onClick={() => navigate(`/lesson/${nextLesson.id}`)}
+                      >
+                        Next lesson
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
+                  {nextLesson && (
+                    <p className="mt-2 text-right text-xs text-foreground/40 ml-auto">
+                      {nextLesson.title}
+                    </p>
+                  )}
                 </>
               )}
             </div>
