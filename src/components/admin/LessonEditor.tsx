@@ -170,22 +170,23 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
           {draft && (
             <div className="overflow-y-auto flex-1 pr-1">
               {/* Form */}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Title</Label>
-                  <Input
-                    value={draft.title}
-                    onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Type</Label>
+              <div className="space-y-3">
+                <div className="grid grid-cols-12 gap-3 items-start">
+                  <div className="col-span-12 md:col-span-5 space-y-1">
+                    <Label className="text-xs text-muted-foreground">Title</Label>
+                    <Input
+                      className="h-9"
+                      value={draft.title}
+                      onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                    />
+                  </div>
+                  <div className="col-span-6 md:col-span-2 space-y-1">
+                    <Label className="text-xs text-muted-foreground">Type</Label>
                     <Select
                       value={draft.lesson_type}
                       onValueChange={(v) => setDraft({ ...draft, lesson_type: v })}
                     >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="video">Video</SelectItem>
                         <SelectItem value="text">Text</SelectItem>
@@ -193,16 +194,16 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Day <span className="text-destructive">*</span></Label>
+                  <div className="col-span-6 md:col-span-2 space-y-1">
+                    <Label className="text-xs text-muted-foreground">Day <span className="text-destructive">*</span></Label>
                     <Select
                       value={draft.day_number ? String(draft.day_number) : ""}
                       onValueChange={(v) =>
                         setDraft({ ...draft, day_number: Number(v) })
                       }
                     >
-                      <SelectTrigger className={dayMissing ? "border-destructive" : ""}>
-                        <SelectValue placeholder="Select day" />
+                      <SelectTrigger className={`h-9 ${dayMissing ? "border-destructive" : ""}`}>
+                        <SelectValue placeholder="Day" />
                       </SelectTrigger>
                       <SelectContent>
                         {[1, 2, 3, 4, 5, 6, 7].map((d) => (
@@ -211,27 +212,28 @@ export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle,
                       </SelectContent>
                     </Select>
                     {dayMissing && (
-                      <p className="text-xs text-destructive">Day is required</p>
+                      <p className="text-xs text-destructive">Required</p>
                     )}
                   </div>
+                  <div className="col-span-12 md:col-span-3 space-y-1">
+                    <Label className="text-xs text-muted-foreground">Status</Label>
+                    <RadioGroup
+                      value={draft.status}
+                      onValueChange={(v) => setDraft({ ...draft, status: v })}
+                      className="flex gap-4 h-9 items-center"
+                    >
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="draft" id="status-draft" />
+                        <Label htmlFor="status-draft" className="cursor-pointer font-normal text-sm">Draft</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="published" id="status-published" />
+                        <Label htmlFor="status-published" className="cursor-pointer font-normal text-sm">Published</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <RadioGroup
-                    value={draft.status}
-                    onValueChange={(v) => setDraft({ ...draft, status: v })}
-                    className="flex gap-6"
-                  >
-                    <div className="flex items-center gap-2">
-                      <RadioGroupItem value="draft" id="status-draft" />
-                      <Label htmlFor="status-draft" className="cursor-pointer font-normal">Draft</Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <RadioGroupItem value="published" id="status-published" />
-                      <Label htmlFor="status-published" className="cursor-pointer font-normal">Published</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
+
                 {(draft.lesson_type === "video" || draft.lesson_type === "pdf") && (
                   <YouTubeUrlField
                     value={draft.video_url ?? ""}
