@@ -41,11 +41,13 @@ type Props = {
   lesson: EditableLesson | null;
   onClose: () => void;
   onSave: (patch: Partial<EditableLesson>) => Promise<void>;
+  nextLessonTitle?: string | null;
+  onNextLesson?: () => void;
 };
 
 const eq = (a: any, b: any) => (a ?? "") === (b ?? "");
 
-export default function LessonEditor({ lesson, onClose, onSave }: Props) {
+export default function LessonEditor({ lesson, onClose, onSave, nextLessonTitle, onNextLesson }: Props) {
   const [draft, setDraft] = useState<EditableLesson | null>(lesson);
   const [original, setOriginal] = useState<EditableLesson | null>(lesson);
   const [confirmClose, setConfirmClose] = useState(false);
@@ -232,30 +234,48 @@ export default function LessonEditor({ lesson, onClose, onSave }: Props) {
             </div>
           )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={tryClose}>
-              Close
-            </Button>
-            <Button
-              onClick={async () => {
-                if (await persist()) toast.success("Saved");
-              }}
-              disabled={!dirty || dayMissing}
-            >
-              Save
-            </Button>
-            <Button
-              onClick={async () => {
-                if (await persist()) {
-                  toast.success("Saved");
-                  onClose();
-                }
-              }}
-              disabled={!dirty || dayMissing}
-            >
-              Save and Close
-            </Button>
+          <DialogFooter className="sm:justify-between">
+            {onNextLesson ? (
+              <Button
+                variant="secondary"
+                className="sm:mr-auto"
+                onClick={async () => {
+                  if (dirty && !dayMissing) await persist();
+                  onNextLesson();
+                }}
+                title={nextLessonTitle ?? undefined}
+              >
+                Next lesson →
+              </Button>
+            ) : (
+              <span />
+            )}
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={tryClose}>
+                Close
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (await persist()) toast.success("Saved");
+                }}
+                disabled={!dirty || dayMissing}
+              >
+                Save
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (await persist()) {
+                    toast.success("Saved");
+                    onClose();
+                  }
+                }}
+                disabled={!dirty || dayMissing}
+              >
+                Save and Close
+              </Button>
+            </div>
           </DialogFooter>
+
         </DialogContent>
       </Dialog>
 
