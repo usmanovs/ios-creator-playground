@@ -186,7 +186,7 @@ export default function LessonEditor({ lesson, onClose, onSave, prevLessonTitle,
           </DialogHeader>
 
           {draft && (
-            <div className="overflow-y-auto flex-1 pr-1">
+            <div ref={scrollRef} className="overflow-y-auto flex-1 pr-1">
               {/* Form */}
               <div className="space-y-3">
                 <div className="grid grid-cols-12 gap-3 items-start">
