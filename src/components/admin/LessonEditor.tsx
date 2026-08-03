@@ -283,17 +283,45 @@ export default function LessonEditor({ lesson, onClose, onSave, prevLessonTitle,
           {/* On-demand preview overlay */}
           {draft && showPreview && (
             <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col rounded-lg">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border">
                 <span className="text-sm font-semibold text-foreground/70">Lesson Preview</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setShowPreview(false)}
-                  title="Close preview"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  {onPrevLesson && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={async () => {
+                        if (dirty && !dayMissing) await persist();
+                        onPrevLesson();
+                      }}
+                      title={prevLessonTitle ? `Previous: ${prevLessonTitle}` : "Previous lesson"}
+                    >
+                      ← Previous
+                    </Button>
+                  )}
+                  {onNextLesson && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={async () => {
+                        if (dirty && !dayMissing) await persist();
+                        onNextLesson();
+                      }}
+                      title={nextLessonTitle ? `Next: ${nextLessonTitle}` : "Next lesson"}
+                    >
+                      Next lesson →
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setShowPreview(false)}
+                    title="Close preview"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto p-4">
                 <LessonPreview
