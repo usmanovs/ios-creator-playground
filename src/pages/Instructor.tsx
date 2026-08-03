@@ -120,6 +120,21 @@ export default function InstructorPage() {
     if (data) setPreviewData(data as any);
   }, []);
 
+  // Board order (day, then schedule order) for preview prev/next navigation.
+  const previewOrder = useMemo(
+    () =>
+      [...lessons].sort(
+        (a, b) =>
+          (a.day_number ?? 99) - (b.day_number ?? 99) ||
+          (a.schedule_order ?? a.order_index) - (b.schedule_order ?? b.order_index)
+      ),
+    [lessons]
+  );
+  const previewIdx = previewId ? previewOrder.findIndex((l) => l.id === previewId) : -1;
+  const prevPreview = previewIdx > 0 ? previewOrder[previewIdx - 1] : null;
+  const nextPreview =
+    previewIdx > -1 && previewIdx < previewOrder.length - 1 ? previewOrder[previewIdx + 1] : null;
+
   useEffect(() => {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -747,7 +762,29 @@ export default function InstructorPage() {
       <Dialog open={!!previewId} onOpenChange={(o) => { if (!o) { setPreviewId(null); setPreviewData(null); } }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Lesson preview</DialogTitle>
+            <div className="flex items-center justify-between gap-3 mr-8">
+              <DialogTitle>Lesson preview</DialogTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={!prevPreview}
+                  onClick={() => prevPreview && openPreview(prevPreview.id)}
+                  title={prevPreview ? `Previous: ${prevPreview.title}` : "No previous lesson"}
+                >
+                  ← Previous
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={!nextPreview}
+                  onClick={() => nextPreview && openPreview(nextPreview.id)}
+                  title={nextPreview ? `Next: ${nextPreview.title}` : "No next lesson"}
+                >
+                  Next lesson →
+                </Button>
+              </div>
+            </div>
           </DialogHeader>
           <div className="overflow-y-auto flex-1">
             {previewLoading && <div className="text-sm text-foreground/50 p-4">Loading…</div>}
