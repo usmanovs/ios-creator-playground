@@ -120,6 +120,21 @@ export default function InstructorPage() {
     if (data) setPreviewData(data as any);
   }, []);
 
+  // Board order (day, then schedule order) for preview prev/next navigation.
+  const previewOrder = useMemo(
+    () =>
+      [...lessons].sort(
+        (a, b) =>
+          (a.day_number ?? 99) - (b.day_number ?? 99) ||
+          (a.schedule_order ?? a.order_index) - (b.schedule_order ?? b.order_index)
+      ),
+    [lessons]
+  );
+  const previewIdx = previewId ? previewOrder.findIndex((l) => l.id === previewId) : -1;
+  const prevPreview = previewIdx > 0 ? previewOrder[previewIdx - 1] : null;
+  const nextPreview =
+    previewIdx > -1 && previewIdx < previewOrder.length - 1 ? previewOrder[previewIdx + 1] : null;
+
   useEffect(() => {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
