@@ -747,7 +747,29 @@ export default function InstructorPage() {
       <Dialog open={!!previewId} onOpenChange={(o) => { if (!o) { setPreviewId(null); setPreviewData(null); } }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Lesson preview</DialogTitle>
+            <div className="flex items-center justify-between gap-3 mr-8">
+              <DialogTitle>Lesson preview</DialogTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={!prevPreview}
+                  onClick={() => prevPreview && openPreview(prevPreview.id)}
+                  title={prevPreview ? `Previous: ${prevPreview.title}` : "No previous lesson"}
+                >
+                  ← Previous
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={!nextPreview}
+                  onClick={() => nextPreview && openPreview(nextPreview.id)}
+                  title={nextPreview ? `Next: ${nextPreview.title}` : "No next lesson"}
+                >
+                  Next lesson →
+                </Button>
+              </div>
+            </div>
           </DialogHeader>
           <div className="overflow-y-auto flex-1">
             {previewLoading && <div className="text-sm text-foreground/50 p-4">Loading…</div>}
