@@ -225,6 +225,13 @@ const Retro = () => {
     await supabase.from('retro_items').update({ status }).eq('id', id);
   };
 
+  const editNote = async (col: Col, id: string, text: string) => {
+    const setter = col === 'well' ? setWell : setImprove;
+    setter((p) => p.map((n) => (n.id === id ? { ...n, text } : n)));
+    await supabase.from('retro_items').update({ content: text }).eq('id', id);
+  };
+
+
   const stats = useMemo(() => {
     const wellCount = well.length;
     const improveCount = improve.length;
