@@ -298,6 +298,7 @@ const Retro = () => {
                 col="well"
                 onAdd={add}
                 onRemove={remove}
+                onStatus={setStatus}
               />
               <Column
                 title="What to improve"
@@ -309,6 +310,8 @@ const Retro = () => {
                 col="improve"
                 onAdd={add}
                 onRemove={remove}
+                onStatus={setStatus}
+
               />
             </div>
             )}
