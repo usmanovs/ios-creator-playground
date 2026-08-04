@@ -282,7 +282,27 @@ const Retro = () => {
                   {stats.wellCount}/{stats.improveCount}
                 </span>
               </div>
+
+              {/* Implementation tracking for improvement items */}
+              <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-foreground/5">
+                <span className="text-[11px] uppercase tracking-wider text-foreground/40 mr-1">
+                  Implementation
+                </span>
+                <span className="px-2 py-0.5 rounded-full border border-foreground/20 bg-foreground/5 text-foreground/60 text-[11px] font-medium tabular-nums">
+                  To do {stats.todo}
+                </span>
+                <span className="px-2 py-0.5 rounded-full border border-amber-400/40 bg-amber-400/10 text-amber-300 text-[11px] font-medium tabular-nums">
+                  In progress {stats.inProgress}
+                </span>
+                <span className="px-2 py-0.5 rounded-full border border-accent/40 bg-accent/15 text-accent text-[11px] font-medium tabular-nums">
+                  Accomplished {stats.done}
+                </span>
+                <span className="ml-auto text-[11px] font-mono text-foreground/40 tabular-nums">
+                  {stats.improveCount ? Math.round((stats.done / stats.improveCount) * 100) : 0}% done
+                </span>
+              </div>
             </div>
+
 
             {loading ? (
               <p className="text-sm text-foreground/40 py-10 text-center">Loading notes…</p>
