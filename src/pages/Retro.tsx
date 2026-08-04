@@ -3,9 +3,22 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, X, ThumbsUp, Lightbulb } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-type Note = { id: string; text: string };
+type Status = 'todo' | 'in_progress' | 'accomplished';
+
+type Note = { id: string; text: string; status: Status };
 
 type Col = 'well' | 'improve';
+
+const STATUSES: { value: Status; label: string; cls: string }[] = [
+  { value: 'todo', label: 'To do', cls: 'border-foreground/20 bg-foreground/5 text-foreground/60' },
+  { value: 'in_progress', label: 'In progress', cls: 'border-amber-400/40 bg-amber-400/10 text-amber-300' },
+  { value: 'accomplished', label: 'Accomplished', cls: 'border-accent/40 bg-accent/15 text-accent' },
+];
+
+function normalizeStatus(s: string | null): Status {
+  return s === 'in_progress' || s === 'accomplished' ? s : 'todo';
+}
+
 
 function Column({
   title,
@@ -17,6 +30,7 @@ function Column({
   col,
   onAdd,
   onRemove,
+  onStatus,
 }: {
   title: string;
   icon: React.ReactNode;
@@ -27,6 +41,8 @@ function Column({
   col: Col;
   onAdd: (col: Col, text: string, setter: (v: string) => void) => void;
   onRemove: (col: Col, id: string) => void;
+  onStatus: (id: string, status: Status) => void;
+
 }) {
   return (
     <div className="glass-card p-5 md:p-6">
@@ -68,17 +84,46 @@ function Column({
         {items.map((n) => (
           <div
             key={n.id}
-            className="group flex items-start gap-2 rounded-xl border border-foreground/10 bg-card/40 px-3 py-2.5 text-sm text-foreground/90"
+            className="group rounded-xl border border-foreground/10 bg-card/40 px-3 py-2.5 text-sm text-foreground/90"
           >
-            <span className="flex-1 leading-relaxed">{n.text}</span>
-            <button
-              onClick={() => onRemove(col, n.id)}
-              className="opacity-0 group-hover:opacity-100 transition text-foreground/40 hover:text-destructive shrink-0"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-start gap-2">
+              <span
+                className={`flex-1 leading-relaxed ${
+                  col === 'improve' && n.status === 'accomplished'
+                    ? 'line-through text-foreground/40'
+                    : ''
+                }`}
+              >
+                {n.text}
+              </span>
+              <button
+                onClick={() => onRemove(col, n.id)}
+                className="opacity-0 group-hover:opacity-100 transition text-foreground/40 hover:text-destructive shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {col === 'improve' && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {STATUSES.map((s) => (
+                  <button
+                    key={s.value}
+                    onClick={() => onStatus(n.id, s.value)}
+                    className={`px-2 py-0.5 rounded-full border text-[11px] font-medium transition ${
+                      n.status === s.value
+                        ? s.cls
+                        : 'border-foreground/10 text-foreground/40 hover:text-foreground/70 hover:border-foreground/20'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
+
       </div>
     </div>
   );
@@ -96,15 +141,20 @@ const Retro = () => {
     (async () => {
       const { data, error } = await supabase
         .from('retro_items')
-        .select('id, category, content')
+        .select('id, category, content, status')
         .order('created_at', { ascending: false });
       if (!active || error) {
         setLoading(false);
         return;
       }
-      const rows = (data ?? []) as { id: string; category: string; content: string }[];
-      setWell(rows.filter((r) => r.category === 'well').map((r) => ({ id: r.id, text: r.content })));
-      setImprove(rows.filter((r) => r.category === 'improve').map((r) => ({ id: r.id, text: r.content })));
+      const rows = (data ?? []) as { id: string; category: string; content: string; status: string | null }[];
+      const toNote = (r: typeof rows[number]): Note => ({
+        id: r.id,
+        text: r.content,
+        status: normalizeStatus(r.status),
+      });
+      setWell(rows.filter((r) => r.category === 'well').map(toNote));
+      setImprove(rows.filter((r) => r.category === 'improve').map(toNote));
       setLoading(false);
     })();
     return () => { active = false; };
@@ -116,14 +166,14 @@ const Retro = () => {
     setter('');
     const { data, error } = await supabase
       .from('retro_items')
-      .insert({ category: col, content: t })
+      .insert({ category: col, content: t, status: 'todo' })
       .select('id')
       .single();
     if (error || !data) {
       setter(t); // restore draft on failure
       return;
     }
-    const note = { id: data.id, text: t };
+    const note: Note = { id: data.id, text: t, status: 'todo' };
     if (col === 'well') setWell((p) => [note, ...p]);
     else setImprove((p) => [note, ...p]);
   };
@@ -134,14 +184,23 @@ const Retro = () => {
     await supabase.from('retro_items').delete().eq('id', id);
   };
 
+  const setStatus = async (id: string, status: Status) => {
+    setImprove((p) => p.map((n) => (n.id === id ? { ...n, status } : n)));
+    await supabase.from('retro_items').update({ status }).eq('id', id);
+  };
+
   const stats = useMemo(() => {
     const wellCount = well.length;
     const improveCount = improve.length;
     const total = wellCount + improveCount;
     const wellPct = total ? (wellCount / total) * 100 : 0;
     const improvePct = total ? (improveCount / total) * 100 : 0;
-    return { wellCount, improveCount, total, wellPct, improvePct };
+    const todo = improve.filter((n) => n.status === 'todo').length;
+    const inProgress = improve.filter((n) => n.status === 'in_progress').length;
+    const done = improve.filter((n) => n.status === 'accomplished').length;
+    return { wellCount, improveCount, total, wellPct, improvePct, todo, inProgress, done };
   }, [well, improve]);
+
 
   return (
     <main className="relative min-h-screen bg-background overflow-x-hidden">
@@ -223,7 +282,27 @@ const Retro = () => {
                   {stats.wellCount}/{stats.improveCount}
                 </span>
               </div>
+
+              {/* Implementation tracking for improvement items */}
+              <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-foreground/5">
+                <span className="text-[11px] uppercase tracking-wider text-foreground/40 mr-1">
+                  Implementation
+                </span>
+                <span className="px-2 py-0.5 rounded-full border border-foreground/20 bg-foreground/5 text-foreground/60 text-[11px] font-medium tabular-nums">
+                  To do {stats.todo}
+                </span>
+                <span className="px-2 py-0.5 rounded-full border border-amber-400/40 bg-amber-400/10 text-amber-300 text-[11px] font-medium tabular-nums">
+                  In progress {stats.inProgress}
+                </span>
+                <span className="px-2 py-0.5 rounded-full border border-accent/40 bg-accent/15 text-accent text-[11px] font-medium tabular-nums">
+                  Accomplished {stats.done}
+                </span>
+                <span className="ml-auto text-[11px] font-mono text-foreground/40 tabular-nums">
+                  {stats.improveCount ? Math.round((stats.done / stats.improveCount) * 100) : 0}% done
+                </span>
+              </div>
             </div>
+
 
             {loading ? (
               <p className="text-sm text-foreground/40 py-10 text-center">Loading notes…</p>
@@ -239,6 +318,7 @@ const Retro = () => {
                 col="well"
                 onAdd={add}
                 onRemove={remove}
+                onStatus={setStatus}
               />
               <Column
                 title="What to improve"
@@ -250,6 +330,8 @@ const Retro = () => {
                 col="improve"
                 onAdd={add}
                 onRemove={remove}
+                onStatus={setStatus}
+
               />
             </div>
             )}
