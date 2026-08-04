@@ -106,13 +106,12 @@ const Retro = () => {
   };
 
   const stats = useMemo(() => {
-    const total = well.length + improve.length;
-    const winRate = total ? Math.round((well.length / total) * 100) : 0;
-    // ratio of well to improve; 100% means perfectly balanced
-    const balance = well.length && improve.length
-      ? Math.round(Math.min(well.length, improve.length) / Math.max(well.length, improve.length) * 100)
-      : 0;
-    return { total, winRate, balance };
+    const wellCount = well.length;
+    const improveCount = improve.length;
+    const total = wellCount + improveCount;
+    const wellPct = total ? (wellCount / total) * 100 : 0;
+    const improvePct = total ? (improveCount / total) * 100 : 0;
+    return { wellCount, improveCount, total, wellPct, improvePct };
   }, [well, improve]);
 
   return (
