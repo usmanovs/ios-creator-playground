@@ -252,6 +252,7 @@ const Retro = () => {
                 onRemove={remove}
               />
             </div>
+            )}
           </div>
         </section>
       </div>
