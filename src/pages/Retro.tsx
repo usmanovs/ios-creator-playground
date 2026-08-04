@@ -362,6 +362,7 @@ const Retro = () => {
                 onAdd={add}
                 onRemove={remove}
                 onStatus={setStatus}
+                onEdit={editNote}
               />
               <Column
                 title="What to improve"
@@ -374,6 +375,7 @@ const Retro = () => {
                 onAdd={add}
                 onRemove={remove}
                 onStatus={setStatus}
+                onEdit={editNote}
 
               />
             </div>
