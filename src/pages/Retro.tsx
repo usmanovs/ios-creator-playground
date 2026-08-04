@@ -30,6 +30,7 @@ function Column({
   col,
   onAdd,
   onRemove,
+  onStatus,
 }: {
   title: string;
   icon: React.ReactNode;
@@ -40,6 +41,8 @@ function Column({
   col: Col;
   onAdd: (col: Col, text: string, setter: (v: string) => void) => void;
   onRemove: (col: Col, id: string) => void;
+  onStatus: (id: string, status: Status) => void;
+
 }) {
   return (
     <div className="glass-card p-5 md:p-6">
