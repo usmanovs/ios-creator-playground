@@ -141,9 +141,54 @@ const Retro = () => {
             <h1 className="font-display text-3xl md:text-5xl font-black tracking-tighter text-foreground mb-2">
               Sprint <span className="gradient-text">Retro</span>
             </h1>
-            <p className="text-sm md:text-base text-foreground/60 mb-8">
+            <p className="text-sm md:text-base text-foreground/60 mb-6">
               What went well · What to improve
             </p>
+
+            {/* KPI strip */}
+            <div className="grid grid-cols-3 gap-3 mb-8">
+              <div className="glass-card px-4 py-3 flex items-center gap-3">
+                <div className="size-9 rounded-lg bg-accent/15 text-accent flex items-center justify-center shrink-0">
+                  <StickyNote className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-display text-2xl font-black tracking-tight text-foreground leading-none tabular-nums">
+                    {stats.total}
+                  </div>
+                  <div className="text-[11px] uppercase tracking-wider text-foreground/40 mt-1">
+                    Total notes
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass-card px-4 py-3 flex items-center gap-3">
+                <div className="size-9 rounded-lg bg-emerald-400/15 text-emerald-300 flex items-center justify-center shrink-0">
+                  <ThumbsUp className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-display text-2xl font-black tracking-tight text-foreground leading-none tabular-nums">
+                    {stats.winRate}%
+                  </div>
+                  <div className="text-[11px] uppercase tracking-wider text-foreground/40 mt-1">
+                    Wins · {well.length}
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass-card px-4 py-3 flex items-center gap-3">
+                <div className="size-9 rounded-lg bg-amber-400/15 text-amber-300 flex items-center justify-center shrink-0">
+                  <Scale className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-display text-2xl font-black tracking-tight text-foreground leading-none tabular-nums">
+                    {stats.balance}%
+                  </div>
+                  <div className="text-[11px] uppercase tracking-wider text-foreground/40 mt-1">
+                    Balance · {improve.length}
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <Column
