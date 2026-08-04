@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Plus, X, ThumbsUp, Lightbulb, StickyNote, Scale } from 'lucide-react';
+import { ArrowLeft, Plus, X, ThumbsUp, Lightbulb } from 'lucide-react';
 
 type Note = { id: string; text: string };
 
