@@ -31,6 +31,7 @@ function Column({
   onAdd,
   onRemove,
   onStatus,
+  onEdit,
 }: {
   title: string;
   icon: React.ReactNode;
@@ -42,8 +43,22 @@ function Column({
   onAdd: (col: Col, text: string, setter: (v: string) => void) => void;
   onRemove: (col: Col, id: string) => void;
   onStatus: (id: string, status: Status) => void;
-
+  onEdit: (col: Col, id: string, text: string) => void;
 }) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState('');
+
+  const startEdit = (n: Note) => {
+    setEditingId(n.id);
+    setEditDraft(n.text);
+  };
+
+  const commitEdit = (n: Note) => {
+    const t = editDraft.trim();
+    setEditingId(null);
+    if (t && t !== n.text) onEdit(col, n.id, t);
+  };
+
   return (
     <div className="glass-card p-5 md:p-6">
       <div className="flex items-center gap-2 mb-4">
