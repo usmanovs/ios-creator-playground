@@ -102,15 +102,35 @@ function Column({
             className="group rounded-xl border border-foreground/10 bg-card/40 px-3 py-2.5 text-sm text-foreground/90"
           >
             <div className="flex items-start gap-2">
-              <span
-                className={`flex-1 leading-relaxed ${
-                  col === 'improve' && n.status === 'accomplished'
-                    ? 'line-through text-foreground/40'
-                    : ''
-                }`}
-              >
-                {n.text}
-              </span>
+              {editingId === n.id ? (
+                <input
+                  autoFocus
+                  value={editDraft}
+                  onChange={(e) => setEditDraft(e.target.value)}
+                  onBlur={() => commitEdit(n)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      commitEdit(n);
+                    } else if (e.key === 'Escape') {
+                      setEditingId(null);
+                    }
+                  }}
+                  className="flex-1 rounded-lg border border-accent/40 bg-background/60 px-2 py-1 text-sm text-foreground focus:outline-none"
+                />
+              ) : (
+                <button
+                  onClick={() => startEdit(n)}
+                  title="Click to edit"
+                  className={`flex-1 text-left leading-relaxed ${
+                    col === 'improve' && n.status === 'accomplished'
+                      ? 'line-through text-foreground/40'
+                      : ''
+                  }`}
+                >
+                  {n.text}
+                </button>
+              )}
               <button
                 onClick={() => onRemove(col, n.id)}
                 className="opacity-0 group-hover:opacity-100 transition text-foreground/40 hover:text-destructive shrink-0"
@@ -118,6 +138,7 @@ function Column({
                 <X className="w-4 h-4" />
               </button>
             </div>
+
 
             {col === 'improve' && (
               <div className="flex flex-wrap gap-1.5 mt-2">
