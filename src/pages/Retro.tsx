@@ -293,46 +293,37 @@ const Retro = () => {
             <h1 className="font-display text-3xl md:text-5xl font-black tracking-tighter text-foreground mb-2">
               Sprint <span className="gradient-text">Retro</span>
             </h1>
-            <p className="text-sm md:text-base text-foreground/60 mb-6">
+            <p className="text-sm md:text-base text-foreground/60 mb-5">
               What went well · What to improve
             </p>
 
-            {/* KPI strip — mirrors the two retro columns */}
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div className="glass-card px-4 py-3 flex items-center gap-3">
-                <div className="size-9 rounded-lg bg-accent/15 text-accent flex items-center justify-center shrink-0">
-                  <ThumbsUp className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="font-display text-2xl font-black tracking-tight text-foreground leading-none tabular-nums">
+            {/* Compact KPI card — counts, balance bar and implementation status */}
+            <div className="glass-card px-4 py-3.5 mb-8">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+                <div className="flex items-center gap-2">
+                  <ThumbsUp className="w-4 h-4 text-accent shrink-0" />
+                  <span className="font-display text-xl font-black tracking-tight text-foreground leading-none tabular-nums">
                     {stats.wellCount}
-                  </div>
-                  <div className="text-[11px] uppercase tracking-wider text-foreground/40 mt-1">
-                    What went well
-                  </div>
+                  </span>
+                  <span className="text-[11px] uppercase tracking-wider text-foreground/40">
+                    went well
+                  </span>
                 </div>
-              </div>
 
-              <div className="glass-card px-4 py-3 flex items-center gap-3">
-                <div className="size-9 rounded-lg bg-amber-400/15 text-amber-300 flex items-center justify-center shrink-0">
-                  <Lightbulb className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="font-display text-2xl font-black tracking-tight text-foreground leading-none tabular-nums">
+                <span className="h-4 w-px bg-foreground/10" aria-hidden />
+
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-amber-300 shrink-0" />
+                  <span className="font-display text-xl font-black tracking-tight text-foreground leading-none tabular-nums">
                     {stats.improveCount}
-                  </div>
-                  <div className="text-[11px] uppercase tracking-wider text-foreground/40 mt-1">
-                    What to improve
-                  </div>
+                  </span>
+                  <span className="text-[11px] uppercase tracking-wider text-foreground/40">
+                    to improve
+                  </span>
                 </div>
-              </div>
-            </div>
 
-            {/* Split bar — well vs improve proportion */}
-            <div className="glass-card px-4 py-3 mb-8">
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] font-mono text-accent shrink-0">well</span>
-                <div className="relative flex-1 h-2 rounded-full overflow-hidden bg-foreground/10">
+                {/* Balance bar */}
+                <div className="relative flex-1 min-w-[120px] h-1.5 rounded-full overflow-hidden bg-foreground/10">
                   <div
                     className="absolute inset-y-0 left-0 bg-accent transition-all duration-500"
                     style={{ width: `${stats.wellPct}%` }}
@@ -342,18 +333,18 @@ const Retro = () => {
                     style={{ left: `${stats.wellPct}%`, width: `${stats.improvePct}%` }}
                   />
                 </div>
-                <span className="text-[11px] font-mono text-amber-300 shrink-0">improve</span>
-                <span className="text-[11px] font-mono text-foreground/40 tabular-nums shrink-0">
-                  {stats.wellCount}/{stats.improveCount}
+
+                <span className="font-display text-xl font-black tracking-tight text-accent leading-none tabular-nums">
+                  {stats.improveCount ? Math.round((stats.done / stats.improveCount) * 100) : 0}%
+                  <span className="ml-1.5 font-sans text-[11px] font-medium uppercase tracking-wider text-foreground/40">
+                    done
+                  </span>
                 </span>
               </div>
 
-              {/* Implementation tracking for improvement items */}
-              <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-foreground/5">
-                <span className="text-[11px] uppercase tracking-wider text-foreground/40 mr-1">
-                  Implementation
-                </span>
-                <span className="px-2 py-0.5 rounded-full border border-foreground/20 bg-foreground/5 text-foreground/60 text-[11px] font-medium tabular-nums">
+              {/* Implementation status chips */}
+              <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-foreground/5">
+                <span className="px-2 py-0.5 rounded-full border border-foreground/15 bg-foreground/5 text-foreground/60 text-[11px] font-medium tabular-nums">
                   To do {stats.todo}
                 </span>
                 <span className="px-2 py-0.5 rounded-full border border-amber-400/40 bg-amber-400/10 text-amber-300 text-[11px] font-medium tabular-nums">
@@ -361,9 +352,6 @@ const Retro = () => {
                 </span>
                 <span className="px-2 py-0.5 rounded-full border border-accent/40 bg-accent/15 text-accent text-[11px] font-medium tabular-nums">
                   Accomplished {stats.done}
-                </span>
-                <span className="ml-auto text-[11px] font-mono text-foreground/40 tabular-nums">
-                  {stats.improveCount ? Math.round((stats.done / stats.improveCount) * 100) : 0}% done
                 </span>
               </div>
             </div>
