@@ -6,47 +6,30 @@ type Note = { id: string; text: string };
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
-const Retro = () => {
-  const [well, setWell] = useState<Note[]>([]);
-  const [improve, setImprove] = useState<Note[]>([]);
-  const [wellDraft, setWellDraft] = useState('');
-  const [improveDraft, setImproveDraft] = useState('');
+type Col = 'well' | 'improve';
 
-  const add = (
-    col: 'well' | 'improve',
-    text: string,
-    setter: (v: string) => void,
-  ) => {
-    const t = text.trim();
-    if (!t) return;
-    const note = { id: uid(), text: t };
-    if (col === 'well') setWell((p) => [note, ...p]);
-    else setImprove((p) => [note, ...p]);
-    setter('');
-  };
-
-  const remove = (col: 'well' | 'improve', id: string) => {
-    if (col === 'well') setWell((p) => p.filter((n) => n.id !== id));
-    else setImprove((p) => p.filter((n) => n.id !== id));
-  };
-
-  const Column = ({
-    title,
-    icon,
-    accent,
-    items,
-    draft,
-    setDraft,
-    col,
-  }: {
-    title: string;
-    icon: React.ReactNode;
-    accent: string;
-    items: Note[];
-    draft: string;
-    setDraft: (v: string) => void;
-    col: 'well' | 'improve';
-  }) => (
+function Column({
+  title,
+  icon,
+  accent,
+  items,
+  draft,
+  setDraft,
+  col,
+  onAdd,
+  onRemove,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  accent: string;
+  items: Note[];
+  draft: string;
+  setDraft: (v: string) => void;
+  col: Col;
+  onAdd: (col: Col, text: string, setter: (v: string) => void) => void;
+  onRemove: (col: Col, id: string) => void;
+}) {
+  return (
     <div className="glass-card p-5 md:p-6">
       <div className="flex items-center gap-2 mb-4">
         {icon}
@@ -62,12 +45,17 @@ const Retro = () => {
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && add(col, draft, setDraft)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              onAdd(col, draft, setDraft);
+            }
+          }}
           placeholder="Type and press Enter…"
           className="flex-1 rounded-xl border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-accent/50 transition"
         />
         <button
-          onClick={() => add(col, draft, setDraft)}
+          onClick={() => onAdd(col, draft, setDraft)}
           className={`inline-flex items-center justify-center size-9 rounded-xl border transition shrink-0 ${accent}`}
         >
           <Plus className="w-4 h-4" />
@@ -85,7 +73,7 @@ const Retro = () => {
           >
             <span className="flex-1 leading-relaxed">{n.text}</span>
             <button
-              onClick={() => remove(col, n.id)}
+              onClick={() => onRemove(col, n.id)}
               className="opacity-0 group-hover:opacity-100 transition text-foreground/40 hover:text-destructive shrink-0"
             >
               <X className="w-4 h-4" />
@@ -95,6 +83,27 @@ const Retro = () => {
       </div>
     </div>
   );
+}
+
+const Retro = () => {
+  const [well, setWell] = useState<Note[]>([]);
+  const [improve, setImprove] = useState<Note[]>([]);
+  const [wellDraft, setWellDraft] = useState('');
+  const [improveDraft, setImproveDraft] = useState('');
+
+  const add = (col: Col, text: string, setter: (v: string) => void) => {
+    const t = text.trim();
+    if (!t) return;
+    const note = { id: uid(), text: t };
+    if (col === 'well') setWell((p) => [note, ...p]);
+    else setImprove((p) => [note, ...p]);
+    setter('');
+  };
+
+  const remove = (col: Col, id: string) => {
+    if (col === 'well') setWell((p) => p.filter((n) => n.id !== id));
+    else setImprove((p) => p.filter((n) => n.id !== id));
+  };
 
   return (
     <main className="relative min-h-screen bg-background overflow-x-hidden">
@@ -135,6 +144,8 @@ const Retro = () => {
                 draft={wellDraft}
                 setDraft={setWellDraft}
                 col="well"
+                onAdd={add}
+                onRemove={remove}
               />
               <Column
                 title="What to improve"
@@ -144,6 +155,8 @@ const Retro = () => {
                 draft={improveDraft}
                 setDraft={setImproveDraft}
                 col="improve"
+                onAdd={add}
+                onRemove={remove}
               />
             </div>
           </div>
