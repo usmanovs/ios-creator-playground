@@ -1,10 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, X, ThumbsUp, Lightbulb } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 type Note = { id: string; text: string };
-
-const uid = () => Math.random().toString(36).slice(2, 9);
 
 type Col = 'well' | 'improve';
 
