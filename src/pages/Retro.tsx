@@ -81,17 +81,46 @@ function Column({
         {items.map((n) => (
           <div
             key={n.id}
-            className="group flex items-start gap-2 rounded-xl border border-foreground/10 bg-card/40 px-3 py-2.5 text-sm text-foreground/90"
+            className="group rounded-xl border border-foreground/10 bg-card/40 px-3 py-2.5 text-sm text-foreground/90"
           >
-            <span className="flex-1 leading-relaxed">{n.text}</span>
-            <button
-              onClick={() => onRemove(col, n.id)}
-              className="opacity-0 group-hover:opacity-100 transition text-foreground/40 hover:text-destructive shrink-0"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-start gap-2">
+              <span
+                className={`flex-1 leading-relaxed ${
+                  col === 'improve' && n.status === 'accomplished'
+                    ? 'line-through text-foreground/40'
+                    : ''
+                }`}
+              >
+                {n.text}
+              </span>
+              <button
+                onClick={() => onRemove(col, n.id)}
+                className="opacity-0 group-hover:opacity-100 transition text-foreground/40 hover:text-destructive shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {col === 'improve' && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {STATUSES.map((s) => (
+                  <button
+                    key={s.value}
+                    onClick={() => onStatus(n.id, s.value)}
+                    className={`px-2 py-0.5 rounded-full border text-[11px] font-medium transition ${
+                      n.status === s.value
+                        ? s.cls
+                        : 'border-foreground/10 text-foreground/40 hover:text-foreground/70 hover:border-foreground/20'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
+
       </div>
     </div>
   );
