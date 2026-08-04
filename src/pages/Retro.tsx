@@ -1,10 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, X, ThumbsUp, Lightbulb } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 type Note = { id: string; text: string };
-
-const uid = () => Math.random().toString(36).slice(2, 9);
 
 type Col = 'well' | 'improve';
 
@@ -90,19 +89,49 @@ const Retro = () => {
   const [improve, setImprove] = useState<Note[]>([]);
   const [wellDraft, setWellDraft] = useState('');
   const [improveDraft, setImproveDraft] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const add = (col: Col, text: string, setter: (v: string) => void) => {
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from('retro_items')
+        .select('id, category, content')
+        .order('created_at', { ascending: false });
+      if (!active || error) {
+        setLoading(false);
+        return;
+      }
+      const rows = (data ?? []) as { id: string; category: string; content: string }[];
+      setWell(rows.filter((r) => r.category === 'well').map((r) => ({ id: r.id, text: r.content })));
+      setImprove(rows.filter((r) => r.category === 'improve').map((r) => ({ id: r.id, text: r.content })));
+      setLoading(false);
+    })();
+    return () => { active = false; };
+  }, []);
+
+  const add = async (col: Col, text: string, setter: (v: string) => void) => {
     const t = text.trim();
     if (!t) return;
-    const note = { id: uid(), text: t };
+    setter('');
+    const { data, error } = await supabase
+      .from('retro_items')
+      .insert({ category: col, content: t })
+      .select('id')
+      .single();
+    if (error || !data) {
+      setter(t); // restore draft on failure
+      return;
+    }
+    const note = { id: data.id, text: t };
     if (col === 'well') setWell((p) => [note, ...p]);
     else setImprove((p) => [note, ...p]);
-    setter('');
   };
 
-  const remove = (col: Col, id: string) => {
+  const remove = async (col: Col, id: string) => {
     if (col === 'well') setWell((p) => p.filter((n) => n.id !== id));
     else setImprove((p) => p.filter((n) => n.id !== id));
+    await supabase.from('retro_items').delete().eq('id', id);
   };
 
   const stats = useMemo(() => {
@@ -196,6 +225,9 @@ const Retro = () => {
               </div>
             </div>
 
+            {loading ? (
+              <p className="text-sm text-foreground/40 py-10 text-center">Loading notes…</p>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <Column
                 title="What went well"
@@ -220,6 +252,7 @@ const Retro = () => {
                 onRemove={remove}
               />
             </div>
+            )}
           </div>
         </section>
       </div>
