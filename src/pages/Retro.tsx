@@ -171,9 +171,31 @@ const Retro = () => {
   const [wellDraft, setWellDraft] = useState('');
   const [improveDraft, setImproveDraft] = useState('');
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserId(session?.user?.id ?? null);
+      setAuthReady(true);
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      setUserId(data.session?.user?.id ?? null);
+      setAuthReady(true);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!authReady) return;
+    if (!userId) {
+      setWell([]);
+      setImprove([]);
+      setLoading(false);
+      return;
+    }
     let active = true;
+    setLoading(true);
     (async () => {
       const { data, error } = await supabase
         .from('retro_items')
@@ -194,15 +216,15 @@ const Retro = () => {
       setLoading(false);
     })();
     return () => { active = false; };
-  }, []);
+  }, [authReady, userId]);
 
   const add = async (col: Col, text: string, setter: (v: string) => void) => {
     const t = text.trim();
-    if (!t) return;
+    if (!t || !userId) return;
     setter('');
     const { data, error } = await supabase
       .from('retro_items')
-      .insert({ category: col, content: t, status: 'todo' })
+      .insert({ category: col, content: t, status: 'todo', created_by: userId })
       .select('id')
       .single();
     if (error || !data) {
