@@ -89,19 +89,49 @@ const Retro = () => {
   const [improve, setImprove] = useState<Note[]>([]);
   const [wellDraft, setWellDraft] = useState('');
   const [improveDraft, setImproveDraft] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const add = (col: Col, text: string, setter: (v: string) => void) => {
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from('retro_items')
+        .select('id, category, content')
+        .order('created_at', { ascending: false });
+      if (!active || error) {
+        setLoading(false);
+        return;
+      }
+      const rows = (data ?? []) as { id: string; category: string; content: string }[];
+      setWell(rows.filter((r) => r.category === 'well').map((r) => ({ id: r.id, text: r.content })));
+      setImprove(rows.filter((r) => r.category === 'improve').map((r) => ({ id: r.id, text: r.content })));
+      setLoading(false);
+    })();
+    return () => { active = false; };
+  }, []);
+
+  const add = async (col: Col, text: string, setter: (v: string) => void) => {
     const t = text.trim();
     if (!t) return;
-    const note = { id: uid(), text: t };
+    setter('');
+    const { data, error } = await supabase
+      .from('retro_items')
+      .insert({ category: col, content: t })
+      .select('id')
+      .single();
+    if (error || !data) {
+      setter(t); // restore draft on failure
+      return;
+    }
+    const note = { id: data.id, text: t };
     if (col === 'well') setWell((p) => [note, ...p]);
     else setImprove((p) => [note, ...p]);
-    setter('');
   };
 
-  const remove = (col: Col, id: string) => {
+  const remove = async (col: Col, id: string) => {
     if (col === 'well') setWell((p) => p.filter((n) => n.id !== id));
     else setImprove((p) => p.filter((n) => n.id !== id));
+    await supabase.from('retro_items').delete().eq('id', id);
   };
 
   const stats = useMemo(() => {
