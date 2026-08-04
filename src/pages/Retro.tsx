@@ -144,48 +144,55 @@ const Retro = () => {
               What went well · What to improve
             </p>
 
-            {/* KPI strip */}
-            <div className="grid grid-cols-3 gap-3 mb-8">
+            {/* KPI strip — mirrors the two retro columns */}
+            <div className="grid grid-cols-2 gap-3 mb-3">
               <div className="glass-card px-4 py-3 flex items-center gap-3">
                 <div className="size-9 rounded-lg bg-accent/15 text-accent flex items-center justify-center shrink-0">
-                  <StickyNote className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="font-display text-2xl font-black tracking-tight text-foreground leading-none tabular-nums">
-                    {stats.total}
-                  </div>
-                  <div className="text-[11px] uppercase tracking-wider text-foreground/40 mt-1">
-                    Total notes
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass-card px-4 py-3 flex items-center gap-3">
-                <div className="size-9 rounded-lg bg-emerald-400/15 text-emerald-300 flex items-center justify-center shrink-0">
                   <ThumbsUp className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
                   <div className="font-display text-2xl font-black tracking-tight text-foreground leading-none tabular-nums">
-                    {stats.winRate}%
+                    {stats.wellCount}
                   </div>
                   <div className="text-[11px] uppercase tracking-wider text-foreground/40 mt-1">
-                    Wins · {well.length}
+                    What went well
                   </div>
                 </div>
               </div>
 
               <div className="glass-card px-4 py-3 flex items-center gap-3">
                 <div className="size-9 rounded-lg bg-amber-400/15 text-amber-300 flex items-center justify-center shrink-0">
-                  <Scale className="w-5 h-5" />
+                  <Lightbulb className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
                   <div className="font-display text-2xl font-black tracking-tight text-foreground leading-none tabular-nums">
-                    {stats.balance}%
+                    {stats.improveCount}
                   </div>
                   <div className="text-[11px] uppercase tracking-wider text-foreground/40 mt-1">
-                    Balance · {improve.length}
+                    What to improve
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Split bar — well vs improve proportion */}
+            <div className="glass-card px-4 py-3 mb-8">
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] font-mono text-accent shrink-0">well</span>
+                <div className="relative flex-1 h-2 rounded-full overflow-hidden bg-foreground/10">
+                  <div
+                    className="absolute inset-y-0 left-0 bg-accent transition-all duration-500"
+                    style={{ width: `${stats.wellPct}%` }}
+                  />
+                  <div
+                    className="absolute inset-y-0 bg-amber-400 transition-all duration-500"
+                    style={{ left: `${stats.wellPct}%`, width: `${stats.improvePct}%` }}
+                  />
+                </div>
+                <span className="text-[11px] font-mono text-amber-300 shrink-0">improve</span>
+                <span className="text-[11px] font-mono text-foreground/40 tabular-nums shrink-0">
+                  {stats.wellCount}/{stats.improveCount}
+                </span>
               </div>
             </div>
 
