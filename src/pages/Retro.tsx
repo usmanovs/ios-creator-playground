@@ -3,9 +3,22 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, X, ThumbsUp, Lightbulb } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-type Note = { id: string; text: string };
+type Status = 'todo' | 'in_progress' | 'accomplished';
+
+type Note = { id: string; text: string; status: Status };
 
 type Col = 'well' | 'improve';
+
+const STATUSES: { value: Status; label: string; cls: string }[] = [
+  { value: 'todo', label: 'To do', cls: 'border-foreground/20 bg-foreground/5 text-foreground/60' },
+  { value: 'in_progress', label: 'In progress', cls: 'border-amber-400/40 bg-amber-400/10 text-amber-300' },
+  { value: 'accomplished', label: 'Accomplished', cls: 'border-accent/40 bg-accent/15 text-accent' },
+];
+
+function normalizeStatus(s: string | null): Status {
+  return s === 'in_progress' || s === 'accomplished' ? s : 'todo';
+}
+
 
 function Column({
   title,
