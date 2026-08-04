@@ -141,15 +141,20 @@ const Retro = () => {
     (async () => {
       const { data, error } = await supabase
         .from('retro_items')
-        .select('id, category, content')
+        .select('id, category, content, status')
         .order('created_at', { ascending: false });
       if (!active || error) {
         setLoading(false);
         return;
       }
-      const rows = (data ?? []) as { id: string; category: string; content: string }[];
-      setWell(rows.filter((r) => r.category === 'well').map((r) => ({ id: r.id, text: r.content })));
-      setImprove(rows.filter((r) => r.category === 'improve').map((r) => ({ id: r.id, text: r.content })));
+      const rows = (data ?? []) as { id: string; category: string; content: string; status: string | null }[];
+      const toNote = (r: typeof rows[number]): Note => ({
+        id: r.id,
+        text: r.content,
+        status: normalizeStatus(r.status),
+      });
+      setWell(rows.filter((r) => r.category === 'well').map(toNote));
+      setImprove(rows.filter((r) => r.category === 'improve').map(toNote));
       setLoading(false);
     })();
     return () => { active = false; };
@@ -161,14 +166,14 @@ const Retro = () => {
     setter('');
     const { data, error } = await supabase
       .from('retro_items')
-      .insert({ category: col, content: t })
+      .insert({ category: col, content: t, status: 'todo' })
       .select('id')
       .single();
     if (error || !data) {
       setter(t); // restore draft on failure
       return;
     }
-    const note = { id: data.id, text: t };
+    const note: Note = { id: data.id, text: t, status: 'todo' };
     if (col === 'well') setWell((p) => [note, ...p]);
     else setImprove((p) => [note, ...p]);
   };
@@ -179,14 +184,23 @@ const Retro = () => {
     await supabase.from('retro_items').delete().eq('id', id);
   };
 
+  const setStatus = async (id: string, status: Status) => {
+    setImprove((p) => p.map((n) => (n.id === id ? { ...n, status } : n)));
+    await supabase.from('retro_items').update({ status }).eq('id', id);
+  };
+
   const stats = useMemo(() => {
     const wellCount = well.length;
     const improveCount = improve.length;
     const total = wellCount + improveCount;
     const wellPct = total ? (wellCount / total) * 100 : 0;
     const improvePct = total ? (improveCount / total) * 100 : 0;
-    return { wellCount, improveCount, total, wellPct, improvePct };
+    const todo = improve.filter((n) => n.status === 'todo').length;
+    const inProgress = improve.filter((n) => n.status === 'in_progress').length;
+    const done = improve.filter((n) => n.status === 'accomplished').length;
+    return { wellCount, improveCount, total, wellPct, improvePct, todo, inProgress, done };
   }, [well, improve]);
+
 
   return (
     <main className="relative min-h-screen bg-background overflow-x-hidden">
