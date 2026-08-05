@@ -25,7 +25,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar as CalendarIcon, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, ListChecks, LogOut, StickyNote, Trash2, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calendar as CalendarIcon, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, ListChecks, LogOut, Pencil, StickyNote, Trash2, TrendingUp } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -763,8 +763,19 @@ export default function InstructorPage() {
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <div className="flex items-center justify-between gap-3 mr-8">
-              <DialogTitle>Lesson preview</DialogTitle>
               <div className="flex items-center gap-2">
+                <DialogTitle>Lesson preview</DialogTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => previewId && navigate(`/admin?edit=${previewId}`)}
+                >
+                  <Pencil className="w-3.5 h-3.5 mr-1" />
+                  Edit
+                </Button>
+              </div>
+              <div className="flex items-center gap-2">
+
                 <Button
                   variant="secondary"
                   size="sm"
