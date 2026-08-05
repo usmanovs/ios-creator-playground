@@ -65,6 +65,29 @@ export default function LessonEditor({ lesson, onClose, onSave, prevLessonTitle,
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [lesson?.id]);
 
+  // Heavy fields (content/content_html/video_url) are fetched after the editor
+  // opens. Merge them in when they arrive so the body isn't blank.
+  useEffect(() => {
+    if (!lesson) return;
+    setDraft((cur) => {
+      if (!cur || cur.id !== lesson.id) return cur;
+      const patch: Partial<EditableLesson> = {};
+      if (cur.content == null && lesson.content != null) patch.content = lesson.content;
+      if (cur.content_html == null && lesson.content_html != null) patch.content_html = lesson.content_html;
+      if (cur.video_url == null && lesson.video_url != null) patch.video_url = lesson.video_url;
+      return Object.keys(patch).length ? { ...cur, ...patch } : cur;
+    });
+    setOriginal((cur) => {
+      if (!cur || cur.id !== lesson.id) return cur;
+      const patch: Partial<EditableLesson> = {};
+      if (cur.content == null && lesson.content != null) patch.content = lesson.content;
+      if (cur.content_html == null && lesson.content_html != null) patch.content_html = lesson.content_html;
+      if (cur.video_url == null && lesson.video_url != null) patch.video_url = lesson.video_url;
+      return Object.keys(patch).length ? { ...cur, ...patch } : cur;
+    });
+  }, [lesson?.id, lesson?.content, lesson?.content_html, lesson?.video_url]);
+
+
   const dirty =
     draft && original
       ? !(
