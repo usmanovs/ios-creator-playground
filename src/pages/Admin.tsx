@@ -188,6 +188,20 @@ export default function AdminPage() {
     if (isAdmin) load();
   }, [isAdmin, load]);
 
+  // Deep link: /admin?edit=<lessonId> opens that lesson's editor once loaded.
+  const handledEditParam = useRef(false);
+  useEffect(() => {
+    if (handledEditParam.current || lessons.length === 0) return;
+    const id = new URLSearchParams(window.location.search).get("edit");
+    if (!id) return;
+    if (!lessons.some((l) => l.id === id)) return;
+    handledEditParam.current = true;
+    openLesson(id);
+    window.history.replaceState({}, "", "/admin");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lessons]);
+
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
