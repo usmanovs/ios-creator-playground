@@ -557,6 +557,37 @@ export default function InstructorPage() {
     }
   }, [courseId, startDate]);
 
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  // Clears every "covered" / "day completed" mark so the same schedule can be
+  // reused with a new batch. Homework, pre-class messages and dates are kept.
+  const resetBoard = useCallback(async () => {
+    setResetOpen(false);
+    setResetting(true);
+    const results = await Promise.all([
+      courseId
+        ? supabase.from("lessons").update({ covered: false }).eq("course_id", courseId).eq("covered", true)
+        : Promise.resolve({ error: null } as { error: null }),
+      supabase.from("instructor_notes").update({ covered: false }).eq("covered", true),
+      supabase.from("day_homework").update({ completed: false }).eq("completed", true),
+    ]);
+    setResetting(false);
+    const error = results.find((r) => r.error)?.error;
+    if (error) {
+      toast.error(error.message);
+      load();
+      return;
+    }
+    setLessons((ls) => ls.map((l) => ({ ...l, covered: false })));
+    setNotes((ns) => ns.map((n) => ({ ...n, covered: false })));
+    setCompleted({});
+    setSortCompleted({});
+    setExpandedOverride({});
+    toast.success("Board reset for a new batch");
+  }, [courseId, load]);
+
+
   const day1 = parseDateOnly(startDate);
   const dayDates = useMemo(
     () => (day1 ? classDates(day1, DAYS.length) : null),
