@@ -25,7 +25,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar as CalendarIcon, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, ListChecks, LogOut, Pencil, StickyNote, Trash2, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calendar as CalendarIcon, Check, ChevronDown, ChevronUp, Copy, Eye, GripVertical, ListChecks, LogOut, Pencil, RotateCcw, StickyNote, Trash2, TrendingUp } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import LessonPreview from "@/components/admin/LessonPreview";
+import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -556,6 +557,37 @@ export default function InstructorPage() {
     }
   }, [courseId, startDate]);
 
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  // Clears every "covered" / "day completed" mark so the same schedule can be
+  // reused with a new batch. Homework, pre-class messages and dates are kept.
+  const resetBoard = useCallback(async () => {
+    setResetOpen(false);
+    setResetting(true);
+    const results = await Promise.all([
+      courseId
+        ? supabase.from("lessons").update({ covered: false }).eq("course_id", courseId).eq("covered", true)
+        : Promise.resolve({ error: null } as { error: null }),
+      supabase.from("instructor_notes").update({ covered: false }).eq("covered", true),
+      supabase.from("day_homework").update({ completed: false }).eq("completed", true),
+    ]);
+    setResetting(false);
+    const error = results.find((r) => r.error)?.error;
+    if (error) {
+      toast.error(error.message);
+      load();
+      return;
+    }
+    setLessons((ls) => ls.map((l) => ({ ...l, covered: false })));
+    setNotes((ns) => ns.map((n) => ({ ...n, covered: false })));
+    setCompleted({});
+    setSortCompleted({});
+    setExpandedOverride({});
+    toast.success("Board reset for a new batch");
+  }, [courseId, load]);
+
+
   const day1 = parseDateOnly(startDate);
   const dayDates = useMemo(
     () => (day1 ? classDates(day1, DAYS.length) : null),
@@ -606,12 +638,32 @@ export default function InstructorPage() {
           <Button
             variant="outline"
             size="sm"
+            disabled={resetting}
+            onClick={() => setResetOpen(true)}
+            title="Clear all covered marks and completed days for a new batch"
+          >
+            <RotateCcw className="w-4 h-4 md:mr-2" />
+            <span className="hidden md:inline">{resetting ? "Resetting…" : "Reset for new batch"}</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={async () => { await supabase.auth.signOut(); navigate("/auth"); }}
           >
             <LogOut className="w-4 h-4 md:mr-2" /> <span className="hidden md:inline">Sign out</span>
           </Button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={resetOpen}
+        onOpenChange={setResetOpen}
+        title="Reset board for a new batch?"
+        description="This clears every covered mark and un-completes all class days. Homework, pre-class messages, dates and lesson content are kept."
+        confirmLabel="Reset board"
+        onConfirm={resetBoard}
+      />
+
 
       <div className="relative max-w-[1600px] mx-auto px-4 md:px-6 py-6">
         {/* KPI strip */}
