@@ -638,12 +638,32 @@ export default function InstructorPage() {
           <Button
             variant="outline"
             size="sm"
+            disabled={resetting}
+            onClick={() => setResetOpen(true)}
+            title="Clear all covered marks and completed days for a new batch"
+          >
+            <RotateCcw className="w-4 h-4 md:mr-2" />
+            <span className="hidden md:inline">{resetting ? "Resetting…" : "Reset for new batch"}</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={async () => { await supabase.auth.signOut(); navigate("/auth"); }}
           >
             <LogOut className="w-4 h-4 md:mr-2" /> <span className="hidden md:inline">Sign out</span>
           </Button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={resetOpen}
+        onOpenChange={setResetOpen}
+        title="Reset board for a new batch?"
+        description="This clears every covered mark and un-completes all class days. Homework, pre-class messages, dates and lesson content are kept."
+        confirmLabel="Reset board"
+        onConfirm={resetBoard}
+      />
+
 
       <div className="relative max-w-[1600px] mx-auto px-4 md:px-6 py-6">
         {/* KPI strip */}
