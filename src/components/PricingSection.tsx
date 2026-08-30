@@ -160,14 +160,14 @@ const PricingSection = () => {
               <div className="flex-1 h-px bg-foreground/10" />
             </div>
 
-            <a
-              href="https://wa.me/12024554575"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full py-3.5 rounded-2xl border border-foreground/10 text-center text-sm font-bold text-foreground/80 hover:bg-card/60 transition-colors mb-8"
+            <button
+              type="button"
+              onClick={() => setCheckout({ priceId: 'ios_course_live_onetime', title: `${t('plan.live.title')} — $349` })}
+              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl border border-primary/40 text-center text-sm font-bold text-foreground/90 hover:bg-primary/10 transition-colors mb-8"
             >
+              <CreditCard className="w-4 h-4" />
               {t('plan.payCard')}
-            </a>
+            </button>
 
             {/* Value breakdown */}
             <div className="space-y-2 mb-6">
