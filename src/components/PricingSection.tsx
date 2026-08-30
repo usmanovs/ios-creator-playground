@@ -49,33 +49,36 @@ const PricingSection = () => {
             <p className="text-xs text-foreground/40 mb-8">{t('plan.oneTime')}</p>
 
             {/* QR */}
-            <div className="rounded-2xl bg-background/60 border border-foreground/5 p-5 mb-4 text-center">
-              <p className="text-[10px] uppercase tracking-widest text-foreground/40 mb-3">{t('plan.scanMbank')}</p>
-              <img src={mbankQr} alt="Mbank QR Code" className="w-32 h-32 mx-auto rounded-lg" />
-              <p className="text-xs text-foreground/40 mt-3">{t('plan.afterPayment')}</p>
+            <div className="relative overflow-hidden group rounded-2xl bg-background/40 border border-foreground/5 p-6 mb-4 text-center transition-colors">
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <p className="relative text-[11px] font-bold uppercase tracking-widest text-primary/80 mb-4">{t('plan.scanMbank')}</p>
+              <div className="relative inline-block bg-white p-4 rounded-xl shadow-lg shadow-black/40">
+                <img src={mbankQr} alt="Mbank QR Code" className="w-32 h-32 rounded-md" />
+              </div>
+              <p className="relative text-[11px] text-foreground/40 leading-relaxed max-w-[220px] mx-auto mt-4">{t('plan.afterPayment')}</p>
             </div>
 
             <a
               href="https://wa.me/12024554575"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-accent text-accent-foreground font-bold transition-all hover:brightness-110 mb-3"
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-accent text-accent-foreground font-bold tracking-tight transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] mb-3"
               style={{ boxShadow: 'var(--shadow-glow-green)' }}
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-5 h-5" />
               {t('plan.confirmWhatsapp')}
             </a>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-foreground/10" />
-              <span className="text-[10px] uppercase tracking-widest text-foreground/40">{t('plan.or')}</span>
-              <div className="flex-1 h-px bg-foreground/10" />
+            <div className="flex items-center gap-4 my-5">
+              <div className="flex-1 h-px bg-foreground/5" />
+              <span className="text-[10px] uppercase tracking-[0.3em] text-foreground/20 font-medium">{t('plan.or')}</span>
+              <div className="flex-1 h-px bg-foreground/5" />
             </div>
 
-<button
+            <button
               type="button"
               onClick={() => setCheckout({ priceId: 'ios_course_recorded_onetime', title: `${t('plan.rec.title')} — $299` })}
-className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground text-base font-black tracking-wide transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.99] mb-8"
+              className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold tracking-tight transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] mb-8"
               style={{ boxShadow: 'var(--shadow-glow-violet)' }}
             >
               <CreditCard className="w-5 h-5" />
@@ -83,24 +86,25 @@ className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gra
             </button>
 
             {/* Value breakdown */}
-            <div className="space-y-2 mb-6">
+            <div className="space-y-4 mb-6">
               {recordingsValue.map((item) => (
-                <div key={item.label} className="flex justify-between text-sm">
-                  <span className="text-foreground/50">{t(item.label)}</span>
-                  <span className="text-foreground/80">{item.value}</span>
+                <div key={item.label} className="flex justify-between items-center text-sm">
+                  <span className="text-foreground/40">{t(item.label)}</span>
+                  <span className="text-foreground/80 font-medium">{item.value}</span>
                 </div>
               ))}
-              <div className="border-t border-foreground/10 pt-2 flex justify-between text-sm">
-                <span className="text-foreground/50">{t('plan.totalValue')}</span>
-                <span className="text-foreground font-semibold">$550</span>
+              <div className="h-px bg-foreground/10" />
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-foreground/60 font-medium">{t('plan.totalValue')}</span>
+                <span className="text-lg text-foreground font-bold">$550</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-foreground/50">{t('plan.youPay')}</span>
-                <span className="text-primary font-bold">$299</span>
+              <div className="flex justify-between items-center bg-primary/10 border border-primary/20 rounded-xl px-4 py-3">
+                <span className="text-sm text-primary/80 font-semibold">{t('plan.youPay')}</span>
+                <span className="text-xl text-primary font-black">$299</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-foreground/50">{t('plan.savings')}</span>
-                <span className="text-accent font-bold">46%</span>
+              <div className="flex justify-between items-center px-4">
+                <span className="text-xs text-accent/60">{t('plan.savings')}</span>
+                <span className="text-sm text-accent font-bold bg-accent/10 px-2 py-0.5 rounded">46%</span>
               </div>
             </div>
 
@@ -138,33 +142,36 @@ className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gra
             <p className="text-xs text-foreground/40 mb-8">{t('plan.oneTime')}</p>
 
             {/* QR */}
-            <div className="rounded-2xl bg-background/60 border border-primary/20 p-5 mb-4 text-center">
-              <p className="text-[10px] uppercase tracking-widest text-primary font-bold mb-3">{t('plan.scanMbank')}</p>
-              <img src={mbankQr} alt="Mbank QR Code" className="w-32 h-32 mx-auto rounded-lg" />
-              <p className="text-xs text-foreground/40 mt-3">{t('plan.afterPayment')}</p>
+            <div className="relative overflow-hidden group rounded-2xl bg-background/40 border border-primary/20 p-6 mb-4 text-center transition-colors">
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <p className="relative text-[11px] font-bold uppercase tracking-widest text-primary mb-4">{t('plan.scanMbank')}</p>
+              <div className="relative inline-block bg-white p-4 rounded-xl shadow-lg shadow-black/40">
+                <img src={mbankQr} alt="Mbank QR Code" className="w-32 h-32 rounded-md" />
+              </div>
+              <p className="relative text-[11px] text-foreground/40 leading-relaxed max-w-[220px] mx-auto mt-4">{t('plan.afterPayment')}</p>
             </div>
 
             <a
               href="https://wa.me/12024554575"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-accent text-accent-foreground font-bold transition-all hover:brightness-110 mb-3"
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-accent text-accent-foreground font-bold tracking-tight transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] mb-3"
               style={{ boxShadow: 'var(--shadow-glow-green)' }}
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-5 h-5" />
               {t('plan.confirmWhatsapp')}
             </a>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-foreground/10" />
-              <span className="text-[10px] uppercase tracking-widest text-foreground/40">{t('plan.or')}</span>
-              <div className="flex-1 h-px bg-foreground/10" />
+            <div className="flex items-center gap-4 my-5">
+              <div className="flex-1 h-px bg-foreground/5" />
+              <span className="text-[10px] uppercase tracking-[0.3em] text-foreground/20 font-medium">{t('plan.or')}</span>
+              <div className="flex-1 h-px bg-foreground/5" />
             </div>
 
-<button
+            <button
               type="button"
               onClick={() => setCheckout({ priceId: 'ios_course_live_onetime', title: `${t('plan.live.title')} — $349` })}
-              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground text-base font-black tracking-wide transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.99] mb-8"
+              className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold tracking-tight transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] mb-8"
               style={{ boxShadow: 'var(--shadow-glow-violet)' }}
             >
               <CreditCard className="w-5 h-5" />
@@ -172,24 +179,25 @@ className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gra
             </button>
 
             {/* Value breakdown */}
-            <div className="space-y-2 mb-6">
+            <div className="space-y-4 mb-6">
               {liveValue.map((item) => (
-                <div key={item.label} className="flex justify-between text-sm">
-                  <span className="text-foreground/50">{t(item.label)}</span>
-                  <span className="text-foreground/80">{item.value}</span>
+                <div key={item.label} className="flex justify-between items-center text-sm">
+                  <span className="text-foreground/40">{t(item.label)}</span>
+                  <span className="text-foreground/80 font-medium">{item.value}</span>
                 </div>
               ))}
-              <div className="border-t border-foreground/10 pt-2 flex justify-between text-sm">
-                <span className="text-foreground/50">{t('plan.totalValue')}</span>
-                <span className="text-foreground font-semibold">$1,194</span>
+              <div className="h-px bg-foreground/10" />
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-foreground/60 font-medium">{t('plan.totalValue')}</span>
+                <span className="text-lg text-foreground font-bold">$1,194</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-foreground/50">{t('plan.youPay')}</span>
-                <span className="text-primary font-bold">$349</span>
+              <div className="flex justify-between items-center bg-primary/10 border border-primary/20 rounded-xl px-4 py-3">
+                <span className="text-sm text-primary/80 font-semibold">{t('plan.youPay')}</span>
+                <span className="text-xl text-primary font-black">$349</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-foreground/50">{t('plan.savings')}</span>
-                <span className="text-accent font-bold">37%</span>
+              <div className="flex justify-between items-center px-4">
+                <span className="text-xs text-accent/60">{t('plan.savings')}</span>
+                <span className="text-sm text-accent font-bold bg-accent/10 px-2 py-0.5 rounded">37%</span>
               </div>
             </div>
 
