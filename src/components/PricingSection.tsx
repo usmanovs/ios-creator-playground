@@ -1,9 +1,14 @@
+import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Check, Star, MessageCircle } from 'lucide-react';
+import { Check, Star, MessageCircle, CreditCard } from 'lucide-react';
 import mbankQr from '@/assets/mbank-qr.png';
+import { CheckoutDialog } from '@/components/CheckoutDialog';
 
 const PricingSection = () => {
   const { t } = useLanguage();
+  const [checkout, setCheckout] = useState<{ priceId: string; title: string } | null>(null);
+
+
 
 
   const recordingsFeatures = ['plan.rec.f1', 'plan.rec.f2', 'plan.rec.f3', 'plan.rec.f4'];
