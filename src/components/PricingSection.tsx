@@ -75,7 +75,7 @@ const PricingSection = () => {
 <button
               type="button"
               onClick={() => setCheckout({ priceId: 'ios_course_recorded_onetime', title: `${t('plan.rec.title')} — $299` })}
-              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-[#0b1220] text-base font-black tracking-wide transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.99] mb-8"
+className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground text-base font-black tracking-wide transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.99] mb-8"
               style={{ boxShadow: 'var(--shadow-glow-violet)' }}
             >
               <CreditCard className="w-5 h-5" />
