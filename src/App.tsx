@@ -16,6 +16,7 @@ import Admin from "./pages/Admin.tsx";
 import Instructor from "./pages/Instructor.tsx";
 import Retro from "./pages/Retro.tsx";
 import CheckoutReturn from "./pages/CheckoutReturn.tsx";
+import PayRecordings from "./pages/PayRecordings.tsx";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ const App = () => (
           <Route path="/instructor" element={<Instructor />} />
           <Route path="/retro" element={<Retro />} />
           <Route path="/checkout/return" element={<CheckoutReturn />} />
+          <Route path="/pay/recordings" element={<PayRecordings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
