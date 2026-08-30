@@ -72,12 +72,13 @@ const PricingSection = () => {
               <div className="flex-1 h-px bg-foreground/10" />
             </div>
 
-            <button
+<button
               type="button"
               onClick={() => setCheckout({ priceId: 'ios_course_recorded_onetime', title: `${t('plan.rec.title')} — $299` })}
-              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl border border-foreground/10 text-center text-sm font-bold text-foreground/80 hover:bg-card/60 transition-colors mb-8"
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-[#0b1220] text-base font-black tracking-wide transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.99] mb-8"
+              style={{ boxShadow: 'var(--shadow-glow-violet)' }}
             >
-              <CreditCard className="w-4 h-4" />
+              <CreditCard className="w-5 h-5" />
               {t('plan.payCard')}
             </button>
 
@@ -160,12 +161,13 @@ const PricingSection = () => {
               <div className="flex-1 h-px bg-foreground/10" />
             </div>
 
-            <button
+<button
               type="button"
               onClick={() => setCheckout({ priceId: 'ios_course_live_onetime', title: `${t('plan.live.title')} — $349` })}
-              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl border border-primary/40 text-center text-sm font-bold text-foreground/90 hover:bg-primary/10 transition-colors mb-8"
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-[#0b1220] text-base font-black tracking-wide transition-all hover:brightness-110 hover:scale-[1.02] active:scale-[0.99] mb-8"
+              style={{ boxShadow: 'var(--shadow-glow-violet)' }}
             >
-              <CreditCard className="w-4 h-4" />
+              <CreditCard className="w-5 h-5" />
               {t('plan.payCard')}
             </button>
 
