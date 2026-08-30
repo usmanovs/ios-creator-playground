@@ -205,6 +205,13 @@ const PricingSection = () => {
         <p className="text-center text-sm text-foreground/40 mt-10">
           👤 {t('price.ageRec')}
         </p>
+
+        <CheckoutDialog
+          open={Boolean(checkout)}
+          onOpenChange={(open) => !open && setCheckout(null)}
+          priceId={checkout?.priceId ?? null}
+          title={checkout?.title ?? ''}
+        />
       </div>
     </section>
   );
