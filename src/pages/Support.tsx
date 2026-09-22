@@ -61,7 +61,7 @@ const Support = () => {
               <MessageCircle className="w-5 h-5 text-green-400" />
               <div>
                 <div className="font-medium">WhatsApp</div>
-                <div className="text-sm text-muted-foreground">+1 (202) 455-4575</div>
+                <div className="text-sm text-muted-foreground">+1 (240) 255-0596</div>
               </div>
             </a>
             <a
