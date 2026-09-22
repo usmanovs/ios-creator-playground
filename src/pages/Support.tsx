@@ -53,7 +53,7 @@ const Support = () => {
           <h2 className="text-xl font-semibold mb-4">Contact Us</h2>
           <div className="space-y-3">
             <a
-              href="https://wa.me/12024554575"
+              href="https://wa.me/12402550596"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-4 rounded-lg border border-border hover:bg-secondary/50 transition-colors"
