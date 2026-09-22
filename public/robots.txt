@@ -12,3 +12,9 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /instructor
+Disallow: /retro
+Disallow: /checkout/
+
+Sitemap: https://ios.getforce.org/sitemap.xml
