@@ -53,7 +53,7 @@ const Support = () => {
           <h2 className="text-xl font-semibold mb-4">Contact Us</h2>
           <div className="space-y-3">
             <a
-              href="https://wa.me/12024554575"
+              href="https://wa.me/12402550596"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-4 rounded-lg border border-border hover:bg-secondary/50 transition-colors"
@@ -61,7 +61,7 @@ const Support = () => {
               <MessageCircle className="w-5 h-5 text-green-400" />
               <div>
                 <div className="font-medium">WhatsApp</div>
-                <div className="text-sm text-muted-foreground">+1 (202) 455-4575</div>
+                <div className="text-sm text-muted-foreground">+1 (240) 255-0596</div>
               </div>
             </a>
             <a
