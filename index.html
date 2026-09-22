@@ -31,6 +31,79 @@
     <meta name="twitter:image" content="https://ios.getforce.org/og-course.jpg" />
     <meta name="twitter:image:alt" content="Build & Ship an iOS App with AI - 15-Day Course by Force" />
   <link rel="icon" type="image/png" href="/favicon.png">
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://ios.getforce.org/#organization",
+            "name": "Force",
+            "url": "https://ios.getforce.org/",
+            "logo": "https://ios.getforce.org/favicon.png"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://ios.getforce.org/#website",
+            "url": "https://ios.getforce.org/",
+            "name": "Force iOS Course",
+            "inLanguage": ["en", "ru"],
+            "publisher": { "@id": "https://ios.getforce.org/#organization" }
+          },
+          {
+            "@type": "Course",
+            "@id": "https://ios.getforce.org/#course",
+            "name": "Build & Ship an iOS App with AI in 15 Days",
+            "description": "A 15-day, AI-first iOS course for absolute beginners. Design with Google Stitch, build with Claude Code and Claude Desktop, and publish a real app to the App Store.",
+            "url": "https://ios.getforce.org/",
+            "inLanguage": ["en", "ru"],
+            "provider": { "@id": "https://ios.getforce.org/#organization" },
+            "teaches": [
+              "Designing an iOS app with Google Stitch",
+              "Building an iOS app with Claude Code",
+              "Publishing to the App Store",
+              "App monetization basics"
+            ],
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Live course",
+                "category": "Paid",
+                "price": "349",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://ios.getforce.org/"
+              },
+              {
+                "@type": "Offer",
+                "name": "Recorded course",
+                "category": "Paid",
+                "price": "299",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://ios.getforce.org/pay/recordings"
+              }
+            ],
+            "hasCourseInstance": [
+              {
+                "@type": "CourseInstance",
+                "name": "Live cohort",
+                "courseMode": "Online",
+                "courseWorkload": "P15D",
+                "instructor": { "@type": "Person", "name": "Seyitbek Usmanov" }
+              },
+              {
+                "@type": "CourseInstance",
+                "name": "Self-paced recordings",
+                "courseMode": "Online",
+                "courseWorkload": "P15D"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
 </head>
 
   <body>
